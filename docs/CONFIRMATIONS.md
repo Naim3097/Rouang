@@ -16,9 +16,13 @@ production build until they are resolved.
   registration numbers so they can be shown, and the copy can say "interior designers".
 - **CIDB registration** and grade, if the studio carries out renovation or fit-out itself.
 - **Service list**: confirm each "What we do" item on the residential and restaurant pages (blocker),
-  and whether office and retail work is offered (the page is a draft).
+  and whether office and retail work is offered (the page is a draft). Until an item is confirmed it
+  does not appear on the live site at all.
 - **Service areas**: Kuala Lumpur and Selangor are assumed (blocker until confirmed).
 - **Process**: confirm the Listen, Plan, Design and Live in steps describe how the studio works (blocker).
+  Unconfirmed steps are hidden on the live site, so the process sections stay empty until then.
+- **Single rooms**: whether the studio takes on one room or area, not only whole homes. The site no
+  longer says so; the enquiry form still offers "One room or area" as a type of space.
 - **Budget brackets** in the enquiry form (`src/config/enquiry.ts`): keep, change or remove.
 
 ## 2. Business details (all blockers for launch unless noted)
@@ -65,7 +69,8 @@ production build until they are resolved.
 
 - Privacy notice (English and Bahasa Malaysia) reviewed by the studio's adviser. Data retention period (two years is drafted).
 - Supabase project, Resend account and verified sending domain, GA4 property, Search Console,
-  Cloudflare Turnstile (optional), Vercel project and GitHub repository. Credentials are entered in
+  Cloudflare Turnstile (both keys, or neither; required if enquiries go by email without Supabase),
+  Vercel project and GitHub repository. Credentials are entered in
   Vercel, never in the code.
 
 ## 6. Brand assets

@@ -36,7 +36,7 @@ content/                 Editable content (Markdown + validated frontmatter)
   insights/*.md          Articles
 src/config/
   studio.ts              Business facts. Unknown facts are null and are hidden on the site
-  process.ts             The process steps (named after the brand-kit icons)
+  process-steps.json     The process steps (named after the brand-kit icons), read by process.ts
   enquiry.ts             Enquiry form options (budget brackets, project types)
   privacy.ts             Privacy notice text in English and Bahasa Malaysia
   media.ts               Provisional brand-kit imagery (dropped automatically in production)
@@ -60,11 +60,16 @@ Every project, service and article has `status: draft | published`.
   linking to `/preview`, a live checklist of everything still owed. Every page is `noindex`, and
   `robots.txt` disallows crawling.
 - **Production** (`VERCEL_ENV=production`, or `SITE_ENV=production` elsewhere) hides drafts, pending
-  photographs and provisional brand-kit images, and becomes indexable.
-- `npm run build` runs `scripts/launch-check.mjs --gate` first. On a Vercel production deployment it
-  **fails the build** while blockers remain: unconfirmed services or process steps, missing
-  photographs or permissions, unverified facts, missing studio details or enquiry delivery. Set
-  `LAUNCH_CHECK=warn` to override deliberately, for example for an agreed soft launch.
+  photographs, provisional brand-kit images, and any service offer, FAQ answer, process step or
+  service area the studio has not confirmed, and becomes indexable. Sections with nothing confirmed
+  are left out rather than shown empty.
+- `npm run build` runs `scripts/launch-check.mjs --gate` first, reading the same env files as
+  `next build` (`.env.production.local`, `.env.local`, `.env.production`, `.env`). For a production
+  build it **fails the build** while blockers remain: unconfirmed services or process steps, missing
+  photographs or permissions, unverified facts, missing studio details or enquiry delivery, or a
+  half-configured Turnstile. Set `LAUNCH_CHECK=warn` to override deliberately, for example for an
+  agreed soft launch. The production pages stay safe either way, because they never render
+  unconfirmed material; the gate stops a launch that would look empty or incomplete.
 
 ### Editing content
 
@@ -85,6 +90,10 @@ the files in GitHub's web editor or locally; a commit to `main` redeploys on Ver
    PATH), applies the ROUANG grade, resizes to at most 2400 px and **strips all metadata, including
    GPS**. Output goes to `public/images/projects/<slug>/` and `scripts/media/media-manifest.json`.
 4. Reference the images in the project's frontmatter (`hero`, `card`, `gallery`).
+5. For a portrait photograph that opens a page full screen, add `"wide": { "aspect": [3, 2], "focusY": 0.28 }`
+   to its curation entry. The export also writes `<name>-wide.jpg`, a landscape crop around that line,
+   which large screens load instead of the portrait. Add it to the image as `wide: { src, width, height }`.
+   `--only <project>` re-exports a single project.
 
 ## Environment variables
 
@@ -97,7 +106,7 @@ See [.env.example](.env.example) for the full list with notes. In Vercel, set th
 | `NEXT_PUBLIC_CONTACT_EMAIL`, `NEXT_PUBLIC_CONTACT_PHONE`, `NEXT_PUBLIC_WHATSAPP_NUMBER` | Contact links and WhatsApp buttons |
 | `SUPABASE_URL`, `SUPABASE_SECRET_KEY`, `ENQUIRY_IP_SALT` | Storing enquiries (server only) |
 | `RESEND_API_KEY`, `ENQUIRY_NOTIFY_TO`, `ENQUIRY_NOTIFY_FROM` | Email notification of new enquiries |
-| `NEXT_PUBLIC_TURNSTILE_SITE_KEY`, `TURNSTILE_SECRET_KEY` | Optional Cloudflare Turnstile spam check |
+| `NEXT_PUBLIC_TURNSTILE_SITE_KEY`, `TURNSTILE_SECRET_KEY` | Cloudflare Turnstile spam check. Set both or neither. Required when enquiries go by email only (no Supabase rate limit) |
 | `NEXT_PUBLIC_GA_MEASUREMENT_ID` | GA4 (production only, after consent) |
 | `GOOGLE_SITE_VERIFICATION` | Search Console HTML-tag verification |
 

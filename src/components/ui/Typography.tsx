@@ -14,7 +14,7 @@ export function Label({
 }) {
   return (
     <Tag className={`t-label flex items-baseline gap-3 ${className}`}>
-      {index ? <span className="tabular-nums opacity-60">{index}</span> : null}
+      {index ? <span className="tabular-nums">{index}</span> : null}
       <span>{children}</span>
     </Tag>
   );
@@ -37,7 +37,8 @@ export function TitlePair({
   as?: ElementType;
   lead: ReactNode;
   italic?: ReactNode;
-  /** Small caps line inside the heading, e.g. "Interior design projects", so the h1 names its subject. */
+  /** Small caps line inside the heading, e.g. "Interior design projects", so the h1 names its subject.
+   * It comes last in the markup, so assistive technology reads the page name first, and is shown above. */
   eyebrow?: ReactNode;
   size?: "hero" | "section";
   className?: string;
@@ -46,8 +47,7 @@ export function TitlePair({
 }) {
   const leadClass = size === "hero" ? "t-headline-hero" : "t-headline";
   return (
-    <Tag id={id} className={`${leadClass} ${className}`}>
-      {eyebrow ? <span className="t-label mb-8 block text-ink-muted">{eyebrow}</span> : null}
+    <Tag id={id} className={`${leadClass} ${eyebrow ? "flex flex-col" : ""} ${className}`}>
       <span className="block">{lead}</span>
       {italic ? (
         <span
@@ -56,6 +56,7 @@ export function TitlePair({
           {italic}
         </span>
       ) : null}
+      {eyebrow ? <span className="t-label order-first mb-8 block text-ink-muted">{eyebrow}</span> : null}
     </Tag>
   );
 }

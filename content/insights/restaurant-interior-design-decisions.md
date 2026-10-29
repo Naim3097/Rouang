@@ -5,7 +5,7 @@ description: Opening or refitting a restaurant in Malaysia? The layout, kitchen,
 category: Restaurants and hospitality
 publishedAt: 2026-10-29
 seo:
-  title: "Restaurant design considerations: 7 decisions to make first"
+  title: "Restaurant interior design considerations, in order"
 purpose: Show restaurant operators how the studio thinks about F&B interiors, and lead them to the restaurant service page and the Rembayung case study.
 audience: Restaurant and café owners planning a new site or a refit in the Klang Valley
 searchIntent: Informational, early research before hiring a designer ("restaurant interior design considerations")

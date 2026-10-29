@@ -11,8 +11,8 @@ import { articleSchema } from "@/lib/schema";
 import { pageMetadata } from "@/lib/seo";
 
 export const ensureStatic = "navigation";
-// Every slug is prerendered and project links prefetch in full, so a navigation that waits for
-// the static payload is acceptable. Content stays in the HTML instead of a hidden Suspense segment.
+// Every slug is prerendered and quick to fetch, so a navigation that waits for the static
+// payload is acceptable. Content stays in the HTML instead of a hidden Suspense segment.
 export const instant = false;
 
 export async function generateStaticParams() {

@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import Image from "next/image";
+import Image, { getImageProps } from "next/image";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { ViewTransition } from "react";
@@ -10,6 +10,7 @@ import { ArrowLink, ButtonLink } from "@/components/ui/Button";
 import { Breadcrumbs } from "@/components/ui/Breadcrumbs";
 import { Figure } from "@/components/ui/Figure";
 import { Film } from "@/components/ui/Film";
+import { HeroImage } from "@/components/ui/HeroImage";
 import { Pending } from "@/components/ui/Section";
 import { Label } from "@/components/ui/Typography";
 import { getProject, getProjects, getServices, publicImage, type Project, staticSlugs } from "@/lib/content";
@@ -18,8 +19,8 @@ import { SHOW_DRAFTS } from "@/lib/env";
 import { pageMetadata } from "@/lib/seo";
 
 export const ensureStatic = "navigation";
-// Every slug is prerendered and project links prefetch in full, so a navigation that waits for
-// the static payload is acceptable. Content stays in the HTML instead of a hidden Suspense segment.
+// Every slug is prerendered and quick to fetch, so a navigation that waits for the static
+// payload is acceptable. Content stays in the HTML instead of a hidden Suspense segment.
 export const instant = false;
 
 export async function generateStaticParams() {
@@ -82,19 +83,19 @@ export default async function ProjectPage({ params }: PageProps<"/projects/[slug
             <Breadcrumbs tone="dark" items={[{ name: "Projects", href: "/projects" }, { name: project.title, href: `/projects/${project.slug}` }]} />
             <div className="page-grid mt-16 gap-y-8 sm:mt-24">
               <div className="col-span-12 lg:col-span-8">
-                <h1>
-                  <span className="t-label block text-kapur/75">{facts}</span>
+                <h1 className="flex flex-col">
                   <span className="mt-5 block font-serif text-[clamp(3.25rem,1.5rem+7vw,8.5rem)] italic leading-[0.88] tracking-[-0.02em]">
                     {project.title}
                     {project.isDraft ? <DraftTag placeholder={project.placeholder} /> : null}
                   </span>
+                  <span className="t-label order-first block text-kapur">{facts}</span>
                 </h1>
               </div>
               <p className="t-sub col-span-12 max-w-[40rem] self-end text-kapur/85 lg:col-span-4">{project.standfirst ?? project.summary}</p>
             </div>
             <ViewTransition name={`project-${project.slug}`} share="project-image" default="none">
               <div className="relative mx-auto mt-14 w-full sm:mt-20" style={{ maxWidth: `${hero.width}px`, aspectRatio: `${hero.width}/${hero.height}` }}>
-                <Image src={hero.src} alt={hero.alt} fill priority fetchPriority="high" sizes={`(min-width: ${hero.width}px) ${hero.width}px, 100vw`} quality={85} className="object-cover" />
+                <Image src={hero.src} alt={hero.alt} fill loading="eager" fetchPriority="high" sizes={`(min-width: ${hero.width}px) ${hero.width}px, 100vw`} quality={85} className="object-cover" />
               </div>
             </ViewTransition>
           </div>
@@ -106,7 +107,8 @@ export default async function ProjectPage({ params }: PageProps<"/projects/[slug
           {project.film ? (
             <Film
               src={project.film.src}
-              poster={project.film.poster}
+              // Served through the image optimiser (AVIF/WebP), not as the original JPEG.
+              poster={getImageProps({ src: project.film.poster, alt: "", width: project.film.width, height: project.film.height, quality: 78, sizes: "100vw" }).props.src}
               width={project.film.width}
               height={project.film.height}
               label={project.film.caption ?? `Film of ${project.title}`}
@@ -118,25 +120,26 @@ export default async function ProjectPage({ params }: PageProps<"/projects/[slug
                 {"pending" in hero ? (
                   <Figure image={hero} sizes="100vw" aspect="auto" tone="dark" reveal={false} className="h-full" />
                 ) : (
-                  <Image src={hero.src} alt={hero.alt} fill priority fetchPriority="high" sizes="100vw" quality={80} className="object-cover" style={hero.focus ? { objectPosition: hero.focus } : undefined} />
+                  <HeroImage image={hero} narrowSizes="100vw" />
                 )}
               </div>
             </ViewTransition>
           ) : null}
           <div className="absolute inset-0 bg-linear-to-t from-ink via-ink/35 to-ink/10" aria-hidden="true" />
           {/* A second scrim under the header, so navigation stays legible over bright ceilings. */}
-          <div className="absolute inset-x-0 top-0 h-56 bg-linear-to-b from-ink/70 to-transparent" aria-hidden="true" />
+          <div className="absolute inset-x-0 top-0 h-64 bg-linear-to-b from-ink/85 via-ink/60 to-transparent" aria-hidden="true" />
         </div>
 
         <div className="page-x relative flex min-h-[100svh] flex-col justify-between pb-12 pt-[calc(var(--header-h)+1.5rem)] sm:pb-16">
-          <Breadcrumbs tone="dark" items={[{ name: "Projects", href: "/projects" }, { name: project.title, href: `/projects/${project.slug}` }]} />
+          <Breadcrumbs tone="photo" items={[{ name: "Projects", href: "/projects" }, { name: project.title, href: `/projects/${project.slug}` }]} />
           <div>
-            <h1>
-              <span className="t-label block text-kapur/75">{facts}</span>
+            {/* The name comes first in the heading; the facts line is shown above it. */}
+            <h1 className="flex flex-col">
               <span className="mt-5 block font-serif text-[clamp(3.5rem,1.5rem+9vw,11rem)] italic leading-[0.86] tracking-[-0.02em]">
               {project.title}
               {project.isDraft ? <DraftTag placeholder={project.placeholder} /> : null}
               </span>
+              <span className="t-label order-first block text-kapur">{facts}</span>
             </h1>
             <p className="t-sub mt-7 max-w-[40rem] text-kapur/85">{project.standfirst ?? project.summary}</p>
           </div>
@@ -376,7 +379,7 @@ function NextProject({ project }: { project: Project }) {
   const photo = img && !("pending" in img) ? img : null;
   return (
     <section data-tone="dark" aria-label="Next project">
-      <Link href={`/projects/${project.slug}`} className="group relative block overflow-hidden" prefetch={true}>
+      <Link href={`/projects/${project.slug}`} className="group relative block overflow-hidden">
         <div className="relative h-[70svh] min-h-[28rem]">
           {photo ? (
             <ViewTransition name={`project-${project.slug}`} share="project-image" default="none">

@@ -1,14 +1,34 @@
 "use client";
 
 import Link from "next/link";
-import Script from "next/script";
-import { useActionState, useEffect, useId, useRef, useState } from "react";
+import { useActionState, useEffect, useId, useRef, useState, useSyncExternalStore } from "react";
 import { Mark } from "@/components/brand/Brand";
 import { budgets, categories, projectTypes, timelines, type Category } from "@/config/enquiry";
 import { track } from "@/lib/analytics";
 import { submitEnquiry, type EnquiryState } from "@/lib/enquiry/action";
 
+/** Form order, and the id suffix of each field, for the linked error summary. */
+const FIELD_IDS: [string, string][] = [
+  ["name", "name"],
+  ["email", "email"],
+  ["phone", "phone"],
+  ["category", "category"],
+  ["message", "message"],
+  ["projectType", "type"],
+  ["location", "location"],
+  ["budget", "budget"],
+  ["timeline", "timeline"],
+];
+
 const initial: EnquiryState = { status: "idle" };
+
+const UTM_KEYS = ["utm_source", "utm_medium", "utm_campaign", "utm_term", "utm_content", "gclid"];
+
+const subscribeNever = () => () => {};
+/** A value from the address bar, read after hydration so the server and client markup match. */
+function useLocation(part: "pathname" | "search") {
+  return useSyncExternalStore(subscribeNever, () => window.location[part], () => "");
+}
 
 /**
  * The project enquiry. Short by default: name, a way to reply, home or business, and a few lines
@@ -28,34 +48,41 @@ export function EnquiryForm({
   location?: string;
 }) {
   const [state, formAction, pending] = useActionState(submitEnquiry, initial);
-  const [category, setCategory] = useState<Category | "">((state.values?.category as Category) ?? "");
-  const [startedAt, setStartedAt] = useState("");
-  const [utm, setUtm] = useState("");
-  const [sourcePath, setSourcePath] = useState("");
+  const [chosen, setChosen] = useState<Category | "">((state.values?.category as Category) ?? "");
   const started = useRef(false);
   const statusRef = useRef<HTMLDivElement>(null);
   const formRef = useRef<HTMLFormElement>(null);
+  const timingRef = useRef<HTMLInputElement>(null);
+  const jsRef = useRef<HTMLInputElement>(null);
   const successRef = useRef<HTMLHeadingElement>(null);
   const uid = useId();
 
+  const search = useLocation("search");
+  const sourcePath = useLocation("pathname");
+  const params = new URLSearchParams(search);
+  const utm = UTM_KEYS.map((k) => (params.get(k) ? `${k}=${params.get(k)}` : null))
+    .filter(Boolean)
+    .join("&");
+  // Links such as /contact?project=commercial preselect home or business.
+  const preset = params.get("project");
+  const presetCategory: Category | "" = preset === "residential" || preset === "commercial" ? preset : "";
+  const category: Category | "" = chosen || presetCategory;
+
+  // When the form became usable, for the server's too-fast check. Written straight to the hidden
+  // fields so mounting the form causes no second render.
   useEffect(() => {
-    setStartedAt(String(Date.now()));
-    setSourcePath(window.location.pathname);
-    const params = new URLSearchParams(window.location.search);
-    const tags = ["utm_source", "utm_medium", "utm_campaign", "utm_term", "utm_content", "gclid"]
-      .map((k) => (params.get(k) ? `${k}=${params.get(k)}` : null))
-      .filter(Boolean);
-    setUtm(tags.join("&"));
-    // Links such as /contact?project=commercial preselect home or business.
-    const preset = params.get("project");
-    if ((preset === "residential" || preset === "commercial") && formRef.current) {
-      const radio = formRef.current.querySelector<HTMLInputElement>(`input[name="category"][value="${preset}"]`);
-      if (radio && !formRef.current.querySelector<HTMLInputElement>('input[name="category"]:checked')) {
-        radio.checked = true;
-        setCategory(preset);
-      }
-    }
+    if (timingRef.current) timingRef.current.value = String(Date.now());
+    if (jsRef.current) jsRef.current.value = "1";
   }, []);
+
+  // A preset from the address bar is known only after hydration, when React has already settled the
+  // radios, so the matching one is checked directly (unless the visitor has chosen already).
+  useEffect(() => {
+    const form = formRef.current;
+    if (!presetCategory || !form || form.querySelector("input[name=category]:checked")) return;
+    const radio = form.querySelector<HTMLInputElement>(`input[name="category"][value="${presetCategory}"]`);
+    if (radio) radio.checked = true;
+  }, [presetCategory]);
 
   useEffect(() => {
     if (state.status === "success") {
@@ -64,12 +91,15 @@ export function EnquiryForm({
     } else if (state.status === "error") {
       track("form_error", { location });
       statusRef.current?.focus();
+      statusRef.current?.scrollIntoView({ block: "center" });
     }
   }, [state, location]);
 
   const dark = tone === "dark";
-  const fieldLine = dark ? "border-kapur/30 focus-within:border-kapur" : "border-ink/25 focus-within:border-ink";
-  const muted = dark ? "text-kapur/70" : "text-ink-muted";
+  // Resting lines meet the 3:1 minimum for controls; labels and hints meet 4.5:1 on both tones.
+  const fieldLine = dark ? "border-kapur/70 focus-within:border-kapur" : "border-ink/60 focus-within:border-ink";
+  const muted = dark ? "text-kapur" : "text-ink-muted";
+  const placeholder = dark ? "placeholder:text-kapur/85" : "placeholder:text-ink-muted";
   const err = state.fieldErrors ?? {};
   const v = state.values ?? {};
 
@@ -96,6 +126,14 @@ export function EnquiryForm({
   };
 
   const types = category ? projectTypes[category] : [];
+  const errorLinks = FIELD_IDS.filter(([field]) => err[field]).map(([field, suffix]) => ({ id: `${uid}-${suffix}`, message: err[field] as string }));
+  const goTo = (id: string) => (e: React.MouseEvent) => {
+    const el = document.getElementById(id);
+    if (!el) return;
+    e.preventDefault();
+    el.focus();
+    el.scrollIntoView({ block: "center" });
+  };
 
   return (
     <form ref={formRef} action={formAction} noValidate onInput={onFirstInput} className="space-y-7" aria-describedby={`${uid}-privacy`}>
@@ -107,14 +145,25 @@ export function EnquiryForm({
         className="outline-none empty:hidden"
       >
         {state.status === "error" && state.message ? (
-          <p className={`rounded-[2px] border px-4 py-3 text-[0.9375rem] ${dark ? "border-kapur/40" : "border-ink/40"}`}>
-            {state.message}
-          </p>
+          <div className={`rounded-[2px] border px-4 py-3 text-[0.9375rem] ${dark ? "border-kapur/70" : "border-ink/60"}`}>
+            <p>{state.message}</p>
+            {errorLinks.length ? (
+              <ul className="mt-2 space-y-1">
+                {errorLinks.map((l) => (
+                  <li key={l.id}>
+                    <a href={`#${l.id}`} onClick={goTo(l.id)} className="underline underline-offset-2">
+                      {l.message}
+                    </a>
+                  </li>
+                ))}
+              </ul>
+            ) : null}
+          </div>
         ) : null}
       </div>
 
       <div className="grid gap-7 sm:grid-cols-2">
-        <Field id={`${uid}-name`} label="Your name" error={err.name} line={fieldLine} className="sm:col-span-2">
+        <Field id={`${uid}-name`} label="Your name" error={err.name} line={fieldLine} tint={muted} className="sm:col-span-2">
           <input
             id={`${uid}-name`}
             name="name"
@@ -128,7 +177,7 @@ export function EnquiryForm({
             className="w-full bg-transparent py-2 text-[1.0625rem] outline-none"
           />
         </Field>
-        <Field id={`${uid}-email`} label="Email" error={err.email} line={fieldLine} hint="Email or phone, whichever you prefer">
+        <Field id={`${uid}-email`} label="Email" error={err.email} line={fieldLine} tint={muted} hint="Email or phone, whichever you prefer">
           <input
             id={`${uid}-email`}
             name="email"
@@ -142,7 +191,7 @@ export function EnquiryForm({
             className="w-full bg-transparent py-2 text-[1.0625rem] outline-none"
           />
         </Field>
-        <Field id={`${uid}-phone`} label="Phone or WhatsApp" error={err.phone} line={fieldLine}>
+        <Field id={`${uid}-phone`} label="Phone or WhatsApp" error={err.phone} line={fieldLine} tint={muted}>
           <input
             id={`${uid}-phone`}
             name="phone"
@@ -158,25 +207,31 @@ export function EnquiryForm({
         </Field>
       </div>
 
-      <fieldset aria-describedby={err.category ? `${uid}-category-error` : undefined}>
+      <fieldset
+        role="radiogroup"
+        aria-required="true"
+        aria-invalid={err.category ? true : undefined}
+        aria-describedby={err.category ? `${uid}-category-error` : undefined}
+      >
         <legend className={`t-label mb-3 ${muted}`}>The project is for</legend>
         <div className="flex flex-wrap gap-3">
-          {categories.map((c) => (
+          {categories.map((c, i) => (
             <label
               key={c.value}
               className={`relative inline-flex min-h-12 cursor-pointer items-center gap-3 rounded-full border px-5 transition-colors has-[:checked]:border-current has-[:focus-visible]:outline-2 has-[:focus-visible]:outline-offset-2 ${
                 dark
-                  ? "border-kapur/30 has-[:checked]:bg-kapur has-[:checked]:text-ink"
-                  : "border-ink/25 has-[:checked]:bg-ink has-[:checked]:text-kapur"
+                  ? "border-kapur/70 has-[:checked]:bg-kapur has-[:checked]:text-ink"
+                  : "border-ink/60 has-[:checked]:bg-ink has-[:checked]:text-kapur"
               }`}
             >
               <input
                 type="radio"
+                id={i === 0 ? `${uid}-category` : undefined}
                 name="category"
                 value={c.value}
                 required
-                defaultChecked={v.category === c.value}
-                onChange={() => setCategory(c.value)}
+                defaultChecked={(v.category || presetCategory) === c.value}
+                onChange={() => setChosen(c.value)}
                 className="peer sr-only"
               />
               <span>{c.label}</span>
@@ -186,7 +241,7 @@ export function EnquiryForm({
         {err.category ? <ErrorText id={`${uid}-category-error`}>{err.category}</ErrorText> : null}
       </fieldset>
 
-      <Field id={`${uid}-message`} label="About the space" error={err.message} line={fieldLine} hint="What it is, roughly how big, and what you'd like to change">
+      <Field id={`${uid}-message`} label="About the space" error={err.message} line={fieldLine} tint={muted} hint="What it is, roughly how big, and what you'd like to change">
         <textarea
           id={`${uid}-message`}
           name="message"
@@ -209,23 +264,33 @@ export function EnquiryForm({
           Add detail (optional)
         </summary>
         <div className="mt-6 grid gap-7 sm:grid-cols-2">
-          <Field id={`${uid}-type`} label="Type of space" error={err.projectType} line={fieldLine}>
+          <Field id={`${uid}-type`} label="Type of space" error={err.projectType} line={fieldLine} tint={muted}>
+            {/* Both lists until home or business is chosen, so the field also works without JavaScript. */}
             <select
               id={`${uid}-type`}
               name="projectType"
               defaultValue={v.projectType ?? ""}
-              disabled={!category}
-              className="w-full appearance-none bg-transparent py-2 text-[1.0625rem] outline-none disabled:opacity-50"
+              className="w-full appearance-none bg-transparent py-2 text-[1.0625rem] outline-none"
             >
-              <option value="">{category ? "Choose one" : "Choose home or business first"}</option>
-              {types.map((t) => (
-                <option key={t} value={t}>
-                  {t}
-                </option>
-              ))}
+              <option value="">Choose one</option>
+              {category
+                ? types.map((t) => (
+                    <option key={t} value={t}>
+                      {t}
+                    </option>
+                  ))
+                : categories.map((c) => (
+                    <optgroup key={c.value} label={c.label}>
+                      {projectTypes[c.value].map((t) => (
+                        <option key={t} value={t}>
+                          {t}
+                        </option>
+                      ))}
+                    </optgroup>
+                  ))}
             </select>
           </Field>
-          <Field id={`${uid}-location`} label="Where is it?" error={err.location} line={fieldLine}>
+          <Field id={`${uid}-location`} label="Where is it?" error={err.location} line={fieldLine} tint={muted}>
             <input
               id={`${uid}-location`}
               name="location"
@@ -234,10 +299,10 @@ export function EnquiryForm({
               maxLength={120}
               placeholder="Area and city"
               defaultValue={v.location}
-              className="w-full bg-transparent py-2 text-[1.0625rem] outline-none placeholder:opacity-50"
+              className={`w-full bg-transparent py-2 text-[1.0625rem] outline-none ${placeholder}`}
             />
           </Field>
-          <Field id={`${uid}-budget`} label="Budget for the whole project" error={err.budget} line={fieldLine}>
+          <Field id={`${uid}-budget`} label="Budget for the whole project" error={err.budget} line={fieldLine} tint={muted}>
             <select id={`${uid}-budget`} name="budget" defaultValue={v.budget ?? ""} className="w-full appearance-none bg-transparent py-2 text-[1.0625rem] outline-none">
               <option value="">Prefer not to say</option>
               {budgets.map((b) => (
@@ -247,7 +312,7 @@ export function EnquiryForm({
               ))}
             </select>
           </Field>
-          <Field id={`${uid}-timeline`} label="When would you like to start?" error={err.timeline} line={fieldLine}>
+          <Field id={`${uid}-timeline`} label="When would you like to start?" error={err.timeline} line={fieldLine} tint={muted}>
             <select id={`${uid}-timeline`} name="timeline" defaultValue={v.timeline ?? ""} className="w-full appearance-none bg-transparent py-2 text-[1.0625rem] outline-none">
               <option value="">Prefer not to say</option>
               {timelines.map((t) => (
@@ -267,15 +332,14 @@ export function EnquiryForm({
           <input type="text" name="company_website" tabIndex={-1} autoComplete="off" defaultValue="" />
         </label>
       </div>
-      <input type="hidden" name="started_at" value={startedAt} />
+      {/* No value props: React would reset them on the next render and wipe the stamp. */}
+      <input ref={timingRef} type="hidden" name="started_at" />
+      <input ref={jsRef} type="hidden" name="js" />
       <input type="hidden" name="sourcePath" value={sourcePath} />
       <input type="hidden" name="utm" value={utm} />
 
       {turnstileSiteKey ? (
-        <>
-          <Script src="https://challenges.cloudflare.com/turnstile/v0/api.js" strategy="lazyOnload" />
-          <div className="cf-turnstile" data-sitekey={turnstileSiteKey} data-theme={dark ? "dark" : "light"} />
-        </>
+        <Turnstile siteKey={turnstileSiteKey} theme={dark ? "dark" : "light"} resetOn={state.status === "error" ? state : null} />
       ) : null}
 
       <div className="flex flex-col gap-5 pt-2 sm:flex-row sm:items-center sm:justify-between">
@@ -308,12 +372,91 @@ export function EnquiryForm({
   );
 }
 
+type TurnstileApi = {
+  render(el: HTMLElement, options: Record<string, unknown>): string;
+  reset(id: string): void;
+  remove(id: string): void;
+};
+
+let turnstileScript: Promise<TurnstileApi> | null = null;
+
+function loadTurnstile(): Promise<TurnstileApi> {
+  const existing = (window as { turnstile?: TurnstileApi }).turnstile;
+  if (existing) return Promise.resolve(existing);
+  turnstileScript ??= new Promise((resolve, reject) => {
+    const script = document.createElement("script");
+    script.src = "https://challenges.cloudflare.com/turnstile/v0/api.js?render=explicit";
+    script.async = true;
+    script.onload = () => {
+      const api = (window as { turnstile?: TurnstileApi }).turnstile;
+      if (api) resolve(api);
+      else reject(new Error("Turnstile did not initialise"));
+    };
+    script.onerror = () => {
+      turnstileScript = null;
+      reject(new Error("Turnstile failed to load"));
+    };
+    document.head.appendChild(script);
+  });
+  return turnstileScript;
+}
+
+/**
+ * Cloudflare Turnstile, rendered explicitly so it also appears after a client-side navigation.
+ * The script loads only as the form comes near the screen or is first used, and the widget is
+ * reset after a failed send because each token can be checked only once.
+ */
+function Turnstile({ siteKey, theme, resetOn }: { siteKey: string; theme: "light" | "dark"; resetOn: EnquiryState | null }) {
+  const box = useRef<HTMLDivElement>(null);
+  const widget = useRef<{ api: TurnstileApi; id: string } | null>(null);
+
+  useEffect(() => {
+    const el = box.current;
+    if (!el) return;
+    const form = el.closest("form");
+    let cancelled = false;
+    const io = new IntersectionObserver(
+      (entries) => {
+        if (entries.some((e) => e.isIntersecting)) start();
+      },
+      { rootMargin: "600px 0px" },
+    );
+    function start() {
+      io.disconnect();
+      form?.removeEventListener("focusin", start);
+      loadTurnstile()
+        .then((api) => {
+          if (cancelled || widget.current || !el) return;
+          widget.current = { api, id: api.render(el, { sitekey: siteKey, theme, action: "enquiry" }) };
+        })
+        .catch((err) => console.error("[enquiry]", err));
+    }
+    io.observe(el);
+    form?.addEventListener("focusin", start);
+    return () => {
+      cancelled = true;
+      io.disconnect();
+      form?.removeEventListener("focusin", start);
+      if (widget.current) widget.current.api.remove(widget.current.id);
+      widget.current = null;
+    };
+  }, [siteKey, theme]);
+
+  useEffect(() => {
+    if (resetOn && widget.current) widget.current.api.reset(widget.current.id);
+  }, [resetOn]);
+
+  // Reserves the widget's height so the button below does not move when it appears.
+  return <div ref={box} className="min-h-[65px]" />;
+}
+
 function Field({
   id,
   label,
   hint,
   error,
   line,
+  tint,
   className = "",
   children,
 }: {
@@ -322,19 +465,21 @@ function Field({
   hint?: string;
   error?: string;
   line: string;
+  /** Text colour for the label and hint, chosen per tone to pass contrast. */
+  tint: string;
   className?: string;
   children: React.ReactNode;
 }) {
   return (
     <div className={className}>
       <div className={`border-b transition-colors ${line} ${error ? "border-current" : ""}`}>
-        <label htmlFor={id} className="t-label block opacity-70">
+        <label htmlFor={id} className={`t-label block ${tint}`}>
           {label}
         </label>
         {children}
       </div>
       {hint ? (
-        <p id={`${id}-hint`} className="t-caption mt-2 opacity-70">
+        <p id={`${id}-hint`} className={`t-caption mt-2 ${tint}`}>
           {hint}
         </p>
       ) : null}

@@ -11,6 +11,14 @@ const optionalText = (max: number) =>
 
 const phonePattern = /^\+?[\d\s\-().]{8,20}$/;
 
+export const CONTACT_REQUIRED = "Please give us an email address or a phone number.";
+
+/** Neither an email nor a phone number. Checked on its own too, because zod skips the rule below
+ * while other fields are invalid, which would hide it until a second attempt. */
+export function missingContact(values: Record<string, string>) {
+  return !values.email?.trim() && !values.phone?.trim();
+}
+
 export const enquirySchema = z
   .object({
     name: z.string().trim().min(2, "Please tell us your name.").max(120, "Please shorten your name."),
@@ -34,7 +42,8 @@ export const enquirySchema = z
   })
   .superRefine((v, ctx) => {
     if (!v.email && !v.phone) {
-      ctx.addIssue({ code: "custom", path: ["email"], message: "Please give us an email address or a phone number." });
+      ctx.addIssue({ code: "custom", path: ["email"], message: CONTACT_REQUIRED });
+      ctx.addIssue({ code: "custom", path: ["phone"], message: CONTACT_REQUIRED });
     }
     if (v.projectType) {
       const allowed = projectTypes[v.category] as readonly string[];

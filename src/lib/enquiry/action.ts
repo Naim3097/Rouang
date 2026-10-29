@@ -3,7 +3,7 @@
 import { headers } from "next/headers";
 import { after } from "next/server";
 import { deliveryConfigured, hashIp, isRateLimited, notifyByEmail, storeEnquiry, verifyTurnstile } from "./deliver";
-import { enquirySchema } from "./validate";
+import { CONTACT_REQUIRED, enquirySchema, missingContact } from "./validate";
 
 export type EnquiryState = {
   status: "idle" | "success" | "error";
@@ -33,8 +33,10 @@ export async function submitEnquiry(_prev: EnquiryState, formData: FormData): Pr
   });
 
   // Spam traps. A person never sees the honeypot field; a form sent within 2.5 seconds of loading is a script.
+  // When the page's script ran (js=1) it always stamps the time, so a missing or odd stamp is not a browser.
   if (String(formData.get("company_website") ?? "") !== "") return fail(NOT_SENT);
-  const started = Number(formData.get("started_at") ?? 0);
+  const started = Number(formData.get("started_at") || 0);
+  if (formData.get("js") === "1" && !(started > 0 && started < Date.now() + 60_000)) return fail(NOT_SENT);
   if (started > 0 && Date.now() - started < 2500) return fail("That was quick. Please check your details and send the form again.");
 
   const parsed = enquirySchema.safeParse(values);
@@ -44,6 +46,10 @@ export async function submitEnquiry(_prev: EnquiryState, formData: FormData): Pr
       const key = String(issue.path[0] ?? "form");
       fieldErrors[key] ??= issue.message;
     }
+    if (missingContact(values)) {
+      fieldErrors.email ??= CONTACT_REQUIRED;
+      fieldErrors.phone ??= CONTACT_REQUIRED;
+    }
     return fail("Please check the highlighted fields.", fieldErrors);
   }
 
@@ -51,12 +57,13 @@ export async function submitEnquiry(_prev: EnquiryState, formData: FormData): Pr
   const ip = h.get("x-forwarded-for")?.split(",")[0]?.trim() || h.get("x-real-ip") || null;
   const ipHash = hashIp(ip);
 
-  if (!(await verifyTurnstile(String(formData.get("cf-turnstile-response") ?? "") || null, ip))) {
-    return fail("We couldn't confirm you're not a bot. Please try again.");
-  }
-
+  // Checked before Turnstile, so a rate-limited request does not spend the visitor's one-use token.
   if (await isRateLimited(ipHash)) {
     return fail("We've received several messages from you in the last few minutes. Please wait a little before sending another.");
+  }
+
+  if (!(await verifyTurnstile(String(formData.get("cf-turnstile-response") ?? "") || null, ip))) {
+    return fail("We couldn't confirm you're not a bot. Please try again.");
   }
 
   const configured = deliveryConfigured();

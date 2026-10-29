@@ -47,7 +47,7 @@ export function SelectedWork({ flagship, others }: { flagship: Project | null; o
               {hero ? (
                 <Figure
                   image={hero}
-                  sizes="(min-width: 1024px) 50vw, (min-width: 640px) 66vw, 100vw"
+                  sizes="(min-width: 1024px) 45vw, (min-width: 640px) 66vw, 100vw"
                   aspect="4/5"
                   transitionName={`project-${flagship.slug}`}
                   imgClassName="transition-transform duration-[1.6s] ease-[var(--ease-brand)] group-hover:scale-[1.02]"
@@ -290,6 +290,10 @@ export function InsideProject({ project }: { project: Project | null }) {
         href={`/projects/${project.slug}`}
         kicker={[project.type, project.location].filter(Boolean).join(" · ")}
       />
+      {/* Without JavaScript nothing drives the pinned walkthrough, so show the photographs in sequence. */}
+      <noscript>
+        <style>{".walk-pinned{display:none!important}.walk-static{display:block!important}"}</style>
+      </noscript>
     </section>
   );
 }
@@ -369,6 +373,7 @@ export function ProjectStory({ project }: { project: Project | null }) {
 /* ——— 06 Process ——— */
 
 export function Process() {
+  if (processSteps.length === 0) return null;
   return (
     <Section labelledBy="process-title" className="section-y">
       <div className="page-x">
@@ -462,14 +467,14 @@ export function EnquiryPanel({ index = "08" }: { index?: string }) {
       <div className="page-x section-y relative">
         <div className="page-grid gap-y-14">
           <div className="col-span-12 lg:col-span-5">
-            <Label index={index} className="text-kapur/75">
+            <Label index={index} className="text-kapur">
               Start a conversation
             </Label>
             <h2 id="enquiry-title" className="t-headline mt-8">
               <span className="block">Tell us about the space.</span>
-              <span className="t-italic-display mt-[0.06em] block text-[1.08em] text-kapur/80">We&rsquo;ll take it from there.</span>
+              <span className="t-italic-display mt-[0.06em] block text-[1.08em] text-kapur">We&rsquo;ll take it from there.</span>
             </h2>
-            <p className="mt-8 max-w-[30rem] text-kapur/85">
+            <p className="mt-8 max-w-[30rem] text-kapur">
               A few lines is enough to begin. Tell us what the space is and what you would like to change, and we&rsquo;ll
               reply to arrange a first conversation.
             </p>

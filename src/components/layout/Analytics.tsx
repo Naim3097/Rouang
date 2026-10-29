@@ -2,18 +2,31 @@
 
 import Link from "next/link";
 import Script from "next/script";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useSyncExternalStore } from "react";
 import { CONSENT_KEY } from "@/lib/analytics";
 
 type Choice = "granted" | "denied" | null;
 
+const CHANGED = "rouang:consent-changed";
+// Used when storage is unavailable: the choice then lasts for this page view only.
+let memoryChoice: Choice = null;
+
 function readChoice(): Choice {
   try {
     const v = window.localStorage.getItem(CONSENT_KEY);
-    return v === "granted" || v === "denied" ? v : null;
+    return v === "granted" || v === "denied" ? v : memoryChoice;
   } catch {
-    return null;
+    return memoryChoice;
   }
+}
+
+function subscribe(onChange: () => void) {
+  window.addEventListener("storage", onChange);
+  window.addEventListener(CHANGED, onChange);
+  return () => {
+    window.removeEventListener("storage", onChange);
+    window.removeEventListener(CHANGED, onChange);
+  };
 }
 
 /**
@@ -22,23 +35,21 @@ function readChoice(): Choice {
  * The footer's "Analytics settings" button reopens the choice via the `rouang:consent` event.
  */
 export function Analytics({ measurementId }: { measurementId: string | null }) {
-  const [choice, setChoice] = useState<Choice>(null);
-  const [ready, setReady] = useState(false);
-  const [open, setOpen] = useState(false);
+  // "unknown" on the server and during hydration, so the banner never flashes for people who chose.
+  const choice = useSyncExternalStore<Choice | "unknown">(subscribe, readChoice, () => "unknown");
+  const [reopened, setReopened] = useState(false);
 
   useEffect(() => {
-    const current = readChoice();
-    setChoice(current);
-    setOpen(current === null);
-    setReady(true);
-    const reopen = () => setOpen(true);
+    const reopen = () => setReopened(true);
     window.addEventListener("rouang:consent", reopen);
     return () => window.removeEventListener("rouang:consent", reopen);
   }, []);
 
   if (!measurementId) return null;
+  const open = choice === null || (reopened && choice !== "unknown");
 
   const decide = (value: Exclude<Choice, null>) => {
+    memoryChoice = value;
     try {
       window.localStorage.setItem(CONSENT_KEY, value);
     } catch {
@@ -54,8 +65,8 @@ export function Analytics({ measurementId }: { measurementId: string | null }) {
       window.location.reload();
       return;
     }
-    setChoice(value);
-    setOpen(false);
+    setReopened(false);
+    window.dispatchEvent(new Event(CHANGED));
   };
 
   return (
@@ -69,7 +80,7 @@ export function Analytics({ measurementId }: { measurementId: string | null }) {
         </>
       ) : null}
 
-      {ready && open ? (
+      {open ? (
         <div
           role="region"
           aria-label="Analytics choice"

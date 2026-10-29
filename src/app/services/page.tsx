@@ -19,7 +19,7 @@ export const metadata: Metadata = pageMetadata({
 export default async function ServicesPage() {
   const services = await getServices();
   const groups = [
-    { key: "residential", label: "For homes", intro: "Condominiums, landed houses and single rooms, designed around the way your household lives." },
+    { key: "residential", label: "For homes", intro: "Condominiums and landed houses, designed around the way your household lives." },
     { key: "commercial", label: "For businesses", intro: "Restaurants, cafés and food businesses that have to work for guests, staff and the bottom line." },
   ] as const;
 

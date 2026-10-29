@@ -7,6 +7,7 @@ type FigureProps = {
   sizes: string;
   /** CSS aspect-ratio. Defaults to the photograph's own proportions. */
   aspect?: string;
+  /** Above the fold: load at once and at high priority, with no reveal. */
   priority?: boolean;
   reveal?: boolean;
   className?: string;
@@ -45,7 +46,7 @@ export function Figure({
       alt={image.alt}
       fill
       sizes={sizes}
-      priority={priority}
+      loading={priority ? "eager" : undefined}
       fetchPriority={priority ? "high" : undefined}
       quality={78}
       className={`object-cover ${imgClassName}`}

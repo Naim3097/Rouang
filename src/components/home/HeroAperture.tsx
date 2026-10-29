@@ -1,6 +1,6 @@
-import Image from "next/image";
 import Link from "next/link";
 import { ButtonLink } from "@/components/ui/Button";
+import { HeroImage } from "@/components/ui/HeroImage";
 import { studio } from "@/config/studio";
 import { ProjectCaption } from "@/components/ui/Typography";
 import type { Image as ImageData, PendingImage } from "@/lib/content/schema";
@@ -45,17 +45,8 @@ export function HeroAperture({
           }}
         >
           {photo ? (
-            <Image
-              src={photo.src}
-              alt={photo.alt}
-              fill
-              priority
-              fetchPriority="high"
-              quality={78}
-              sizes="(min-width: 1024px) 100vw, 84vw"
-              className="object-cover"
-              style={{ objectPosition: photo.focus ?? "50% 40%" }}
-            />
+            // The circle is at most 30rem across below 1024px; the full screen above it.
+            <HeroImage image={photo} narrowSizes="min(84vw, 30rem)" defaultFocus="50% 40%" />
           ) : (
             <div className="absolute inset-0 bg-ink-raised" aria-hidden="true" />
           )}

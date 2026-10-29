@@ -24,8 +24,11 @@ const nextConfig: NextConfig = {
   },
   images: {
     formats: ["image/avif", "image/webp"],
-    qualities: [70, 78, 85],
-    deviceSizes: [640, 828, 1080, 1280, 1600, 1920, 2560],
+    qualities: [78, 85],
+    // Sources are exported at most 2400 px wide, so nothing larger than 1920 is ever needed.
+    deviceSizes: [640, 828, 1080, 1280, 1600, 1920],
+    // Optimised images are kept for 31 days. A replaced photograph gets a new file name.
+    minimumCacheTTL: 2678400,
   },
   turbopack: {
     rules: {

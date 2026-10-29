@@ -1,6 +1,13 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState, useSyncExternalStore } from "react";
+
+const REDUCED = "(prefers-reduced-motion: reduce)";
+function subscribeMotion(onChange: () => void) {
+  const mq = window.matchMedia(REDUCED);
+  mq.addEventListener("change", onChange);
+  return () => mq.removeEventListener("change", onChange);
+}
 
 /**
  * A silent loop of real project footage. It only plays while on screen, never plays for visitors
@@ -29,27 +36,24 @@ export function Film({
   const ref = useRef<HTMLVideoElement>(null);
   const [playing, setPlaying] = useState(false);
   const [userPaused, setUserPaused] = useState(false);
-  const [allowed, setAllowed] = useState(false);
-
-  useEffect(() => {
-    const mq = window.matchMedia("(prefers-reduced-motion: reduce)");
-    setAllowed(!mq.matches);
-    const onChange = () => setAllowed(!mq.matches);
-    mq.addEventListener("change", onChange);
-    return () => mq.removeEventListener("change", onChange);
-  }, []);
+  // False on the server, so the film never starts before the visitor's preference is known.
+  const allowed = useSyncExternalStore(subscribeMotion, () => !window.matchMedia(REDUCED).matches, () => false);
 
   useEffect(() => {
     const video = ref.current;
-    if (!video || !allowed || userPaused) return;
+    if (!video) return;
+    // Switching reduced motion on mid-film stops it straight away.
+    if (!allowed || userPaused) {
+      video.pause();
+      return;
+    }
     const io = new IntersectionObserver(
       ([entry]) => {
         if (entry.isIntersecting) {
           if (video.preload === "none") video.preload = "auto";
-          video.play().then(() => setPlaying(true)).catch(() => setPlaying(false));
+          video.play().catch(() => undefined);
         } else {
           video.pause();
-          setPlaying(false);
         }
       },
       { threshold: 0.25 },
@@ -63,11 +67,10 @@ export function Film({
     if (!video) return;
     if (video.paused) {
       setUserPaused(false);
-      video.play().then(() => setPlaying(true)).catch(() => undefined);
+      video.play().catch(() => undefined);
     } else {
       setUserPaused(true);
       video.pause();
-      setPlaying(false);
     }
   };
 
@@ -84,10 +87,12 @@ export function Film({
         aria-label={label}
         width={width}
         height={height}
+        onPlay={() => setPlaying(true)}
+        onPause={() => setPlaying(false)}
       >
         <source src={src} type="video/mp4" />
       </video>
-      {allowed ? (
+      {allowed || playing ? (
         <button
           type="button"
           onClick={toggle}

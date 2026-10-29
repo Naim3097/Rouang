@@ -25,14 +25,15 @@ export async function generateMetadata(): Promise<Metadata> {
 
 /*
  * Plates are laid out to a rhythm rather than a uniform grid: a wide landscape, then a tall
- * plate set lower, then the reverse. Each entry is [column classes, aspect ratio, vertical offset].
+ * plate set lower, then the reverse. Each entry is [column classes, aspect ratio, vertical offset,
+ * the plate's share of the screen width on large screens (for `sizes`)].
  */
-const rhythm: [string, string, string][] = [
-  ["lg:col-span-7", "4/3", ""],
-  ["lg:col-span-4 lg:col-start-9", "4/5", "lg:mt-40"],
-  ["lg:col-span-5 lg:col-start-2", "4/5", ""],
-  ["lg:col-span-6 lg:col-start-7", "3/2", "lg:mt-24"],
-  ["lg:col-span-8 lg:col-start-3", "16/9", ""],
+const rhythm: [string, string, string, string][] = [
+  ["lg:col-span-7", "4/3", "", "56vw"],
+  ["lg:col-span-4 lg:col-start-9", "4/5", "lg:mt-40", "32vw"],
+  ["lg:col-span-5 lg:col-start-2", "4/5", "", "40vw"],
+  ["lg:col-span-6 lg:col-start-7", "3/2", "lg:mt-24", "48vw"],
+  ["lg:col-span-8 lg:col-start-3", "16/9", "", "64vw"],
 ];
 
 export default async function ProjectsPage() {
@@ -67,9 +68,6 @@ export default async function ProjectsPage() {
         <div className="page-x pb-[var(--section-space)]">
           <div className="mb-14 flex flex-wrap items-center justify-between gap-6 border-t border-ink/15 pt-6">
             <SectorFilter targetId="project-plates" counts={counts} />
-            <p className="t-caption text-ink-muted">
-              {projects.length} {projects.length === 1 ? "project" : "projects"}
-            </p>
           </div>
 
           <ul id="project-plates" data-filter="all" className="page-grid gap-y-20 sm:gap-y-28 [&[data-filter=commercial]_[data-sector=residential]]:hidden [&[data-filter=residential]_[data-sector=commercial]]:hidden">
@@ -77,7 +75,7 @@ export default async function ProjectsPage() {
               const img = publicImage(p.card ?? p.hero);
               // Small source files are shown at a size they can hold.
               const lowRes = !!img && !("pending" in img) && img.width < 1400;
-              const [cols, aspect, offset] = lowRes ? (["lg:col-span-5 lg:col-start-2", "16/9", ""] as const) : rhythm[i % rhythm.length];
+              const [cols, aspect, offset, share] = lowRes ? (["lg:col-span-5 lg:col-start-2", "16/9", "", "40vw"] as const) : rhythm[i % rhythm.length];
               const firstProposal = p.visualisation && !ordered[i - 1]?.visualisation;
               return (
                 <Fragment key={p.slug}>
@@ -90,12 +88,14 @@ export default async function ProjectsPage() {
                   </li>
                 ) : null}
                 <li data-sector={p.sector} className={`col-span-12 ${cols} ${offset}`}>
-                  <Link href={`/projects/${p.slug}`} className="group block" prefetch={true}>
+                  <Link href={`/projects/${p.slug}`} className="group block">
                     {img ? (
                       <Figure
                         image={img}
                         aspect={aspect}
-                        sizes="(min-width: 1024px) 60vw, 100vw"
+                        sizes={`(min-width: 1024px) ${share}, 100vw`}
+                        // The first plate is the largest paint on this page.
+                        priority={i === 0}
                         transitionName={`project-${p.slug}`}
                         imgClassName="transition-transform duration-[1.6s] ease-[var(--ease-brand)] group-hover:scale-[1.03]"
                       />

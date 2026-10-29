@@ -20,7 +20,6 @@ export function ProjectIndex({ projects, startAt = 1 }: { projects: Project[]; s
             <Link
               href={`/projects/${p.slug}`}
               className="page-grid relative items-baseline gap-y-2 py-6 outline-offset-[-2px] sm:py-8"
-              prefetch={true}
             >
               <span className="t-label col-span-2 tabular-nums text-ink-muted sm:col-span-1">
                 {String(i + startAt).padStart(2, "0")}

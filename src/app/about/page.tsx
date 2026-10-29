@@ -18,7 +18,7 @@ export const ensureStatic = "navigation";
 export const metadata: Metadata = pageMetadata({
   title: "About ROUANG, an interior design studio",
   description:
-    "ROUANG is a design-led interior studio for homes and businesses. The name comes from the Malay ruang, space, with an O for openness, originality and opportunity.",
+    "ROUANG is a design-led interior studio for homes and businesses. The name is the Malay ruang, space, with an O for openness, originality and opportunity.",
   path: "/about",
 });
 
@@ -68,7 +68,9 @@ export default async function AboutPage() {
               The name
             </Label>
             <h2 id="name-title" className="t-headline mt-8">
-              <span className="block">Ruang means space.</span>
+              <span className="block">
+                <span lang="ms">Ruang</span> means space.
+              </span>
               <span className="t-italic-display block text-[1.08em] text-rikyu">We added an O.</span>
             </h2>
             <div className="mt-8 max-w-[34rem] space-y-5 text-kapur/80">
@@ -129,7 +131,7 @@ export default async function AboutPage() {
               How we think
             </Label>
             <div className="col-span-12 lg:col-span-9">
-              <TitlePair id="principles-title" lead="Three things we hold to" italic="on every project, at every budget" />
+              <TitlePair id="principles-title" lead="Three things we hold to" italic="on every project, at every budget" italicClassName="text-rikyu-deep" />
               <ol className="mt-14 border-t border-ink/15">
                 {principles.map((p, i) => (
                   <li key={p.title} className="grid gap-3 border-b border-ink/15 py-8 sm:grid-cols-[3rem_minmax(0,16rem)_1fr] sm:gap-8">
@@ -145,6 +147,7 @@ export default async function AboutPage() {
       </section>
 
       {/* Process */}
+      {processSteps.length ? (
       <section data-tone="light" className="bg-kapur text-ink" aria-labelledby="process-title">
         <div className="page-x section-y">
           <div className="page-grid gap-y-10">
@@ -169,6 +172,7 @@ export default async function AboutPage() {
           </div>
         </div>
       </section>
+      ) : null}
 
       {SHOW_DRAFTS ? (
         <section data-tone="light" className="bg-kapur text-ink">

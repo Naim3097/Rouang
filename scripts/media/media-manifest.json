@@ -5,8 +5,14 @@
    "width": 1800,
    "height": 2400,
    "bytes": 536712,
+   "wide": {
+    "src": "/images/projects/rembayung/rembayung-glazed-gable-wide.jpg",
+    "width": 1800,
+    "height": 1200,
+    "bytes": 258918
+   },
    "alt": "Rembayung's glazed timber gable, with the Petronas Twin Towers seen through the glass and the window frames casting shadows across the terracotta floor",
-   "focus": "50% 45%"
+   "focus": "50% 28%"
   },
   "card": {
    "src": "/images/projects/rembayung/rembayung-a-frame-ceiling.jpg",

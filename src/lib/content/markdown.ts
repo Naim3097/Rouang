@@ -3,6 +3,13 @@ import { Marked, type Tokens } from "marked";
 
 export type Heading = { id: string; text: string };
 
+/** Site paths, in-page anchors, and web, email and phone links. */
+const SAFE_HREF = /^(?:\/(?!\/)|#|https?:\/\/|mailto:|tel:)/i;
+
+function escapeAttr(value: string) {
+  return value.replace(/&/g, "&amp;").replace(/"/g, "&quot;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+}
+
 export function slugify(text: string) {
   return text
     .toLowerCase()
@@ -38,10 +45,16 @@ export function renderMarkdown(source: string): { html: string; headings: Headin
       },
       link(this: { parser: { parseInline(tokens: Tokens.Generic[]): string } }, token: Tokens.Link) {
         const inner = this.parser.parseInline(token.tokens);
-        const external = /^https?:\/\//.test(token.href);
-        const title = token.title ? ` title="${token.title}"` : "";
+        // A link that is not a page on this site or a web, email or phone address keeps its text only.
+        if (!SAFE_HREF.test(token.href.trim())) return inner;
+        const external = /^https?:\/\//i.test(token.href);
+        const title = token.title ? ` title="${escapeAttr(token.title)}"` : "";
         const rel = external ? ` rel="noopener noreferrer"` : "";
-        return `<a href="${token.href}"${title}${rel}>${inner}</a>`;
+        return `<a href="${escapeAttr(token.href.trim())}"${title}${rel}>${inner}</a>`;
+      },
+      // Raw HTML in a content file is shown as text, never injected into the page.
+      html(token: Tokens.HTML | Tokens.Tag) {
+        return escapeAttr(token.text);
       },
     },
   });

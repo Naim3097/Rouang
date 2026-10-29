@@ -45,6 +45,11 @@
     scroll-padding-top: calc(var(--header-h) + 1rem);
   }
 
+  /* The open mobile menu keeps the page behind it still. */
+  html:has(dialog.mobile-menu[open]) {
+    overflow: hidden;
+  }
+
   @media (prefers-reduced-motion: no-preference) {
     html {
       scroll-behavior: smooth;
@@ -75,7 +80,8 @@
     border-radius: 2px;
   }
 
-  [data-tone="dark"] :focus-visible {
+  [data-tone="dark"] :focus-visible,
+  [data-tone="rikyu"] :focus-visible {
     outline-color: var(--color-kapur);
   }
 
@@ -208,9 +214,12 @@
   color-scheme: dark;
 }
 
+/* The Rikyū panel starts at an even mix of the kit's two Rikyū stops: Milky White text measures
+   5.1:1 there and up to 8.7:1 at the deep end, so small text and form fields pass everywhere.
+   (Milky White on the lighter Rikyū Grey itself is only 3:1.) */
 [data-tone="rikyu"] {
   background:
-    linear-gradient(115deg, var(--color-rikyu) 0%, color-mix(in oklab, var(--color-rikyu) 55%, var(--color-rikyu-deep)) 55%, var(--color-rikyu-deep) 100%);
+    linear-gradient(115deg, color-mix(in oklab, var(--color-rikyu) 50%, var(--color-rikyu-deep)) 0%, var(--color-rikyu-deep) 100%);
   color: var(--color-kapur);
   color-scheme: dark;
 }
@@ -310,7 +319,8 @@
   background-size: 14px 14px;
   -webkit-mask-image: linear-gradient(100deg, transparent 18%, rgb(0 0 0 / 0.65) 60%, #000 100%);
   mask-image: linear-gradient(100deg, transparent 18%, rgb(0 0 0 / 0.65) 60%, #000 100%);
-  opacity: 0.55;
+  /* Light enough that text over the dots keeps its contrast. */
+  opacity: 0.4;
 }
 
 /* ——— Buttons: pill with an open ring at the end. The label says exactly what happens next (kit p.14). ——— */
@@ -535,6 +545,15 @@
       animation-timeline: scroll(root block);
       animation-range: 92svh 118svh;
     }
+
+    /* A focused link is always shown in full, wherever the scroll has left it. */
+    .aperture-fade:focus-within,
+    .aperture-caption:focus-within {
+      animation: none;
+      opacity: 1;
+      translate: none;
+      visibility: visible;
+    }
   }
 }
 
@@ -557,6 +576,7 @@
   to {
     opacity: 0;
     translate: 0 -2.5rem;
+    visibility: hidden;
   }
 }
 
@@ -564,6 +584,7 @@
   from {
     opacity: 0;
     translate: 0 1rem;
+    visibility: hidden;
   }
   to {
     opacity: 1;
@@ -571,7 +592,7 @@
   }
 }
 
-/* ——— View transitions: a quiet crossfade between pages, a morph for project imagery. ——— */
+/* ——— View transitions: a project image morphs between the index and its case study; the page around it crossfades for that moment. ——— */
 
 ::view-transition-old(root),
 ::view-transition-new(root) {
@@ -589,6 +610,26 @@
   ::view-transition-old(*),
   ::view-transition-new(*) {
     animation: none !important;
+  }
+}
+
+/* Walkthrough: pinned and scroll-driven, or the photographs in sequence for reduced motion.
+   Chosen by CSS, so the server markup is already the right layout and hydration moves nothing. */
+.walk-static {
+  display: none;
+}
+
+.walk-pinned[data-live] .walk-layer > img {
+  will-change: transform;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .walk-pinned {
+    display: none;
+  }
+
+  .walk-static {
+    display: block;
   }
 }
 

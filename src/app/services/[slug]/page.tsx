@@ -15,8 +15,8 @@ import { serviceSchema } from "@/lib/schema";
 import { pageMetadata } from "@/lib/seo";
 
 export const ensureStatic = "navigation";
-// Every slug is prerendered and project links prefetch in full, so a navigation that waits for
-// the static payload is acceptable. Content stays in the HTML instead of a hidden Suspense segment.
+// Every slug is prerendered and quick to fetch, so a navigation that waits for the static
+// payload is acceptable. Content stays in the HTML instead of a hidden Suspense segment.
 export const instant = false;
 
 export async function generateStaticParams() {
@@ -35,7 +35,10 @@ export default async function ServicePage({ params }: PageProps<"/services/[slug
   const service = await getService(slug);
   if (!service) notFound();
   const projects = (await getProjects()).filter((p) => service.relatedProjects.includes(p.slug));
+  // In production only what the studio has confirmed is shown as an offer, an answer or a step.
+  const offers = service.offers.filter((o) => o.confirmed || SHOW_DRAFTS);
   const faqs = service.faqs.filter((f) => f.confirmed || SHOW_DRAFTS);
+  const steps = processSteps.slice(0, 4);
   const featureProject = service.feature ? await getProject(service.feature.project) : null;
   const feature = service.feature ? projectImage(featureProject, service.feature.image) : null;
 
@@ -98,6 +101,7 @@ export default async function ServicePage({ params }: PageProps<"/services/[slug
       </section>
 
       {/* What we do */}
+      {offers.length || service.projectTypes.length ? (
       <section data-tone="light" className="bg-kapur text-ink">
         <div className="page-x section-y">
           <div className="page-grid gap-y-10">
@@ -105,8 +109,9 @@ export default async function ServicePage({ params }: PageProps<"/services/[slug
               What we do
             </Label>
             <div className="col-span-12 lg:col-span-8 lg:col-start-5">
+              {offers.length ? (
               <ol className="border-t border-ink/15">
-                {service.offers.map((o, i) => (
+                {offers.map((o, i) => (
                   <li key={o.title} className="grid gap-3 border-b border-ink/15 py-7 sm:grid-cols-[3rem_minmax(0,14rem)_1fr] sm:gap-8">
                     <span className="t-label tabular-nums text-ink-muted">{String(i + 1).padStart(2, "0")}</span>
                     <h3 className="t-sub">{o.title}</h3>
@@ -114,8 +119,9 @@ export default async function ServicePage({ params }: PageProps<"/services/[slug
                   </li>
                 ))}
               </ol>
+              ) : null}
               {service.projectTypes.length ? (
-                <div className="mt-12">
+                <div className={offers.length ? "mt-12" : ""}>
                   <p className="t-label text-ink-muted">Projects we take on</p>
                   <ul className="mt-4 flex flex-wrap gap-2">
                     {service.projectTypes.map((t) => (
@@ -130,6 +136,7 @@ export default async function ServicePage({ params }: PageProps<"/services/[slug
           </div>
         </div>
       </section>
+      ) : null}
 
       {service.html ? (
         <section data-tone="light" className="bg-kapur text-ink">
@@ -154,6 +161,7 @@ export default async function ServicePage({ params }: PageProps<"/services/[slug
       ) : null}
 
       {/* Process, briefly */}
+      {steps.length ? (
       <section data-tone="dark">
         <div className="page-x section-y">
           <div className="page-grid gap-y-10">
@@ -161,7 +169,7 @@ export default async function ServicePage({ params }: PageProps<"/services/[slug
               How it runs
             </Label>
             <ol className="col-span-12 grid gap-x-[var(--grid-gap)] gap-y-10 sm:grid-cols-2 lg:col-span-9 lg:grid-cols-4">
-              {processSteps.slice(0, 4).map((s, i) => (
+              {steps.map((s, i) => (
                 <li key={s.title}>
                   <Icon name={s.icon} className="-ml-2 h-12 w-12 text-kapur" />
                   <p className="t-label mt-5 text-mouse">{String(i + 1).padStart(2, "0")}</p>
@@ -173,6 +181,7 @@ export default async function ServicePage({ params }: PageProps<"/services/[slug
           </div>
         </div>
       </section>
+      ) : null}
 
       {/* Questions */}
       {faqs.length || SHOW_DRAFTS ? (

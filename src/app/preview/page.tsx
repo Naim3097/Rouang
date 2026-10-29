@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { Label } from "@/components/ui/Typography";
-import { processSteps } from "@/config/process";
+import { allProcessSteps } from "@/config/process";
 import { studio } from "@/config/studio";
 import { getInsights, getProjects, getServices } from "@/lib/content";
 import { IS_PRODUCTION, SITE_ENV } from "@/lib/env";
@@ -33,7 +33,7 @@ export default async function PreviewChecklist() {
   add(!Object.values(studio.social).some(Boolean), "Instagram, Facebook, TikTok or LinkedIn links");
   add(true, "Confirm the full list of services: is renovation or design-and-build offered, or design only?");
 
-  const processItems: Item[] = processSteps.filter((s) => !s.confirmed).map((s) => ({ area: "Process", text: `Confirm the "${s.title}" step describes how the studio works` }));
+  const processItems: Item[] = allProcessSteps.filter((s) => !s.confirmed).map((s) => ({ area: "Process", text: `Confirm the "${s.title}" step describes how the studio works` }));
 
   const contentItems: Item[] = [
     ...projects.flatMap((p) => [

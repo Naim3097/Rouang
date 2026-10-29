@@ -11,15 +11,18 @@
  * reaches the live site by accident.
  */
 import fs from "node:fs";
+import { createRequire } from "node:module";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 import matter from "gray-matter";
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
-for (const f of [".env.local", ".env"]) {
-  const p = path.join(root, f);
-  if (fs.existsSync(p)) process.loadEnvFile(p);
-}
+
+// Load env files exactly as `next build` does (.env.production.local, .env.local, .env.production,
+// .env), using Next's own loader, so the gate sees the same values as the build it guards.
+const requireFromNext = createRequire(createRequire(import.meta.url).resolve("next/package.json"));
+const { loadEnvConfig } = requireFromNext("@next/env");
+loadEnvConfig(root, false, { info: () => {}, error: console.error });
 
 const args = new Set(process.argv.slice(2));
 const env = process.env.VERCEL_ENV ?? process.env.SITE_ENV ?? "development";
@@ -108,9 +111,11 @@ const studioSrc = fs.readFileSync(path.join(root, "src/config/studio.ts"), "utf8
 for (const m of studioSrc.matchAll(/\{\s*name:\s*"([^"]+)",\s*confirmed:\s*false\s*\}/g)) block("Studio", `service area not confirmed: ${m[1]}`);
 if (/address:\s*null/.test(studioSrc)) warn("Studio", "no studio address (needed for Google Business Profile and LocalBusiness data)");
 if (/foundingYear:\s*null/.test(studioSrc)) warn("Studio", "founding year not set");
-const processSrc = fs.readFileSync(path.join(root, "src/config/process.ts"), "utf8");
-const unconfirmedSteps = [...processSrc.matchAll(/title:\s*"([^"]+)"[\s\S]*?confirmed:\s*false/g)].map((m) => m[1]);
-if (unconfirmedSteps.length) block("Process", `steps not confirmed by the studio: ${unconfirmedSteps.join(", ")}`);
+// Only steps that render count: one that needs a capability the studio has not confirmed is hidden.
+const capability = (name) => new RegExp(`\\b${name}:\\s*true\\b`).test(studioSrc);
+const steps = JSON.parse(fs.readFileSync(path.join(root, "src/config/process-steps.json"), "utf8"));
+const unconfirmedSteps = steps.filter((s) => (!s.requires || capability(s.requires)) && !s.confirmed).map((s) => s.title);
+if (unconfirmedSteps.length) block("Process", `steps not confirmed by the studio (hidden on the live site until they are): ${unconfirmedSteps.join(", ")}`);
 
 // ——— Environment ———
 const need = (key, area, why) => !process.env[key] && block(area, `${key} is not set (${why})`);
@@ -126,7 +131,15 @@ if (hasDb && !hasMail) warn("Enquiries", "no email notification: enquiries will 
 want("NEXT_PUBLIC_WHATSAPP_NUMBER", "Contact", "WhatsApp buttons are hidden without it");
 want("NEXT_PUBLIC_GA_MEASUREMENT_ID", "Analytics", "no conversion tracking");
 want("GOOGLE_SITE_VERIFICATION", "Search Console", "verify the domain in Search Console (or use DNS verification)");
-want("TURNSTILE_SECRET_KEY", "Enquiries", "spam protection is honeypot plus rate limit only");
+const turnstile = { secret: !!process.env.TURNSTILE_SECRET_KEY, site: !!process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY };
+if (turnstile.secret !== turnstile.site) {
+  const [set, missing] = turnstile.secret ? ["TURNSTILE_SECRET_KEY", "NEXT_PUBLIC_TURNSTILE_SITE_KEY"] : ["NEXT_PUBLIC_TURNSTILE_SITE_KEY", "TURNSTILE_SECRET_KEY"];
+  block("Enquiries", `${set} is set without ${missing}: Turnstile needs both keys or neither`);
+} else if (!hasDb && hasMail && !turnstile.secret) {
+  block("Enquiries", "email-only delivery has no rate limit: add Supabase, or both Turnstile keys, before going live");
+} else if (!turnstile.secret) {
+  warn("Enquiries", "TURNSTILE_SECRET_KEY and NEXT_PUBLIC_TURNSTILE_SITE_KEY are not set (spam protection is honeypot plus rate limit only)");
+}
 
 // ——— Manual checks that code cannot verify ———
 const manual = [
@@ -137,6 +150,7 @@ const manual = [
   "If the studio carries out renovation or fit-out itself: CIDB registration and grade confirmed",
   "Rembayung: owners' consent to publish the project; scope wording (interior design only) confirmed",
   "Google Business Profile created and verified with the same name, address and phone as the site",
+  "Every project film is real footage of that project. No AI-generated interior is shown as a completed space",
 ];
 
 const print = (title, list) => {

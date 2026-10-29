@@ -1,23 +1,28 @@
 "use client";
 
 import Link from "next/link";
-import { useEffect, useRef } from "react";
+import { useEffect, useId, useRef, useState } from "react";
 import { Mark, Wordmark } from "@/components/brand/Brand";
 import type { NavItem } from "@/lib/nav";
-import { track } from "@/lib/analytics";
+import { ContactLink } from "./ContactLink";
 
 /**
  * Full-screen menu on a native modal <dialog>: focus is trapped, Escape closes it and the page
- * behind becomes inert without extra code. Wordmark top left, mark in the opposite corner (kit p.8).
+ * behind becomes inert without extra code. The page behind is also kept from scrolling (globals.css). Wordmark top left, mark in the opposite corner (kit p.8).
  */
 export function MobileMenu({ pathname, whatsapp, nav }: { pathname: string; whatsapp: string | null; nav: NavItem[] }) {
   const dialog = useRef<HTMLDialogElement>(null);
+  const id = useId();
+  const [expanded, setExpanded] = useState(false);
 
   useEffect(() => {
     dialog.current?.close();
   }, [pathname]);
 
-  const open = () => dialog.current?.showModal();
+  const open = () => {
+    dialog.current?.showModal();
+    setExpanded(true);
+  };
   const close = () => dialog.current?.close();
 
   return (
@@ -27,6 +32,8 @@ export function MobileMenu({ pathname, whatsapp, nav }: { pathname: string; what
         onClick={open}
         className="-mr-2 inline-flex min-h-11 items-center gap-3 px-2 text-[0.9375rem] lg:hidden"
         aria-haspopup="dialog"
+        aria-expanded={expanded}
+        aria-controls={id}
       >
         <span>Menu</span>
         <span className="flex w-6 flex-col gap-[5px]" aria-hidden="true">
@@ -37,7 +44,9 @@ export function MobileMenu({ pathname, whatsapp, nav }: { pathname: string; what
 
       <dialog
         ref={dialog}
+        id={id}
         aria-label="Menu"
+        onClose={() => setExpanded(false)}
         className="mobile-menu m-0 h-dvh max-h-none w-screen max-w-none bg-ink p-0 text-kapur backdrop:bg-ink"
         data-tone="dark"
       >
@@ -55,7 +64,7 @@ export function MobileMenu({ pathname, whatsapp, nav }: { pathname: string; what
             </button>
           </div>
 
-          <nav aria-label="Menu" className="mt-[8vh]">
+          <nav aria-label="Primary" className="mt-[8vh]">
             <ul className="border-t border-kapur/15">
               {nav.map((item, i) => (
                 <li key={item.href} className="border-b border-kapur/15">
@@ -66,7 +75,9 @@ export function MobileMenu({ pathname, whatsapp, nav }: { pathname: string; what
                     className="flex items-baseline justify-between gap-4 py-4"
                   >
                     <span className="text-[2.25rem] font-medium leading-none tracking-[-0.03em] xs:text-[2.75rem]">{item.label}</span>
-                    <span className="t-label tabular-nums text-mouse">{String(i + 1).padStart(2, "0")}</span>
+                    <span className="t-label tabular-nums text-mouse" aria-hidden="true">
+                      {String(i + 1).padStart(2, "0")}
+                    </span>
                   </Link>
                 </li>
               ))}
@@ -79,13 +90,9 @@ export function MobileMenu({ pathname, whatsapp, nav }: { pathname: string; what
                 Anda cerita macam mana nak duduk. Kami terjemah jadi ruang.
               </p>
               {whatsapp ? (
-                <a
-                  href={whatsapp}
-                  className="link-line inline-block"
-                  onClick={() => track("whatsapp_click", { location: "menu" })}
-                >
+                <ContactLink href={whatsapp} kind="whatsapp" location="menu" className="link-line inline-block">
                   Message us on WhatsApp
-                </a>
+                </ContactLink>
               ) : null}
             </div>
             <Mark className="h-6 w-6 shrink-0 text-kapur" />

@@ -25,12 +25,19 @@ Four colours: Chinese Black #141414, Milky White #F3F3F3, Mouse Grey #949495, Ri
 Mouse Grey would fail contrast. Rikyū Grey appears as one panel per page at most (the enquiry panel)
 and as accents. Outfit 400/500 only; EB Garamond italic 400 only.
 
+Milky White on Rikyū Grey itself is only 3:1, so the enquiry panel runs from an even mix of the kit's
+two Rikyū stops (#888E7E and #404732) to the deep end: text and form fields measure 5.1:1 to 8.7:1
+across it. Small text never sits on Rikyū Grey at full strength, and Rikyū italic is not set on any
+surface darker than Milky White (the About principles line uses the deep stop instead).
+
 ## Motion
 
 Purposeful and quiet: images open upward from the horizon as they enter (clip reveal); the hero
-aperture and the walkthrough are driven by the visitor's own scrolling; page changes crossfade and
-project images morph between the index and the case study (View Transitions). With reduced motion
-everything is static, and nothing depends on animation to be read.
+aperture and the walkthrough are driven by the visitor's own scrolling; project images morph between
+the index and the case study (View Transitions). There is no page-wide crossfade: it ran after every
+load and held back the first paint. With reduced motion everything is static, and nothing depends on
+animation to be read: the walkthrough becomes the photographs in sequence, and screen readers always
+get every frame and caption as a list.
 
 ## Photography: what was chosen and why
 

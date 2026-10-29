@@ -1,6 +1,5 @@
 import type { Metadata, Viewport } from "next";
 import { EB_Garamond, Outfit } from "next/font/google";
-import { ViewTransition } from "react";
 import { Analytics } from "@/components/layout/Analytics";
 import { MobileActionBar } from "@/components/layout/MobileActionBar";
 import { PreviewBar } from "@/components/layout/PreviewBar";
@@ -48,17 +47,17 @@ export default async function RootLayout({ children }: LayoutProps<"/">) {
   const nav = await liveNav();
   const whatsapp = whatsappHref("Hello ROUANG, I'd like to talk about a project.");
   return (
-    <html lang="en-MY" className={`${outfit.variable} ${garamond.variable}`} suppressHydrationWarning>
+    <html lang="en-MY" data-scroll-behavior="smooth" className={`${outfit.variable} ${garamond.variable}`} suppressHydrationWarning>
       <body>
         <a href="#main" className="skip-link">
           Skip to content
         </a>
         <SiteHeader whatsapp={whatsapp} nav={nav} />
-        <ViewTransition>
-          <main id="main" tabIndex={-1} className="outline-none">
-            {children}
-          </main>
-        </ViewTransition>
+        {/* No page-wide crossfade: it ran after hydration on every load and held the first paint.
+            Project images still morph between pages through their own named transitions. */}
+        <main id="main" tabIndex={-1} className="outline-none">
+          {children}
+        </main>
         <SiteFooter nav={nav} />
         <MobileActionBar whatsapp={whatsapp} />
         <Analytics measurementId={IS_PRODUCTION ? GA_MEASUREMENT_ID : null} />

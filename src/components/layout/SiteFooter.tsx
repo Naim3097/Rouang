@@ -3,6 +3,7 @@ import { Wordmark } from "@/components/brand/Brand";
 import { legalNav } from "@/config/navigation";
 import type { NavItem } from "@/lib/nav";
 import { areaLabel, studio, telHref, whatsappHref } from "@/config/studio";
+import { GA_MEASUREMENT_ID, IS_PRODUCTION } from "@/lib/env";
 import { ConsentSettingsButton } from "./Analytics";
 import { ContactLink } from "./ContactLink";
 
@@ -106,9 +107,12 @@ export function SiteFooter({ nav }: { nav: NavItem[] }) {
                 </Link>
               </li>
             ))}
-            <li>
-              <ConsentSettingsButton className="link-reveal" />
-            </li>
+            {/* Only where analytics can actually load, so the button always does something. */}
+            {IS_PRODUCTION && GA_MEASUREMENT_ID ? (
+              <li>
+                <ConsentSettingsButton className="link-reveal" />
+              </li>
+            ) : null}
           </ul>
         </div>
       </div>

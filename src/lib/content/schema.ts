@@ -8,7 +8,11 @@ import { z } from "zod";
 
 const isoDate = z.preprocess(
   (v) => (v instanceof Date ? v.toISOString().slice(0, 10) : v),
-  z.string().regex(/^\d{4}-\d{2}-\d{2}$/, "Use YYYY-MM-DD"),
+  z
+    .string()
+    .regex(/^\d{4}-\d{2}-\d{2}$/, "Use YYYY-MM-DD")
+    // The pattern alone accepts 2026-02-31; a real date survives the round trip unchanged.
+    .refine((v) => !Number.isNaN(Date.parse(v)) && new Date(v).toISOString().slice(0, 10) === v, "Not a real date"),
 );
 
 const slug = z.string().regex(/^[a-z0-9]+(?:-[a-z0-9]+)*$/, "Use lowercase-words-with-hyphens");
@@ -16,7 +20,7 @@ const slug = z.string().regex(/^[a-z0-9]+(?:-[a-z0-9]+)*$/, "Use lowercase-words
 export const status = z.enum(["draft", "published"]);
 
 /** A photograph that exists. `provisional` marks brand-kit or stock imagery whose licence is unconfirmed. */
-export const image = z.object({
+export const image = z.strictObject({
   src: z.string().startsWith("/"),
   alt: z.string().min(3),
   width: z.number().int().positive(),
@@ -26,10 +30,14 @@ export const image = z.object({
   provisional: z.boolean().default(false),
   /** CSS object-position used when the frame crops the photograph, e.g. "50% 40%". */
   focus: z.string().optional(),
+  /** A landscape crop of the same photograph for large screens (made by scripts/media/export.cjs). */
+  wide: z
+    .strictObject({ src: z.string().startsWith("/"), width: z.number().int().positive(), height: z.number().int().positive() })
+    .optional(),
 });
 
 /** A photograph the studio still has to supply. Rendered as a drawing-frame placeholder in previews only. */
-export const pendingImage = z.object({
+export const pendingImage = z.strictObject({
   pending: z.string().min(3),
   aspect: z.enum(["3/2", "4/5", "16/9", "1/1", "2/3", "21/9"]).default("3/2"),
 });
@@ -48,21 +56,21 @@ export const galleryItem = z.union([
 ]);
 
 const seo = z
-  .object({
+  .strictObject({
     title: z.string().max(65).optional(),
     description: z.string().max(170).optional(),
   })
   .default({});
 
 /** A sourced statement. Only `verified` facts may be rendered in production. */
-const fact = z.object({
+const fact = z.strictObject({
   label: z.string(),
   value: z.string(),
   source: z.string(),
   verified: z.boolean(),
 });
 
-export const projectSchema = z.object({
+export const projectSchema = z.strictObject({
   title: z.string(),
   status,
   /** Layout placeholders exist only to show the template in previews. They can never be published. */
@@ -80,14 +88,14 @@ export const projectSchema = z.object({
   area: z.string().nullable().default(null),
   client: z.string().nullable().default(null),
   photography: z
-    .object({ credit: z.string().nullable().default(null), permissionConfirmed: z.boolean().default(false) })
+    .strictObject({ credit: z.string().nullable().default(null), permissionConfirmed: z.boolean().default(false) })
     .default({ credit: null, permissionConfirmed: false }),
   hero: z.union([image, pendingImage]).nullable().default(null),
   /** The picture used for this project in listings, so a listing never repeats the case-study opener. */
   card: z.union([image, pendingImage]).nullable().default(null),
   /** Short silent loop of real footage from the project. Never AI-generated. */
   film: z
-    .object({
+    .strictObject({
       src: z.string().startsWith("/"),
       poster: z.string().startsWith("/"),
       width: z.number().int().positive(),
@@ -101,10 +109,10 @@ export const projectSchema = z.object({
   brief: z.string().nullable().default(null),
   concept: z.string().nullable().default(null),
   planning: z.string().nullable().default(null),
-  materials: z.array(z.object({ name: z.string(), note: z.string() })).default([]),
+  materials: z.array(z.strictObject({ name: z.string(), note: z.string() })).default([]),
   lighting: z.string().nullable().default(null),
-  challenges: z.array(z.object({ constraint: z.string(), response: z.string() })).default([]),
-  quote: z.object({ text: z.string(), attribution: z.string(), approved: z.boolean() }).nullable().default(null),
+  challenges: z.array(z.strictObject({ constraint: z.string(), response: z.string() })).default([]),
+  quote: z.strictObject({ text: z.string(), attribution: z.string(), approved: z.boolean() }).nullable().default(null),
   gallery: z.array(galleryItem).default([]),
   services: z.array(slug).default([]),
   facts: z.array(fact).default([]),
@@ -113,7 +121,7 @@ export const projectSchema = z.object({
   todo: z.array(z.string()).default([]),
 });
 
-export const serviceSchema = z.object({
+export const serviceSchema = z.strictObject({
   title: z.string(),
   status,
   sector: z.enum(["residential", "commercial"]),
@@ -124,18 +132,18 @@ export const serviceSchema = z.object({
   headlineItalic: z.string(),
   summary: z.string(),
   audience: z.array(z.string()).min(1),
-  offers: z.array(z.object({ title: z.string(), body: z.string(), confirmed: z.boolean() })).min(1),
+  offers: z.array(z.strictObject({ title: z.string(), body: z.string(), confirmed: z.boolean() })).min(1),
   projectTypes: z.array(z.string()).default([]),
-  faqs: z.array(z.object({ q: z.string(), a: z.string(), confirmed: z.boolean() })).default([]),
+  faqs: z.array(z.strictObject({ q: z.string(), a: z.string(), confirmed: z.boolean() })).default([]),
   relatedProjects: z.array(slug).default([]),
   /** A photograph from one of the studio's projects, shown only while that project is live. */
-  feature: z.object({ project: slug, image: z.string() }).nullable().default(null),
+  feature: z.strictObject({ project: slug, image: z.string() }).nullable().default(null),
   primaryKeyword: z.string(),
   seo,
   todo: z.array(z.string()).default([]),
 });
 
-export const insightSchema = z.object({
+export const insightSchema = z.strictObject({
   title: z.string(),
   status,
   description: z.string().max(170),
@@ -156,7 +164,7 @@ export const insightSchema = z.object({
   searchIntent: z.string(),
   relatedServices: z.array(slug).default([]),
   relatedProjects: z.array(slug).default([]),
-  sources: z.array(z.object({ title: z.string(), url: z.string().url() })).default([]),
+  sources: z.array(z.strictObject({ title: z.string(), url: z.string().url() })).default([]),
   seo,
   todo: z.array(z.string()).default([]),
 });

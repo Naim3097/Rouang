@@ -119,6 +119,12 @@ export async function notifyByEmail(e: Enquiry, id: string | null) {
 export async function verifyTurnstile(token: string | null, ip: string | null) {
   const secret = process.env.TURNSTILE_SECRET_KEY;
   if (!secret) return true; // not enabled
+  // Without the public key no widget is shown, so no visitor could ever pass. The launch check blocks
+  // this pairing; if it ships anyway, enquiries keep arriving and the log says what to fix.
+  if (!process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY) {
+    console.error("[enquiry] TURNSTILE_SECRET_KEY is set without NEXT_PUBLIC_TURNSTILE_SITE_KEY; Turnstile is not being checked.");
+    return true;
+  }
   if (!token) return false;
   try {
     const body = new URLSearchParams({ secret, response: token, ...(ip ? { remoteip: ip } : {}) });

@@ -20,26 +20,84 @@ export function SiteHeader({ whatsapp, nav }: { whatsapp: string | null; nav: Na
   const [tone, setTone] = useState<Tone | null>(null);
   const [hidden, setHidden] = useState(false);
   const [solid, setSolid] = useState(false);
+  // A new page always starts with the header showing.
+  const [shownFor, setShownFor] = useState(pathname);
+  if (shownFor !== pathname) {
+    setShownFor(pathname);
+    setHidden(false);
+  }
 
+  // Tone: whichever [data-tone] section crosses a one-pixel line at the header's middle, found by
+  // an IntersectionObserver so scrolling never forces a layout read. A nested section wins over
+  // the one containing it, as the topmost layer does on screen.
+  useEffect(() => {
+    const header = ref.current;
+    if (!header) return;
+    const hits = new Map<HTMLElement, DOMRectReadOnly>();
+    let io: IntersectionObserver | null = null;
+    let rebuild = 0;
+
+    const pick = () => {
+      const x = window.innerWidth / 2;
+      let best: HTMLElement | null = null;
+      for (const [el, rect] of hits) {
+        if (rect.left > x || rect.right < x) continue;
+        if (!best || best.contains(el)) best = el;
+      }
+      const t = best?.dataset.tone;
+      setTone(t === "dark" || t === "rikyu" ? "dark" : "light");
+    };
+
+    const build = () => {
+      rebuild = 0;
+      io?.disconnect();
+      hits.clear();
+      const mid = Math.round(header.offsetHeight / 2);
+      io = new IntersectionObserver(
+        (entries) => {
+          for (const e of entries) {
+            const el = e.target as HTMLElement;
+            if (e.isIntersecting) hits.set(el, e.boundingClientRect);
+            else hits.delete(el);
+          }
+          pick();
+        },
+        { rootMargin: `-${mid}px 0px -${Math.max(0, window.innerHeight - mid - 1)}px 0px` },
+      );
+      for (const el of document.querySelectorAll<HTMLElement>("[data-tone]")) {
+        if (!header.contains(el)) io.observe(el);
+      }
+    };
+    const schedule = () => {
+      if (!rebuild) rebuild = requestAnimationFrame(build);
+    };
+
+    build();
+    // Sections that mount after this effect (client-only content) are picked up as they appear.
+    const mo = new MutationObserver((records) => {
+      for (const r of records) {
+        for (const n of r.addedNodes) {
+          if (n instanceof HTMLElement && (n.matches("[data-tone]") || n.querySelector("[data-tone]"))) return schedule();
+        }
+      }
+    });
+    mo.observe(document.body, { childList: true, subtree: true });
+    window.addEventListener("resize", schedule);
+    return () => {
+      io?.disconnect();
+      mo.disconnect();
+      window.removeEventListener("resize", schedule);
+      if (rebuild) cancelAnimationFrame(rebuild);
+    };
+  }, [pathname]);
+
+  // Solid background and hide-on-scroll come from the scroll position alone.
   useEffect(() => {
     let lastY = window.scrollY;
     let frame = 0;
-
-    const measure = () => {
+    const update = () => {
       frame = 0;
-      const header = ref.current;
-      if (!header) return;
       const y = window.scrollY;
-      const probeY = header.offsetHeight / 2;
-      const stack = document.elementsFromPoint(window.innerWidth / 2, probeY);
-      // During a view transition the page is a snapshot and only <html> is hit-testable, so the
-      // reading would be meaningless. Keep the current tone and look again once it has finished.
-      if (!stack.includes(header)) {
-        window.setTimeout(onScroll, 200);
-        return;
-      }
-      const section = stack.find((el) => !header.contains(el))?.closest<HTMLElement>("[data-tone]");
-      setTone(section?.dataset.tone === "dark" || section?.dataset.tone === "rikyu" ? "dark" : "light");
       setSolid(y > 24);
       const delta = y - lastY;
       if (Math.abs(delta) > 6) {
@@ -47,32 +105,16 @@ export function SiteHeader({ whatsapp, nav }: { whatsapp: string | null; nav: Na
         lastY = y;
       }
     };
-
     const onScroll = () => {
-      if (!frame) frame = requestAnimationFrame(measure);
+      if (!frame) frame = requestAnimationFrame(update);
     };
-
-    // The page below may paint after this effect runs (navigation, late images), so the tone is
-    // measured again whenever the content under the header changes size.
-    measure();
-    const settle = window.setTimeout(onScroll, 250);
-    const main = document.getElementById("main");
-    const ro = main ? new ResizeObserver(onScroll) : null;
-    if (main && ro) ro.observe(main);
+    update();
     window.addEventListener("scroll", onScroll, { passive: true });
-    window.addEventListener("resize", onScroll);
-    window.addEventListener("load", onScroll);
     return () => {
       window.removeEventListener("scroll", onScroll);
-      window.removeEventListener("resize", onScroll);
-      window.removeEventListener("load", onScroll);
-      window.clearTimeout(settle);
-      ro?.disconnect();
       if (frame) cancelAnimationFrame(frame);
     };
-  }, [pathname]);
-
-  useEffect(() => setHidden(false), [pathname]);
+  }, []);
 
   const dark = tone === "dark";
 

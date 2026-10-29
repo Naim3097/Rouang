@@ -21,6 +21,10 @@ hero:
   width: 1800
   height: 2400
   focus: "50% 28%"
+  wide:
+    src: /images/projects/rembayung/rembayung-glazed-gable-wide.jpg
+    width: 1800
+    height: 1200
 card:
   src: /images/projects/rembayung/rembayung-upper-dining.jpg
   alt: "Upstairs dining under the pitched timber roof, with rows of tables and planters along the edge"
