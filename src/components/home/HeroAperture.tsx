@@ -1,6 +1,7 @@
 import Image from "next/image";
 import Link from "next/link";
 import { ButtonLink } from "@/components/ui/Button";
+import { studio } from "@/config/studio";
 import { ProjectCaption } from "@/components/ui/Typography";
 import type { Image as ImageData, PendingImage } from "@/lib/content/schema";
 
@@ -18,11 +19,14 @@ export function HeroAperture({
   image,
   project,
   areas,
+  hasWork = true,
 }: {
   image: ImageData | PendingImage | null;
   /** Set only when the image is a photograph of this project, so the caption never mislabels a picture. */
   project: HeroProject;
   areas: string;
+  /** False while no project is published, so the first button never leads to an empty page. */
+  hasWork?: boolean;
 }) {
   const photo = image && !("pending" in image) ? image : null;
 
@@ -32,7 +36,7 @@ export function HeroAperture({
       <div className="aperture-stage relative pt-[calc(var(--header-h)+1.5rem)] lg:min-h-[100svh] lg:pt-0">
         {/* Image layer: full-bleed, clipped to the aperture on large screens. */}
         <div
-          className="aperture-window relative mx-auto aspect-square w-[min(84vw,30rem)] overflow-hidden rounded-full lg:absolute lg:inset-0 lg:aspect-auto lg:w-auto lg:rounded-none"
+          className="aperture-window relative mx-auto aspect-square w-[min(84vw,30rem)] overflow-hidden rounded-full ring-1 ring-kapur/25 ring-offset-[10px] ring-offset-ink lg:ring-0 lg:ring-offset-0 lg:absolute lg:inset-0 lg:aspect-auto lg:w-auto lg:rounded-none"
           style={{
             ["--aperture-x" as string]: "71%",
             ["--aperture-y" as string]: "53%",
@@ -53,9 +57,9 @@ export function HeroAperture({
               style={{ objectPosition: photo.focus ?? "50% 40%" }}
             />
           ) : (
-            <div className="absolute inset-0 bg-ink-raised" role="img" aria-label="Photograph to come" />
+            <div className="absolute inset-0 bg-ink-raised" aria-hidden="true" />
           )}
-          <div className="aperture-caption pointer-events-none absolute inset-x-0 bottom-0 hidden bg-linear-to-t from-ink/80 via-ink/30 to-transparent pb-10 pt-40 lg:block">
+          <div className="aperture-caption pointer-events-none absolute inset-x-0 bottom-0 hidden bg-linear-to-t from-ink/90 via-ink/50 to-transparent pb-10 pt-56 lg:block">
             <div className="page-x pointer-events-auto flex items-end justify-between gap-8">
               {project ? (
                 <>
@@ -92,7 +96,7 @@ export function HeroAperture({
         <div className="aperture-fade relative z-10 page-x pb-16 pt-12 lg:absolute lg:inset-0 lg:flex lg:items-center lg:pb-[4svh] lg:pt-[calc(var(--header-h)+2svh)]">
           <div className="max-w-[38rem] lg:w-[46%] lg:max-w-none xl:w-[44%]">
             <h1 id="hero-title">
-              <span className="t-label mb-[min(2rem,3.5svh)] block text-mouse">Interior design studio · {areas}</span>
+              <span className="t-label mb-[min(2rem,3.5svh)] block text-mouse">{studio.descriptor} · {areas}</span>
               <span className="t-headline-hero block lg:text-[clamp(2.625rem,min(1.4rem+4.2vw,8.6svh),5.75rem)]">
                 Tell us how you want to live.
               </span>
@@ -102,13 +106,15 @@ export function HeroAperture({
             </h1>
             <p className="mt-[min(2rem,4svh)] max-w-[32rem] text-kapur/85">
               Interior design for homes and for businesses such as restaurants. We start with how a space will be used,
-              then plan it, finish it and light it, within the budget you are working to.
+              then plan it, choose its finishes and light it, within the budget you are working to.
             </p>
             <div className="mt-[min(2.5rem,4.5svh)] flex flex-wrap gap-3">
-              <ButtonLink href="/projects" variant="light">
-                See our projects
-              </ButtonLink>
-              <ButtonLink href="/contact" variant="outline">
+              {hasWork ? (
+                <ButtonLink href="/projects" variant="light">
+                  See our projects
+                </ButtonLink>
+              ) : null}
+              <ButtonLink href="/contact" variant={hasWork ? "outline" : "light"}>
                 Discuss your project
               </ButtonLink>
             </div>

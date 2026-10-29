@@ -12,7 +12,7 @@ export const ensureStatic = "navigation";
 export const metadata: Metadata = pageMetadata({
   title: "Privacy notice · Notis privasi",
   description:
-    "How ROUANG collects, uses and protects the personal data you give us through this website, under Malaysia's Personal Data Protection Act 2010. In English and Bahasa Malaysia.",
+    "How ROUANG collects, uses and protects personal data from this website under Malaysia's Personal Data Protection Act 2010. English and Bahasa Malaysia.",
   path: "/privacy",
 });
 

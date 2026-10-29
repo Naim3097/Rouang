@@ -9,7 +9,12 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const live = <T extends { isDraft: boolean; placeholder?: boolean }>(items: T[]) =>
     items.filter((i) => !i.isDraft && !i.placeholder);
 
-  const staticPages = ["/", "/projects", "/services", "/about", "/insights", "/contact", "/privacy"].map((path) => ({
+  // Listings with nothing live in them are thin pages, so they stay out until something is published.
+  const listings = [
+    ...(live(projects).length ? ["/projects"] : []),
+    ...(live(insights).length ? ["/insights"] : []),
+  ];
+  const staticPages = ["/", "/services", "/about", ...listings, "/contact", "/privacy"].map((path) => ({
     url: absoluteUrl(path),
     changeFrequency: "monthly" as const,
     priority: path === "/" ? 1 : 0.7,

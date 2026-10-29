@@ -13,6 +13,8 @@ const nextConfig: NextConfig = {
   cacheComponents: true,
   partialPrefetching: true,
   poweredByHeader: false,
+  // Lets a production-mode check build into its own folder without disturbing a running server.
+  distDir: process.env.NEXT_DIST_DIR || ".next",
   env: {
     BUILD_YEAR: String(new Date().getFullYear()),
   },

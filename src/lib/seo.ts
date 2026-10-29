@@ -42,6 +42,9 @@ export function pageMetadata({
   const fullTitle = absoluteTitle ? title : `${title}${TITLE_SUFFIX}`;
   const canonical = absoluteUrl(path);
   const index = IS_PRODUCTION && !noindex;
+  // Routes with their own opengraph-image file override this (file-based metadata wins); every
+  // other page shares the brand card, because a page-level openGraph object replaces the root one.
+  image ??= absoluteUrl("/opengraph-image");
   return {
     title: { absolute: fullTitle },
     description,

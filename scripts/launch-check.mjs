@@ -84,6 +84,25 @@ for (const a of read("insights")) {
   for (const t of a.todo ?? []) block(area, `open item: ${t}`);
 }
 
+// ——— Cross-checks across collections ———
+const allProjects = read("projects");
+const liveProjects = new Set(allProjects.filter((p) => p.status === "published" && !p.placeholder).map((p) => p.slug));
+if (liveProjects.size === 0) block("Projects", "no project is published, so the portfolio, the home page hero and the Work section would be empty");
+// Published pages must not link to case studies that are still drafts.
+for (const dir of ["projects", "services", "insights"]) {
+  const folder = path.join(root, "content", dir);
+  for (const f of fs.readdirSync(folder).filter((x) => x.endsWith(".md"))) {
+    const parsed = matter(fs.readFileSync(path.join(folder, f), "utf8"));
+    if (parsed.data.status !== "published") continue;
+    for (const m of parsed.content.matchAll(/\]\(\/projects\/([a-z0-9-]+)\)/g)) {
+      if (!liveProjects.has(m[1])) block(`${dir}/${f}`, `links to the draft project /projects/${m[1]}`);
+    }
+    for (const rel of parsed.data.relatedProjects ?? []) {
+      if (!liveProjects.has(rel)) warn(`${dir}/${f}`, `related project ${rel} is a draft and will not be shown`);
+    }
+  }
+}
+
 // ——— Studio facts and process (read from the config source) ———
 const studioSrc = fs.readFileSync(path.join(root, "src/config/studio.ts"), "utf8");
 for (const m of studioSrc.matchAll(/\{\s*name:\s*"([^"]+)",\s*confirmed:\s*false\s*\}/g)) block("Studio", `service area not confirmed: ${m[1]}`);
@@ -113,6 +132,8 @@ want("TURNSTILE_SECRET_KEY", "Enquiries", "spam protection is honeypot plus rate
 const manual = [
   "Privacy notice (English and Bahasa Malaysia) reviewed by the studio's legal adviser",
   "LAM registration confirmed before any page describes the studio or its people as \"Interior Designers\"",
+  "Legal advice on the descriptor \"Interior design studio\" (src/config/studio.ts descriptor) given the studio's LAM status",
+  "Studio approves the voice copy: About principles, service introductions, the hero and home page lines",
   "If the studio carries out renovation or fit-out itself: CIDB registration and grade confirmed",
   "Rembayung: owners' consent to publish the project; scope wording (interior design only) confirmed",
   "Google Business Profile created and verified with the same name, address and phone as the site",

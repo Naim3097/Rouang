@@ -1,7 +1,7 @@
 ---
 title: "How to choose an interior designer in Malaysia"
 status: draft
-description: What to check before you hire anyone to design your home or business in Malaysia, from LAM and CIDB registration to the questions that reveal how a studio really works.
+description: What to check before hiring anyone to design your home or business in Malaysia, from LAM and CIDB registration to the questions that show how a studio works.
 category: Choosing a designer
 publishedAt: 2026-10-29
 purpose: Help prospective clients compare studios on the things that matter, and position ROUANG as transparent about registration, scope and process.
@@ -27,9 +27,9 @@ Choosing who designs your home or restaurant is mostly a question of trust: you 
 
 ## Check the registrations
 
-In Malaysia, **"Interior Designer" is a protected title**. Under the Architects Act 1967, only people registered with Lembaga Arkitek Malaysia (LAM) as Interior Designers may describe themselves that way, and interior design consultancy services are provided through practices registered with LAM. LAM offers a public registration check on its website, so you can look up a name in a minute.
+In Malaysia, **"Interior Designer" is a protected title**. Under the Architects Act 1967, only people registered with Lembaga Arkitek Malaysia (LAM) as Interior Designers may describe themselves that way, and interior design consultancy services may only be provided through practices registered with LAM. LAM offers a public registration check on its website, so you can look a name up yourself.
 
-**Building work is regulated separately.** Anyone who carries out construction work, which includes renovation and alteration, or offers to, must be registered with the Construction Industry Development Board (CIDB). CIDB grades limit the value of work a contractor may take on, so check that the grade fits the size of your project.
+**Building work is regulated separately.** Anyone who carries out construction work, which includes renovation and alteration, or offers to, must be registered with the Construction Industry Development Board (CIDB), unless exempted. CIDB grades limit the value of work a contractor may take on, so check that the grade fits the size of your project.
 
 Many studios design and then work with a separate contractor; some offer design and build under one roof. Either can work well. What matters is that you know which you are getting, and that whoever does the building is registered to do it.
 
@@ -49,4 +49,4 @@ Renders show intent. Photographs of finished rooms show whether a studio can del
 
 The best early sign is a studio that asks more about how you live or run your business than about what style you like. Style follows from use. A designer who listens first is more likely to give you a space that works.
 
-If you would like to put these questions to us, [start a conversation here](/contact).
+If you are planning a project and want to talk it through, [start a conversation here](/contact).

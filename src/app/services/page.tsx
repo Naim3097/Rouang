@@ -3,15 +3,16 @@ import Link from "next/link";
 import { Arrow, ButtonLink } from "@/components/ui/Button";
 import { Breadcrumbs } from "@/components/ui/Breadcrumbs";
 import { Label, TitlePair } from "@/components/ui/Typography";
+import { areaLabel } from "@/config/studio";
 import { getServices } from "@/lib/content";
 import { pageMetadata } from "@/lib/seo";
 
 export const ensureStatic = "navigation";
 
 export const metadata: Metadata = pageMetadata({
-  title: "Interior design services for homes and businesses",
+  title: "Interior design services in Kuala Lumpur",
   description:
-    "Residential and commercial interior design by ROUANG in Kuala Lumpur and Selangor: space planning, materials, lighting and built-in joinery, scoped to your project and budget.",
+    "Interior design for homes, restaurants and cafés in Kuala Lumpur and Selangor: space planning, materials, lighting and joinery, scoped to your budget.",
   path: "/services",
 });
 
@@ -19,7 +20,7 @@ export default async function ServicesPage() {
   const services = await getServices();
   const groups = [
     { key: "residential", label: "For homes", intro: "Condominiums, landed houses and single rooms, designed around the way your household lives." },
-    { key: "commercial", label: "For businesses", intro: "Restaurants and other commercial spaces that have to work for guests, staff and the bottom line." },
+    { key: "commercial", label: "For businesses", intro: "Restaurants, cafés and food businesses that have to work for guests, staff and the bottom line." },
   ] as const;
 
   return (
@@ -30,10 +31,10 @@ export default async function ServicesPage() {
           <div className="page-grid mt-16 gap-y-10 sm:mt-24">
             <Label className="col-span-12 text-ink-muted lg:col-span-3">Services</Label>
             <div className="col-span-12 lg:col-span-9">
-              <TitlePair as="h1" size="hero" lead="Good design isn't one-size-fits-all." italic="So the scope is yours to shape." />
+              <TitlePair as="h1" size="hero" eyebrow={`Interior design services in ${areaLabel()}`} lead="Good design isn't one-size-fits-all." italic="So the scope is yours to shape." />
               <p className="t-sub mt-10 max-w-[44rem] text-ink-soft">
-                Some clients need a full interior designed from an empty shell; others need one room that finally works.
-                We agree the scope at the start, so you pay for the design your project needs.
+                Some projects start from an empty shell, others from a home or restaurant that has stopped working. The
+                scope is agreed at the start, so the design matches what your project needs.
               </p>
             </div>
           </div>

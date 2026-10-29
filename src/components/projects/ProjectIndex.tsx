@@ -7,7 +7,7 @@ import { publicImage } from "@/lib/content";
 /**
  * Projects as an index of rows rather than a card grid. On pointer devices, hovering a row opens
  * a circular preview of its photograph: the aperture again, at the size of a thumbnail.
- * Pure CSS; on touch screens the preview simply sits at the start of the row.
+ * Pure CSS; below the large breakpoint a small circle sits at the start of each row instead.
  */
 export function ProjectIndex({ projects, startAt = 1 }: { projects: Project[]; startAt?: number }) {
   return (
@@ -25,9 +25,16 @@ export function ProjectIndex({ projects, startAt = 1 }: { projects: Project[]; s
               <span className="t-label col-span-2 tabular-nums text-ink-muted sm:col-span-1">
                 {String(i + startAt).padStart(2, "0")}
               </span>
-              <span className="col-span-10 font-serif text-[clamp(1.75rem,1.2rem+2vw,3.25rem)] italic leading-[1.05] tracking-[-0.01em] transition-transform duration-700 ease-[var(--ease-brand)] group-hover:translate-x-2 sm:col-span-6 lg:col-span-5">
+              <span className="col-span-10 flex items-center gap-4 font-serif text-[clamp(1.75rem,1.2rem+2vw,3.25rem)] italic leading-[1.05] tracking-[-0.01em] transition-transform duration-700 ease-[var(--ease-brand)] group-hover:translate-x-2 sm:col-span-6 lg:col-span-5">
+                {photo ? (
+                  <span className="relative block h-14 w-14 shrink-0 overflow-hidden rounded-full lg:hidden" aria-hidden="true">
+                    <Image src={photo.src} alt="" fill sizes="56px" className="object-cover" style={photo.focus ? { objectPosition: photo.focus } : undefined} />
+                  </span>
+                ) : null}
+                <span>
                 {p.title}
                 {p.isDraft ? <DraftTag placeholder={p.placeholder} /> : null}
+                </span>
               </span>
               <span className="t-caption col-span-10 col-start-3 text-ink-muted sm:col-span-3 sm:col-start-auto lg:col-span-3">
                 {p.type}
@@ -45,9 +52,9 @@ export function ProjectIndex({ projects, startAt = 1 }: { projects: Project[]; s
             {photo ? (
               <div
                 aria-hidden="true"
-                className="pointer-events-none absolute right-[12%] top-1/2 z-10 hidden aspect-square w-[min(15vw,15rem)] -translate-y-1/2 overflow-hidden [clip-path:circle(0%_at_50%_50%)] transition-[clip-path] duration-700 ease-[var(--ease-settle)] group-hover:[clip-path:circle(50%_at_50%_50%)] lg:block"
+                className="pointer-events-none absolute left-[40%] top-1/2 z-10 hidden aspect-square w-[min(11vw,11rem)] -translate-y-1/2 overflow-hidden [clip-path:circle(0%_at_50%_50%)] transition-[clip-path] duration-700 ease-[var(--ease-settle)] group-hover:[clip-path:circle(50%_at_50%_50%)] lg:block"
               >
-                <Image src={photo.src} alt="" fill sizes="15vw" className="object-cover" />
+                <Image src={photo.src} alt="" fill sizes="11rem" className="object-cover" style={photo.focus ? { objectPosition: photo.focus } : undefined} />
               </div>
             ) : null}
           </li>

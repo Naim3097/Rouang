@@ -7,7 +7,7 @@ order: 2
 kicker: For restaurants and cafés
 headline: Restaurant interiors
 headlineItalic: that work for guests and for staff.
-summary: Interior design for restaurants, cafés and food businesses in Kuala Lumpur and Selangor. ROUANG designed the interior of Rembayung, the Malay restaurant in Kampung Baru.
+summary: Interior design for restaurants, cafés and food businesses in Kuala Lumpur and Selangor, planned around how guests arrive, sit and are served, and how the team works.
 audience:
   - Operators opening a new restaurant or café
   - Established restaurants refitting or expanding into the unit next door
@@ -33,7 +33,6 @@ projectTypes:
   - Restaurant
   - Café
   - Warung
-  - Takeaway counter
 faqs:
   - q: Can you work around a kitchen layout that is already fixed?
     a: Answer to come from the studio.
@@ -47,13 +46,17 @@ faqs:
 relatedProjects:
   - rembayung
   - warung-soho
+feature:
+  project: rembayung
+  image: rembayung-gable-dining
 primaryKeyword: restaurant interior design Kuala Lumpur
 seo:
-  title: "Restaurant interior design in Kuala Lumpur"
-  description: Interior design for restaurants and cafés in KL and Selangor, by the studio that designed the interior of Rembayung, Kampung Baru.
+  title: "Restaurant and café interior design in Kuala Lumpur"
+  description: "Interior design for restaurants and cafés in KL and Selangor: seating, service flow, materials and lighting, planned for a full night of service."
 todo:
   - Confirm each offer above matches what the studio delivers on restaurant projects
   - Answer the three questions in the studio's own words
+  - Confirm the project types listed (restaurant, café, warung) are work the studio takes on
 ---
 
 ## A restaurant is two rooms at once
@@ -64,4 +67,4 @@ That is why we start with the plan and the numbers that matter to an operator, s
 
 ## Designed to be remembered
 
-Once the room works, it has to be worth coming back to. The best restaurant interiors feel like they could only belong to that restaurant: its food, its story, its people. That comes from the brief, which is why we spend time with the owners before we draw.
+Once the room works, it has to be worth coming back to. The best restaurant interiors feel like they could only belong to that restaurant: its food, its story, its people. That comes from the brief, which is why the first conversations are with the owners, before anything is drawn.

@@ -3,14 +3,14 @@
 import Link from "next/link";
 import { useEffect, useRef } from "react";
 import { Mark, Wordmark } from "@/components/brand/Brand";
-import { primaryNav } from "@/config/navigation";
+import type { NavItem } from "@/lib/nav";
 import { track } from "@/lib/analytics";
 
 /**
  * Full-screen menu on a native modal <dialog>: focus is trapped, Escape closes it and the page
  * behind becomes inert without extra code. Wordmark top left, mark in the opposite corner (kit p.8).
  */
-export function MobileMenu({ pathname, whatsapp }: { pathname: string; whatsapp: string | null }) {
+export function MobileMenu({ pathname, whatsapp, nav }: { pathname: string; whatsapp: string | null; nav: NavItem[] }) {
   const dialog = useRef<HTMLDialogElement>(null);
 
   useEffect(() => {
@@ -57,7 +57,7 @@ export function MobileMenu({ pathname, whatsapp }: { pathname: string; whatsapp:
 
           <nav aria-label="Menu" className="mt-[8vh]">
             <ul className="border-t border-kapur/15">
-              {primaryNav.map((item, i) => (
+              {nav.map((item, i) => (
                 <li key={item.href} className="border-b border-kapur/15">
                   <Link
                     href={item.href}

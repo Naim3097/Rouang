@@ -48,6 +48,9 @@ gallery:
     span: half
 services:
   - restaurant-interior-design
+seo:
+  title: "Warung Soho: restaurant design proposal"
+  description: Design visualisations by ROUANG for Warung Soho, a dining room of rattan, timber and green steel around a red service counter.
 todo:
   - Confirm what Warung Soho is, where it is, whether it was built, and what ROUANG's role was
   - Supply the renders at full resolution (the Drive copies are 1080 pixels wide, too small for large display)

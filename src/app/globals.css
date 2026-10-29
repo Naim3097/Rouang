@@ -173,6 +173,7 @@
   line-height: 1.4;
   letter-spacing: 0.12em;
   text-transform: uppercase;
+  text-wrap: balance;
 }
 
 /* ——— Layout ——— */
@@ -234,12 +235,19 @@
   opacity: 0.09;
 }
 
+/* Offset into the gutter so the guides frame the text rather than run through it. */
 .sheet-guides::before {
-  left: var(--page-gutter);
+  left: calc(var(--page-gutter) - 1.25rem);
 }
 
 .sheet-guides::after {
-  right: var(--page-gutter);
+  right: calc(var(--page-gutter) - 1.25rem);
+}
+
+@media (max-width: 63.99rem) {
+  .sheet-guides {
+    display: none;
+  }
 }
 
 .cross {
@@ -525,7 +533,7 @@
     .aperture-caption {
       animation: aperture-caption linear both;
       animation-timeline: scroll(root block);
-      animation-range: 80svh 112svh;
+      animation-range: 92svh 118svh;
     }
   }
 }

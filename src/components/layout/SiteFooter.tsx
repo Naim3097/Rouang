@@ -1,31 +1,32 @@
 import Link from "next/link";
 import { Wordmark } from "@/components/brand/Brand";
-import { legalNav, primaryNav } from "@/config/navigation";
+import { legalNav } from "@/config/navigation";
+import type { NavItem } from "@/lib/nav";
 import { areaLabel, studio, telHref, whatsappHref } from "@/config/studio";
 import { ConsentSettingsButton } from "./Analytics";
 import { ContactLink } from "./ContactLink";
 
 /** Footer carries the tagline lockup, as the kit assigns it (p.5: "Covers, hoardings, website footer"). */
-export function SiteFooter() {
+export function SiteFooter({ nav }: { nav: NavItem[] }) {
   const wa = whatsappHref("Hello ROUANG, I'd like to talk about a project.");
   const tel = telHref();
   const year = process.env.BUILD_YEAR;
 
   return (
-    <footer data-tone="dark" className="relative overflow-hidden">
+    <footer data-tone="dark" className="relative overflow-hidden border-t border-kapur/10">
       <div className="page-x pt-24 sm:pt-32">
         <div className="page-grid gap-y-14">
           <div className="col-span-12 lg:col-span-5">
-            <p className="t-italic-display text-[clamp(2rem,1.4rem+2vw,3.25rem)] text-kapur" lang="ms">
-              Ruang tanpa batas.
+            {/* The tagline lives in the lockup below; the footer opens with what the studio does. */}
+            <p className="t-sub max-w-[26rem] text-kapur">
+              Design-led interiors for homes and businesses, balancing how a space looks with how it works.
             </p>
-            <p className="t-caption mt-3 text-mouse">Space without limits.</p>
           </div>
 
           <nav aria-label="Footer" className="col-span-6 sm:col-span-4 lg:col-span-2 lg:col-start-7">
             <p className="t-label mb-5 text-mouse">Navigate</p>
             <ul className="space-y-2.5">
-              {primaryNav.map((item) => (
+              {nav.map((item) => (
                 <li key={item.href}>
                   <Link href={item.href} className="link-reveal">
                     {item.label}
@@ -86,13 +87,13 @@ export function SiteFooter() {
           <p
             aria-hidden="true"
             lang="ms"
-            className="mt-[1.6cqw] text-[2.05cqw] uppercase leading-none tracking-[0.62em] text-mouse [text-align-last:justify] [text-align:justify]"
+            className="mt-[1.6cqw] hidden text-[2.05cqw] uppercase leading-none tracking-[0.62em] text-mouse [text-align-last:justify] [text-align:justify] sm:block"
           >
             Ruang tanpa batas
           </p>
         </div>
 
-        <div className="t-caption mt-14 flex flex-col gap-4 border-t border-kapur/12 py-7 text-mouse sm:flex-row sm:items-center sm:justify-between">
+        <div className="t-caption mt-14 flex flex-col gap-4 border-t border-kapur/12 pb-28 pt-7 text-mouse lg:pb-7 sm:flex-row sm:items-center sm:justify-between">
           <p>
             © {year} {studio.legalName ?? studio.name}
             {studio.registrationNo ? ` (${studio.registrationNo})` : ""}. All rights reserved.

@@ -10,7 +10,8 @@ export const categories = [
 
 export const projectTypes = {
   residential: ["Condominium or apartment", "Landed house", "One room or area", "Not sure yet"],
-  commercial: ["Restaurant, café or bar", "Office", "Shop or showroom", "Another commercial space", "Not sure yet"],
+  // Neutral until the studio confirms office and retail work (the commercial service page is a draft).
+  commercial: ["Restaurant, café or bar", "Another food business", "Another kind of space", "Not sure yet"],
 } as const;
 
 export const budgets = [

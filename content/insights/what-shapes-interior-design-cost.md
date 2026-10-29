@@ -1,5 +1,7 @@
 ---
 title: "What shapes the cost of an interior design project"
+seo:
+  title: "Interior design cost in Malaysia: what shapes it"
 status: draft
 description: Why two similar-looking homes can cost very different amounts to design and build, and how to set a budget your designer can actually work to.
 category: Costs and budgeting
@@ -30,7 +32,7 @@ The works are almost always the larger of the two, so the design decisions are w
 
 **Scope.** Refreshing finishes in a sound layout costs a fraction of moving walls, kitchens or bathrooms. Anything that touches plumbing, electrical points or structure adds cost quickly.
 
-**Built-in joinery.** Wardrobes, kitchen cabinets, feature walls and full-height storage are often the single biggest line in a home interior. Their length, finish and hardware matter more than the size of the room.
+**Built-in joinery.** Wardrobes, kitchen cabinets, feature walls and full-height storage are often one of the largest lines in a home interior. Their length, finish and hardware matter more than the size of the room.
 
 **Materials and finishes.** The same wall can be painted, panelled, plastered or clad in stone. The gap between those choices is large, and it compounds across a whole home.
 
@@ -42,7 +44,7 @@ The works are almost always the larger of the two, so the design decisions are w
 
 ## How design fees are usually structured
 
-Designers commonly charge in one of three ways: a percentage of the construction cost, a rate per square foot of the area designed, or a fixed fee agreed for a defined scope. Each can be fair. What matters is that you know exactly what is included: how many design options, how many revisions, whether drawings for the contractor are part of it, and whether the designer visits site during the works.
+Design fees are usually set in one of a few ways: a percentage of the construction cost, a fixed fee for a defined scope, or a rate per room or per area. Be careful with per square foot figures you see quoted online: many of them are renovation or package prices that include the works, not the design. Each fee model can be fair. What matters is that you know exactly what is included: how many design options, how many revisions, whether drawings for the contractor are part of it, and whether the designer visits site during the works.
 
 Ask for the scope in writing before you compare fees. A low fee that excludes the drawings your contractor needs is not cheaper in the end.
 

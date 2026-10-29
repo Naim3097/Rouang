@@ -41,6 +41,8 @@ export const galleryItem = z.union([
     role: z.enum(["space", "material", "whole"]).optional(),
     /** Include in the scroll walkthrough, with this line as its caption. */
     walk: z.string().optional(),
+    /** Position in the walkthrough, which tells the story in its own order (rooms first, then details). */
+    walkOrder: z.number().optional(),
   }),
   pendingImage.extend({ span: z.enum(["full", "wide", "half", "narrow"]).default("half") }),
 ]);
@@ -126,6 +128,8 @@ export const serviceSchema = z.object({
   projectTypes: z.array(z.string()).default([]),
   faqs: z.array(z.object({ q: z.string(), a: z.string(), confirmed: z.boolean() })).default([]),
   relatedProjects: z.array(slug).default([]),
+  /** A photograph from one of the studio's projects, shown only while that project is live. */
+  feature: z.object({ project: slug, image: z.string() }).nullable().default(null),
   primaryKeyword: z.string(),
   seo,
   todo: z.array(z.string()).default([]),

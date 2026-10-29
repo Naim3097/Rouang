@@ -1,23 +1,26 @@
-import { Suspense } from "react";
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { Icon, Mark } from "@/components/brand/Brand";
 import { ProjectIndex } from "@/components/projects/ProjectIndex";
 import { ButtonLink } from "@/components/ui/Button";
 import { Breadcrumbs } from "@/components/ui/Breadcrumbs";
+import { Figure } from "@/components/ui/Figure";
 import { JsonLd } from "@/components/ui/JsonLd";
 import { Pending } from "@/components/ui/Section";
 import { Label, TitlePair } from "@/components/ui/Typography";
 import { processSteps } from "@/config/process";
-import { getProjects, getService, getServices } from "@/lib/content";
+import { getProject, getProjects, getService, getServices, projectImage, staticSlugs } from "@/lib/content";
 import { SHOW_DRAFTS } from "@/lib/env";
 import { serviceSchema } from "@/lib/schema";
 import { pageMetadata } from "@/lib/seo";
 
 export const ensureStatic = "navigation";
+// Every slug is prerendered and project links prefetch in full, so a navigation that waits for
+// the static payload is acceptable. Content stays in the HTML instead of a hidden Suspense segment.
+export const instant = false;
 
 export async function generateStaticParams() {
-  return (await getServices()).map((s) => ({ slug: s.slug }));
+  return staticSlugs(await getServices());
 }
 
 export async function generateMetadata({ params }: PageProps<"/services/[slug]">): Promise<Metadata> {
@@ -27,24 +30,14 @@ export async function generateMetadata({ params }: PageProps<"/services/[slug]">
   return pageMetadata({ title: s.seo.title ?? s.title, description: s.seo.description ?? s.summary, path: `/services/${s.slug}` });
 }
 
-/*
- * The params-dependent content sits inside Suspense so a default <Link> can show the page frame
- * instantly. Every slug is prerendered, so in practice the fallback is never seen.
- */
-export default function ServicePage({ params }: PageProps<"/services/[slug]">) {
-  return (
-    <Suspense fallback={<div data-tone="light" className="min-h-[100svh] bg-kapur" aria-busy="true" />}>
-      <ServicePageContent params={params} />
-    </Suspense>
-  );
-}
-
-async function ServicePageContent({ params }: { params: PageProps<"/services/[slug]">["params"] }) {
+export default async function ServicePage({ params }: PageProps<"/services/[slug]">) {
   const { slug } = await params;
   const service = await getService(slug);
   if (!service) notFound();
   const projects = (await getProjects()).filter((p) => service.relatedProjects.includes(p.slug));
   const faqs = service.faqs.filter((f) => f.confirmed || SHOW_DRAFTS);
+  const featureProject = service.feature ? await getProject(service.feature.project) : null;
+  const feature = service.feature ? projectImage(featureProject, service.feature.image) : null;
 
   return (
     <>
@@ -73,11 +66,23 @@ async function ServicePageContent({ params }: { params: PageProps<"/services/[sl
         </div>
       </section>
 
+      {feature && featureProject ? (
+        <section data-tone="light" className="bg-kapur text-ink" aria-label={`Photograph: ${featureProject.title}`}>
+          <div className="page-x pb-[var(--section-space)]">
+            <Figure image={feature} aspect="21/9" sizes="100vw" />
+            <p className="t-caption mt-4 text-ink-muted">
+              <span className="font-serif text-[1.08em] italic">{featureProject.title}</span>
+              {featureProject.location ? ` · ${featureProject.location}` : ""} · Interior design by ROUANG
+            </p>
+          </div>
+        </section>
+      ) : null}
+
       {/* Who it is for */}
       <section data-tone="light" className="bg-kapur-deep text-ink">
         <div className="page-x section-y">
           <div className="page-grid gap-y-10">
-            <Label index="01" className="col-span-12 text-ink-muted lg:col-span-3">
+            <Label as="h2" index="01" className="col-span-12 text-ink-muted lg:col-span-3">
               Who it is for
             </Label>
             <ul className="col-span-12 grid gap-x-[var(--grid-gap)] border-t border-ink/15 sm:grid-cols-2 lg:col-span-8 lg:col-start-5">
@@ -96,7 +101,7 @@ async function ServicePageContent({ params }: { params: PageProps<"/services/[sl
       <section data-tone="light" className="bg-kapur text-ink">
         <div className="page-x section-y">
           <div className="page-grid gap-y-10">
-            <Label index="02" className="col-span-12 text-ink-muted lg:col-span-3">
+            <Label as="h2" index="02" className="col-span-12 text-ink-muted lg:col-span-3">
               What we do
             </Label>
             <div className="col-span-12 lg:col-span-8 lg:col-start-5">
@@ -104,14 +109,14 @@ async function ServicePageContent({ params }: { params: PageProps<"/services/[sl
                 {service.offers.map((o, i) => (
                   <li key={o.title} className="grid gap-3 border-b border-ink/15 py-7 sm:grid-cols-[3rem_minmax(0,14rem)_1fr] sm:gap-8">
                     <span className="t-label tabular-nums text-ink-muted">{String(i + 1).padStart(2, "0")}</span>
-                    <h2 className="t-sub">{o.title}</h2>
+                    <h3 className="t-sub">{o.title}</h3>
                     <p className="text-ink-soft">{o.body}</p>
                   </li>
                 ))}
               </ol>
               {service.projectTypes.length ? (
                 <div className="mt-12">
-                  <p className="t-label text-ink-muted">Typical projects</p>
+                  <p className="t-label text-ink-muted">Projects we take on</p>
                   <ul className="mt-4 flex flex-wrap gap-2">
                     {service.projectTypes.map((t) => (
                       <li key={t} className="rounded-full border border-ink/20 px-4 py-2 text-[0.9375rem]">
@@ -152,7 +157,7 @@ async function ServicePageContent({ params }: { params: PageProps<"/services/[sl
       <section data-tone="dark">
         <div className="page-x section-y">
           <div className="page-grid gap-y-10">
-            <Label index="04" className="col-span-12 text-mouse lg:col-span-3">
+            <Label as="h2" index="04" className="col-span-12 text-mouse lg:col-span-3">
               How it runs
             </Label>
             <ol className="col-span-12 grid gap-x-[var(--grid-gap)] gap-y-10 sm:grid-cols-2 lg:col-span-9 lg:grid-cols-4">

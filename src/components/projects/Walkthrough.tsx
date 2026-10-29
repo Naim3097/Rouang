@@ -13,6 +13,8 @@ export type WalkFrame = {
   focus?: string;
   /** One of the brand kit's three kinds of picture. */
   role: "Space" | "Material" | "Whole";
+  /** Short name for the frame index, e.g. "Batik frame". */
+  label: string;
   caption: string;
 };
 
@@ -62,11 +64,12 @@ export function Walkthrough({
       layers.current.forEach((layer, i) => {
         if (!layer) return;
         if (i === 0) return;
-        // Each photograph opens over 70% of its step, centred on the step boundary.
-        const t = Math.min(1, Math.max(0, (pos - (i - 1) - 0.15) / 0.7));
+        // Each photograph opens over 40% of its step and then holds still, so most of the scroll
+        // shows one settled picture rather than two caught mid-wipe.
+        const t = Math.min(1, Math.max(0, (pos - (i - 1) - 0.3) / 0.4));
         const eased = 1 - Math.pow(1 - t, 3);
         // The caption follows the photograph that has mostly opened, not the scroll position.
-        if (t >= 0.5) showing = i;
+        if (t >= 0.35) showing = i;
         layer.style.clipPath = `circle(${(eased * 75).toFixed(2)}% at 50% 50%)`;
         const img = layer.firstElementChild as HTMLElement | null;
         if (img) img.style.transform = `scale(${(1.12 - 0.12 * eased).toFixed(4)})`;
@@ -98,7 +101,7 @@ export function Walkthrough({
               <p className="t-label text-mouse">
                 {String(i + 1).padStart(2, "0")} · {f.role}
               </p>
-              <p className="t-quote mt-3 text-kapur">{f.caption}</p>
+              <p className="mt-3 text-kapur">{f.caption}</p>
             </figcaption>
           </figure>
         ))}
@@ -111,9 +114,9 @@ export function Walkthrough({
   return (
     <div ref={track} className="relative" style={{ height: `${frames.length * 85 + 20}svh` }}>
       <div className="sticky top-0 flex h-[100svh] items-center overflow-hidden">
-        <div className="page-x grid w-full items-center gap-8 lg:grid-cols-12 lg:gap-[var(--grid-gap)]">
+        <div className="page-x grid w-full grid-cols-[minmax(0,1fr)] items-center gap-6 lg:grid-cols-12 lg:gap-[var(--grid-gap)]">
           {/* The picture: photographs stacked, each opening out of the last. */}
-          <div className="relative mx-auto aspect-[4/5] h-[min(62svh,40rem)] max-w-full lg:order-2 lg:col-span-5 lg:col-start-5 lg:h-[min(80svh,52rem)]">
+          <div className="relative mx-auto aspect-[4/5] w-[min(100%,44svh)] lg:order-2 lg:col-span-6 lg:col-start-4 lg:h-[min(84svh,56rem)] lg:w-auto">
             {frames.map((f, i) => (
               <div
                 key={f.src}
@@ -128,32 +131,31 @@ export function Walkthrough({
                   src={f.src}
                   alt={i === active ? f.alt : ""}
                   fill
-                  sizes="(min-width: 1024px) 42vw, 90vw"
+                  sizes="(min-width: 1024px) 50vw, 90vw"
                   className="object-cover will-change-transform"
                   style={f.focus ? { objectPosition: f.focus } : undefined}
                   loading={i < 2 ? "eager" : "lazy"}
                 />
               </div>
             ))}
-            <span className="pointer-events-none absolute -inset-5 rounded-full border border-dashed border-kapur/0" aria-hidden="true" />
           </div>
 
           {/* The words: what you are looking at, frame by frame. */}
           <div className="lg:order-1 lg:col-span-3">
             <p className="t-label text-mouse">{kicker}</p>
-            <p className="mt-4 font-serif text-[clamp(2rem,1.4rem+2vw,3.25rem)] italic leading-none">{title}</p>
-            <div className="mt-8 h-px w-full bg-kapur/15">
+            <p className="mt-2 font-serif text-[clamp(1.625rem,1.2rem+2vw,3.25rem)] italic leading-none lg:mt-4">{title}</p>
+            <div className="mt-4 h-px w-full bg-kapur/15 lg:mt-8">
               <div className="h-px bg-rikyu transition-[width] duration-500" style={{ width: `${((active + 1) / frames.length) * 100}%` }} />
             </div>
-            <div aria-live="polite" className="mt-6 min-h-[8.5rem]">
+            <div aria-live="polite" className="mt-4 min-h-[5.5rem] lg:mt-6 lg:min-h-[8.5rem]">
               <p className="t-label tabular-nums text-mouse">
                 {String(active + 1).padStart(2, "0")} / {String(frames.length).padStart(2, "0")} · {current.role}
               </p>
-              <p key={current.src} className="t-quote mt-3 animate-[walk-in_0.7s_var(--ease-brand)_both] text-kapur">
+              <p key={current.src} className="mt-2 animate-[walk-in_0.7s_var(--ease-brand)_both] text-[1.0625rem] leading-relaxed text-kapur lg:mt-3 lg:text-[1.1875rem]">
                 {current.caption}
               </p>
             </div>
-            <Link href={href} className="group mt-8 inline-flex items-center gap-3 text-kapur">
+            <Link href={href} className="group mt-3 inline-flex min-h-11 items-center gap-3 text-kapur lg:mt-8">
               <span className="link-line">Read the case study</span>
               <Mark className="h-5 w-5 transition-transform duration-500 group-hover:translate-x-1" />
             </Link>
@@ -163,7 +165,7 @@ export function Walkthrough({
             {frames.map((f, i) => (
               <li key={f.src} className={`t-caption flex items-center gap-3 py-1.5 transition-colors duration-500 ${i === active ? "text-kapur" : "text-kapur/35"}`}>
                 <span className={`block h-px transition-all duration-500 ${i === active ? "w-8 bg-kapur" : "w-4 bg-kapur/35"}`} />
-                {f.role}
+                {f.label}
               </li>
             ))}
           </ol>

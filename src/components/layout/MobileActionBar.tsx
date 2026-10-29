@@ -15,10 +15,29 @@ export function MobileActionBar({ whatsapp }: { whatsapp: string | null }) {
   const [visible, setVisible] = useState(false);
 
   useEffect(() => {
-    const onScroll = () => setVisible(window.scrollY > window.innerHeight * 0.8);
+    // Out of the way while the footer or an enquiry form is on screen: it would cover their links
+    // and fields, and a form in view is already the next step.
+    const blocking = new Set<Element>();
+    let pastHero = false;
+    const sync = () => setVisible(pastHero && blocking.size === 0);
+    const onScroll = () => {
+      pastHero = window.scrollY > window.innerHeight * 0.8;
+      sync();
+    };
+    const io = new IntersectionObserver((entries) => {
+      for (const e of entries) {
+        if (e.isIntersecting) blocking.add(e.target);
+        else blocking.delete(e.target);
+      }
+      sync();
+    });
+    document.querySelectorAll("footer, form").forEach((el) => io.observe(el));
     onScroll();
     window.addEventListener("scroll", onScroll, { passive: true });
-    return () => window.removeEventListener("scroll", onScroll);
+    return () => {
+      window.removeEventListener("scroll", onScroll);
+      io.disconnect();
+    };
   }, [pathname]);
 
   if (pathname.startsWith("/contact")) return null;
@@ -46,7 +65,7 @@ export function MobileActionBar({ whatsapp }: { whatsapp: string | null }) {
         href="/contact"
         tabIndex={visible ? 0 : -1}
         onClick={() => track("cta_click", { location: "mobile_bar" })}
-        className="flex min-h-12 items-center gap-3 rounded-full bg-ink py-1.5 pl-5 pr-1.5 text-[0.9375rem] text-kapur shadow-[0_12px_30px_-12px_rgb(0_0_0/0.55)]"
+        className="flex min-h-12 items-center gap-3 rounded-full bg-ink py-1.5 pl-5 pr-1.5 text-[0.9375rem] text-kapur shadow-[0_12px_30px_-12px_rgb(0_0_0/0.55)] ring-1 ring-kapur/25"
       >
         <span>Discuss your project</span>
         <Mark className="h-8 w-8" />

@@ -9,16 +9,16 @@ import { Label, TitlePair } from "@/components/ui/Typography";
 import { brandImagery } from "@/config/media";
 import { processSteps } from "@/config/process";
 import { studio } from "@/config/studio";
-import { getProjects, publicImage } from "@/lib/content";
+import { getProjects, projectImage, publicImage } from "@/lib/content";
 import { SHOW_DRAFTS } from "@/lib/env";
 import { pageMetadata } from "@/lib/seo";
 
 export const ensureStatic = "navigation";
 
 export const metadata: Metadata = pageMetadata({
-  title: "About the studio",
+  title: "About ROUANG, an interior design studio",
   description:
-    "ROUANG is a design-led interior studio for homes and businesses. The name comes from the Malay word ruang, space, with an added O for openness, originality and opportunity.",
+    "ROUANG is a design-led interior studio for homes and businesses. The name comes from the Malay ruang, space, with an O for openness, originality and opportunity.",
   path: "/about",
 });
 
@@ -39,7 +39,8 @@ const principles = [
 
 export default async function AboutPage() {
   const projects = await getProjects();
-  const horizon = publicImage(brandImagery.horizonWall);
+  // A real material photograph behind the wordmark; brand-kit atmosphere only as a preview fallback.
+  const horizon = projectImage(projects.find((p) => p.slug === "ampang"), "ampang-black-joinery") ?? publicImage(brandImagery.horizonWall);
 
   return (
     <>
@@ -49,7 +50,7 @@ export default async function AboutPage() {
           <div className="page-grid mt-16 gap-y-10 sm:mt-24">
             <Label className="col-span-12 text-ink-muted lg:col-span-3">Studio</Label>
             <div className="col-span-12 lg:col-span-9">
-              <TitlePair as="h1" size="hero" lead="Considered design." italic="Spaces that feel distinctly yours." />
+              <TitlePair as="h1" size="hero" eyebrow="About ROUANG, interior design studio" lead="Considered design." italic="Spaces that feel distinctly yours." />
               <p className="t-sub mt-10 max-w-[44rem] text-ink-soft">
                 ROUANG is a design-led interior studio for homes and businesses. We balance how a space looks with how it
                 works, and with the realities of each project: the budget, the site and the time there is.

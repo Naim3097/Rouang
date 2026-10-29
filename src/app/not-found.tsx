@@ -1,5 +1,8 @@
+import type { Metadata } from "next";
 import { Mark } from "@/components/brand/Brand";
 import { ButtonLink } from "@/components/ui/Button";
+
+export const metadata: Metadata = { title: { absolute: "Page not found · ROUANG" }, robots: { index: false } };
 
 export default function NotFound() {
   return (

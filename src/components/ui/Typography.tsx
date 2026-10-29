@@ -28,6 +28,7 @@ export function TitlePair({
   as: Tag = "h2",
   lead,
   italic,
+  eyebrow,
   size = "section",
   className = "",
   italicClassName = "",
@@ -36,6 +37,8 @@ export function TitlePair({
   as?: ElementType;
   lead: ReactNode;
   italic?: ReactNode;
+  /** Small caps line inside the heading, e.g. "Interior design projects", so the h1 names its subject. */
+  eyebrow?: ReactNode;
   size?: "hero" | "section";
   className?: string;
   italicClassName?: string;
@@ -44,6 +47,7 @@ export function TitlePair({
   const leadClass = size === "hero" ? "t-headline-hero" : "t-headline";
   return (
     <Tag id={id} className={`${leadClass} ${className}`}>
+      {eyebrow ? <span className="t-label mb-8 block text-ink-muted">{eyebrow}</span> : null}
       <span className="block">{lead}</span>
       {italic ? (
         <span

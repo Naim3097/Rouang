@@ -9,7 +9,7 @@ location: Kampung Baru, Kuala Lumpur
 year: "2026"
 scope:
   - Interior design
-summary: The interior of Rembayung, food creator Khairul Aming's first restaurant, serving Malay kampung cooking in Kampung Baru, Kuala Lumpur.
+summary: The interior of Rembayung, food creator Khairul Aming’s first restaurant, serving Malay kampung cooking in Kampung Baru, Kuala Lumpur.
 standfirst: Rembayung opened in Kampung Baru in January 2026, in a new glass-walled building under a pitched timber roof. ROUANG designed the interior.
 area: null
 photography:
@@ -22,11 +22,11 @@ hero:
   height: 2400
   focus: "50% 28%"
 card:
-  src: /images/projects/rembayung/rembayung-a-frame-ceiling.jpg
-  alt: "The timber-lined A-frame ceiling of the dining hall, rising to a glazed gable"
-  width: 1800
+  src: /images/projects/rembayung/rembayung-upper-dining.jpg
+  alt: "Upstairs dining under the pitched timber roof, with rows of tables and planters along the edge"
+  width: 1350
   height: 2400
-  focus: "50% 40%"
+  focus: "50% 62%"
 gallery:
   - src: /images/projects/rembayung/rembayung-a-frame-ceiling.jpg
     alt: "The timber-lined A-frame ceiling of the dining hall, rising to a glazed gable above a mezzanine"
@@ -34,7 +34,6 @@ gallery:
     height: 2400
     span: wide
     role: space
-    walk: "The main hall rises to a glazed gable under a timber-lined roof."
     caption: "The main hall under its timber-lined roof."
   - src: /images/projects/rembayung/rembayung-table-in-sun.jpg
     alt: "A timber table and rattan-backed chair by the window in afternoon sun, with planting outside"
@@ -50,6 +49,7 @@ gallery:
     span: half
     role: material
     walk: "Batik, carried overhead on timber frames."
+    walkOrder: 2
     caption: "Batik carried on timber frames overhead."
   - src: /images/projects/rembayung/rembayung-long-hall.jpg
     alt: "A long dining hall under the A-frame roof, divided down its length by a planted banquette"
@@ -57,7 +57,6 @@ gallery:
     height: 2400
     span: half
     role: whole
-    walk: "The long hall, divided down its length by a planted banquette."
     caption: "The long hall, divided by a planted banquette."
   - src: /images/projects/rembayung/rembayung-counter-edge.jpg
     alt: "Close-up of a timber counter top with a routed groove along its edge, against slatted timber"
@@ -65,7 +64,8 @@ gallery:
     height: 2400
     span: narrow
     role: material
-    walk: "Timber, worked to a clean edge."
+    walk: "A timber counter, detailed with a routed edge."
+    walkOrder: 4
     caption: "Edge detail on a timber counter."
   - src: /images/projects/rembayung/rembayung-rattan-pendant.jpg
     alt: "A large rattan pendant lamp hanging under the steel and timber roof, with tables below"
@@ -74,12 +74,15 @@ gallery:
     span: half
     role: space
     walk: "Rattan pendants hang low over the tables."
+    walkOrder: 5
   - src: /images/projects/rembayung/rembayung-gable-dining.jpg
     alt: "Dining tables with rattan-backed chairs beneath the glazed gable, behind a slatted timber screen"
     width: 1350
     height: 2400
     span: half
     role: space
+    walk: "Dining tables beneath the building's glazed gable, behind a slatted timber screen."
+    walkOrder: 1
   - src: /images/projects/rembayung/rembayung-stained-glass-screen.jpg
     alt: "A partition of corrugated and stained glass in green, blue and amber, hung with woven trays and the Rembayung name"
     width: 1350
@@ -87,6 +90,7 @@ gallery:
     span: half
     role: material
     walk: "Stained glass in green, blue and amber, hung with woven trays."
+    walkOrder: 6
     caption: "Stained glass, woven trays and the restaurant's name."
   - src: /images/projects/rembayung/rembayung-batik-shelves.jpg
     alt: "Timber shelving stacked with folded batik cloth above a slatted base"
@@ -100,6 +104,8 @@ gallery:
     height: 2400
     span: half
     role: whole
+    walk: "The ground-floor dining room: bentwood chairs, timber blinds, terracotta underfoot."
+    walkOrder: 3
   - src: /images/projects/rembayung/rembayung-upper-dining.jpg
     alt: "Upstairs dining under the pitched timber roof, with rows of tables and planters along the edge"
     width: 1350
@@ -136,8 +142,8 @@ services:
 facts:
   - label: ROUANG's role
     value: Interior design only. Construction was not part of ROUANG's scope.
-    source: Agency brief, 28 October 2026
-    verified: true
+    source: Agency brief, 28 October 2026. To be confirmed in writing by the studio
+    verified: false
   - label: Location
     value: Lot 2791, Jalan Daud, Kampung Baru, Kuala Lumpur
     source: Press coverage (The Beat, Sinar Harian, PeKhabar), see docs/research/discovery-research.md
@@ -148,9 +154,10 @@ facts:
     verified: true
 seo:
   title: "Rembayung, Kampung Baru: restaurant interior design"
-  description: How ROUANG designed the interior of Rembayung, Khairul Aming's Malay restaurant in Kampung Baru, Kuala Lumpur. Photographs and design notes.
+  description: The interior of Rembayung, a Malay kampung restaurant in Kampung Baru, Kuala Lumpur, designed by ROUANG. Photographs of the dining rooms and details.
 todo:
-  - Confirm the restaurant's owners are happy for the project to be named, photographed and published here
+  - Confirm the restaurant's owners are happy for the project to be named, photographed and published here, and keep the written agreement or appointment on file
+  - Written consent to name Khairul Aming as the owner (he is named in the summary, never in titles or search snippets)
   - Confirm the photographs can be used and who should be credited (they were taken on an iPhone)
   - "Confirm ROUANG's scope. Several photos show ROUANG-branded crew assembling furniture and finishing timber screens on site, which suggests more than design. Until confirmed, the site says interior design only"
   - Confirm the description under Inside, and which elements were ROUANG's design rather than the building's

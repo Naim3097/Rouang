@@ -69,12 +69,34 @@ async function loadCollection<S extends z.ZodTypeAny>(dir: string, schema: S): P
   return entries.filter((e) => SHOW_DRAFTS || !e.isDraft);
 }
 
+/**
+ * Params for generateStaticParams. With Cache Components the list must never be empty, and in
+ * production a collection can be (everything still in draft). The sentinel slug renders notFound()
+ * and never appears in the sitemap, the pattern Next's own docs give for this case.
+ */
+export const NO_ENTRIES_SLUG = "__none";
+
+export function staticSlugs(entries: { slug: string }[]) {
+  return entries.length ? entries.map((e) => ({ slug: e.slug })) : [{ slug: NO_ENTRIES_SLUG }];
+}
+
 /** Drop media that may not appear on the live site: pending shots and unlicensed provisional imagery. */
 export function publicImage<T extends Image | PendingImage | null>(img: T): T | null {
   if (!img) return null;
   if ("pending" in img) return SHOW_DRAFTS ? img : null;
   if (img.provisional && !SHOW_DRAFTS) return null;
   return img;
+}
+
+/**
+ * A named photograph from a project's gallery ("rembayung-long-hall"), only if that project is
+ * visible in this environment and the photograph is cleared. Used wherever a page borrows a
+ * project's imagery, so nothing from an unpublished project can leak onto a live page.
+ */
+export function projectImage(project: Project | null | undefined, file: string): Image | null {
+  const item = project?.gallery.find((g) => !("pending" in g) && g.src.endsWith(`/${file}.jpg`));
+  const img = item ? publicImage(item) : null;
+  return img && !("pending" in img) ? img : null;
 }
 
 export async function getProjects(): Promise<Project[]> {

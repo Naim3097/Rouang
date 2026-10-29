@@ -9,6 +9,7 @@ import { SiteHeader } from "@/components/layout/SiteHeader";
 import { JsonLd } from "@/components/ui/JsonLd";
 import { studio, whatsappHref } from "@/config/studio";
 import { GA_MEASUREMENT_ID, GOOGLE_SITE_VERIFICATION, IS_PRODUCTION, SITE_URL } from "@/lib/env";
+import { liveNav } from "@/lib/nav";
 import { organizationSchema, websiteSchema } from "@/lib/schema";
 import "./globals.css";
 
@@ -43,7 +44,8 @@ export const viewport: Viewport = {
   colorScheme: "light",
 };
 
-export default function RootLayout({ children }: LayoutProps<"/">) {
+export default async function RootLayout({ children }: LayoutProps<"/">) {
+  const nav = await liveNav();
   const whatsapp = whatsappHref("Hello ROUANG, I'd like to talk about a project.");
   return (
     <html lang="en-MY" className={`${outfit.variable} ${garamond.variable}`} suppressHydrationWarning>
@@ -51,13 +53,13 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
         <a href="#main" className="skip-link">
           Skip to content
         </a>
-        <SiteHeader whatsapp={whatsapp} />
+        <SiteHeader whatsapp={whatsapp} nav={nav} />
         <ViewTransition>
           <main id="main" tabIndex={-1} className="outline-none">
             {children}
           </main>
         </ViewTransition>
-        <SiteFooter />
+        <SiteFooter nav={nav} />
         <MobileActionBar whatsapp={whatsapp} />
         <Analytics measurementId={IS_PRODUCTION ? GA_MEASUREMENT_ID : null} />
         {!IS_PRODUCTION ? <PreviewBar /> : null}

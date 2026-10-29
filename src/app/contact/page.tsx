@@ -13,7 +13,7 @@ export const ensureStatic = "navigation";
 export const metadata: Metadata = pageMetadata({
   title: "Contact: discuss your interior design project",
   description:
-    "Tell ROUANG about your home, restaurant or commercial space. Send a short enquiry and the studio will reply to arrange a first conversation.",
+    "Tell ROUANG about your home, restaurant or café. Send a short enquiry and the studio will reply to arrange a first conversation.",
   path: "/contact",
 });
 
@@ -34,8 +34,8 @@ export default function ContactPage() {
           <div className="col-span-12 lg:col-span-5">
             <Label className="text-ink-muted">Project enquiry</Label>
             <h1 className="t-headline-hero mt-8">
-              <span className="block">Tell us about the space.</span>
-              <span className="t-italic-display mt-[0.06em] block text-[1.08em] text-rikyu">We&rsquo;ll take it from there.</span>
+              <span className="block">Start with a few lines.</span>
+              <span className="t-italic-display mt-[0.06em] block text-[1.08em] text-rikyu">The first conversation follows.</span>
             </h1>
             <p lang="ms" className="t-quote mt-8 text-ink-muted">
               Anda cerita macam mana nak duduk. Kami terjemah jadi ruang.

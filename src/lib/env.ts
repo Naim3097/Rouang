@@ -32,6 +32,11 @@ function resolveSiteUrl(): string {
 /** Canonical origin. Preview deployments still point canonicals at production. */
 export const SITE_URL = resolveSiteUrl();
 
+// A live site must never canonicalise to localhost, whatever the launch check is set to.
+if (IS_PRODUCTION && SITE_URL.startsWith("http://localhost")) {
+  throw new Error("Production build without a site URL: set NEXT_PUBLIC_SITE_URL to the live domain.");
+}
+
 export const GA_MEASUREMENT_ID = process.env.NEXT_PUBLIC_GA_MEASUREMENT_ID || null;
 export const GOOGLE_SITE_VERIFICATION = process.env.GOOGLE_SITE_VERIFICATION || null;
 export const TURNSTILE_SITE_KEY = process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY || null;

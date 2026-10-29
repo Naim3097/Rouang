@@ -2,9 +2,19 @@ import "server-only";
 import fs from "node:fs/promises";
 import path from "node:path";
 import { ImageResponse } from "next/og";
+import sharp from "sharp";
 import { MARK, WORDMARK } from "@/components/brand/paths";
 
 export const OG_SIZE = { width: 1200, height: 630 };
+
+/** Social cards are served as JPEG: a PNG of a photograph is several times larger. */
+export async function asJpeg(card: ImageResponse) {
+  const png = Buffer.from(await card.arrayBuffer());
+  const jpg = await sharp(png).jpeg({ quality: 82, mozjpeg: true }).toBuffer();
+  return new Response(new Uint8Array(jpg), {
+    headers: { "Content-Type": "image/jpeg", "Cache-Control": "public, max-age=31536000, immutable" },
+  });
+}
 
 async function font(file: string) {
   return fs.readFile(path.join(process.cwd(), "node_modules/@fontsource", file));
@@ -27,11 +37,16 @@ export async function brandCard({ kicker, title, italic, image }: { kicker: stri
     font("eb-garamond/files/eb-garamond-latin-400-italic.woff"),
   ]);
 
+  // The photograph is cropped and compressed to the card's own size before embedding, so the
+  // card stays small enough for WhatsApp and LinkedIn previews.
   let photo: string | null = null;
   if (image && image.startsWith("/") && /\.(jpe?g|png)$/i.test(image)) {
     try {
-      const buf = await fs.readFile(path.join(process.cwd(), "public", image));
-      photo = `data:image/${image.toLowerCase().endsWith("png") ? "png" : "jpeg"};base64,${buf.toString("base64")}`;
+      const buf = await sharp(path.join(process.cwd(), "public", image))
+        .resize({ width: 500, height: 630, fit: "cover", position: "attention" })
+        .jpeg({ quality: 72, mozjpeg: true })
+        .toBuffer();
+      photo = `data:image/jpeg;base64,${buf.toString("base64")}`;
     } catch {
       photo = null;
     }

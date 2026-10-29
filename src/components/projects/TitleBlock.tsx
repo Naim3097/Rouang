@@ -9,7 +9,7 @@ export function TitleBlock({
   tone = "light",
   className = "",
 }: {
-  project: Pick<Project, "type" | "location" | "year" | "scope" | "area" | "sector">;
+  project: Pick<Project, "type" | "location" | "year" | "scope" | "area" | "sector" | "visualisation">;
   tone?: "light" | "dark";
   className?: string;
 }) {
@@ -18,7 +18,8 @@ export function TitleBlock({
     ["Location", project.location],
     ["Our role", project.scope.join(", ")],
     ["Area", project.area],
-    ["Completed", project.year],
+    // A proposal has a stage, not a completion date.
+    project.visualisation ? ["Stage", ["Design proposal", project.year].filter(Boolean).join(", ")] : ["Completed", project.year],
   ];
   const visible = rows.filter(([, v]) => v);
   const line = tone === "dark" ? "border-kapur/15" : "border-ink/15";

@@ -19,6 +19,8 @@ export type PostalAddress = {
   country: "MY";
 };
 
+import { IS_PRODUCTION } from "@/lib/env";
+
 const env = (key: string) => process.env[key]?.trim() || null;
 
 export const studio = {
@@ -35,6 +37,11 @@ export const studio = {
     ms: "Anda cerita macam mana nak duduk. Kami terjemah jadi ruang.",
     en: "You tell us how you want to live. We translate it into space.",
   },
+  /**
+   * How the studio describes itself. "Interior Designer" is a protected title (Architects Act 1967
+   * s.27A); legal advice on this wording is a launch check. Change it here and it changes everywhere.
+   */
+  descriptor: "Interior design studio",
   /** Working positioning from the project brief. */
   positioning:
     "A design-led interior studio creating considered spaces for homes and businesses, balancing aesthetics, functionality and the realities of each project.",
@@ -97,6 +104,12 @@ export function telHref() {
   return phone ? `tel:${phone}` : null;
 }
 
+/**
+ * Where the studio works, as shown on the page. Previews show the intended areas so they can be
+ * reviewed; production shows confirmed areas only, so an override of the launch check cannot ship
+ * an unconfirmed location.
+ */
 export function areaLabel() {
-  return studio.serviceAreas.map((a) => a.name).join(" and ");
+  const areas = IS_PRODUCTION ? studio.serviceAreas.filter((a) => a.confirmed) : studio.serviceAreas;
+  return areas.length ? areas.map((a) => a.name).join(" and ") : "Malaysia";
 }

@@ -1,4 +1,3 @@
-import { Suspense } from "react";
 import type { Metadata } from "next";
 import Image from "next/image";
 import Link from "next/link";
@@ -13,16 +12,18 @@ import { Figure } from "@/components/ui/Figure";
 import { Film } from "@/components/ui/Film";
 import { Pending } from "@/components/ui/Section";
 import { Label } from "@/components/ui/Typography";
-import { getProject, getProjects, getServices, publicImage, type Project } from "@/lib/content";
+import { getProject, getProjects, getServices, publicImage, type Project, staticSlugs } from "@/lib/content";
 import type { GalleryItem } from "@/lib/content/schema";
 import { SHOW_DRAFTS } from "@/lib/env";
 import { pageMetadata } from "@/lib/seo";
 
 export const ensureStatic = "navigation";
+// Every slug is prerendered and project links prefetch in full, so a navigation that waits for
+// the static payload is acceptable. Content stays in the HTML instead of a hidden Suspense segment.
+export const instant = false;
 
 export async function generateStaticParams() {
-  const projects = await getProjects();
-  return projects.map((p) => ({ slug: p.slug }));
+  return staticSlugs(await getProjects());
 }
 
 export async function generateMetadata({ params }: PageProps<"/projects/[slug]">): Promise<Metadata> {
@@ -39,19 +40,7 @@ export async function generateMetadata({ params }: PageProps<"/projects/[slug]">
 
 type Chapter = { key: string; label: string; title: string; body: string | null; hint: string };
 
-/*
- * The params-dependent content sits inside Suspense so a default <Link> can show the page frame
- * instantly. Every slug is prerendered, so in practice the fallback is never seen.
- */
-export default function ProjectPage({ params }: PageProps<"/projects/[slug]">) {
-  return (
-    <Suspense fallback={<div data-tone="dark" className="min-h-[100svh]" aria-busy="true" />}>
-      <ProjectPageContent params={params} />
-    </Suspense>
-  );
-}
-
-async function ProjectPageContent({ params }: { params: PageProps<"/projects/[slug]">["params"] }) {
+export default async function ProjectPage({ params }: PageProps<"/projects/[slug]">) {
   const { slug } = await params;
   const project = await getProject(slug);
   if (!project) notFound();
@@ -93,10 +82,12 @@ async function ProjectPageContent({ params }: { params: PageProps<"/projects/[sl
             <Breadcrumbs tone="dark" items={[{ name: "Projects", href: "/projects" }, { name: project.title, href: `/projects/${project.slug}` }]} />
             <div className="page-grid mt-16 gap-y-8 sm:mt-24">
               <div className="col-span-12 lg:col-span-8">
-                <p className="t-label text-kapur/75">{facts}</p>
-                <h1 className="mt-5 font-serif text-[clamp(3.25rem,1.5rem+7vw,8.5rem)] italic leading-[0.88] tracking-[-0.02em]">
-                  {project.title}
-                  {project.isDraft ? <DraftTag placeholder={project.placeholder} /> : null}
+                <h1>
+                  <span className="t-label block text-kapur/75">{facts}</span>
+                  <span className="mt-5 block font-serif text-[clamp(3.25rem,1.5rem+7vw,8.5rem)] italic leading-[0.88] tracking-[-0.02em]">
+                    {project.title}
+                    {project.isDraft ? <DraftTag placeholder={project.placeholder} /> : null}
+                  </span>
                 </h1>
               </div>
               <p className="t-sub col-span-12 max-w-[40rem] self-end text-kapur/85 lg:col-span-4">{project.standfirst ?? project.summary}</p>
@@ -127,21 +118,25 @@ async function ProjectPageContent({ params }: { params: PageProps<"/projects/[sl
                 {"pending" in hero ? (
                   <Figure image={hero} sizes="100vw" aspect="auto" tone="dark" reveal={false} className="h-full" />
                 ) : (
-                  <Image src={hero.src} alt={hero.alt} fill priority fetchPriority="high" sizes="100vw" quality={80} className="object-cover" />
+                  <Image src={hero.src} alt={hero.alt} fill priority fetchPriority="high" sizes="100vw" quality={80} className="object-cover" style={hero.focus ? { objectPosition: hero.focus } : undefined} />
                 )}
               </div>
             </ViewTransition>
           ) : null}
           <div className="absolute inset-0 bg-linear-to-t from-ink via-ink/35 to-ink/10" aria-hidden="true" />
+          {/* A second scrim under the header, so navigation stays legible over bright ceilings. */}
+          <div className="absolute inset-x-0 top-0 h-56 bg-linear-to-b from-ink/70 to-transparent" aria-hidden="true" />
         </div>
 
         <div className="page-x relative flex min-h-[100svh] flex-col justify-between pb-12 pt-[calc(var(--header-h)+1.5rem)] sm:pb-16">
           <Breadcrumbs tone="dark" items={[{ name: "Projects", href: "/projects" }, { name: project.title, href: `/projects/${project.slug}` }]} />
           <div>
-            <p className="t-label text-kapur/75">{facts}</p>
-            <h1 className="mt-5 font-serif text-[clamp(3.5rem,1.5rem+9vw,11rem)] italic leading-[0.86] tracking-[-0.02em]">
+            <h1>
+              <span className="t-label block text-kapur/75">{facts}</span>
+              <span className="mt-5 block font-serif text-[clamp(3.5rem,1.5rem+9vw,11rem)] italic leading-[0.86] tracking-[-0.02em]">
               {project.title}
               {project.isDraft ? <DraftTag placeholder={project.placeholder} /> : null}
+              </span>
             </h1>
             <p className="t-sub mt-7 max-w-[40rem] text-kapur/85">{project.standfirst ?? project.summary}</p>
           </div>
@@ -353,14 +348,19 @@ function GalleryRow({ items, flip = false, tight = false }: { items: GalleryItem
     half: "col-span-12 sm:col-span-6",
     narrow: "col-span-12 sm:col-span-5 lg:col-span-4",
   };
+  // One crop per span, so phone photographs never run taller than the screen and pairs line up.
+  const aspectFor: Record<GalleryItem["span"], string> = { full: "16/9", wide: "3/2", half: "4/5", narrow: "4/5" };
   return (
-    <div className={`page-grid items-end gap-y-[var(--grid-gap)] ${tight ? "" : "mt-16 sm:mt-24"}`}>
+    <div className={`page-grid items-start gap-y-[var(--grid-gap)] ${tight ? "" : "mt-16 sm:mt-24"}`}>
       {items.map((img, k) => {
-        const start = items.length === 1 && img.span !== "full" ? (flip ? "lg:col-start-4" : "") : "";
+        // A photograph on its own in a row is centred, not left beside an empty column.
+        const alone = items.length === 1 && img.span !== "full" && img.span !== "wide";
+        const start = alone ? "sm:col-start-4 sm:col-span-6" : items.length === 1 && img.span === "wide" ? (flip ? "lg:col-start-4" : "") : "";
         return (
           <Figure
             key={k}
             image={img}
+            aspect={aspectFor[img.span]}
             sizes={img.span === "full" ? "100vw" : img.span === "narrow" ? "(min-width: 1024px) 33vw, 100vw" : "(min-width: 640px) 50vw, 100vw"}
             className={`${spanClass[img.span]} ${start} ${flip && k === 0 && items.length > 1 ? "sm:order-2" : ""}`}
             showCaption

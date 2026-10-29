@@ -11,12 +11,17 @@ import { pageMetadata } from "@/lib/seo";
 
 export const ensureStatic = "navigation";
 
-export const metadata: Metadata = pageMetadata({
+export async function generateMetadata(): Promise<Metadata> {
+  const empty = (await getProjects()).length === 0;
+  return pageMetadata({
   title: "Interior design projects: homes and restaurants",
   description:
-    "Interior design projects by ROUANG across the Klang Valley, from the Rembayung restaurant in Kampung Baru to family homes in Selangor.",
+    "Interior design projects by ROUANG in the Klang Valley: restaurants and homes, from finished rooms to design proposals.",
   path: "/projects",
-});
+    // An empty listing is a thin page: keep it out of the index until something is published.
+    noindex: empty,
+  });
+}
 
 /*
  * Plates are laid out to a rhythm rather than a uniform grid: a wide landscape, then a tall
@@ -48,10 +53,10 @@ export default async function ProjectsPage() {
           <div className="page-grid mt-16 gap-y-10 sm:mt-24">
             <Label className="col-span-12 text-ink-muted lg:col-span-3">Projects</Label>
             <div className="col-span-12 lg:col-span-9">
-              <TitlePair as="h1" size="hero" lead="Rooms we have designed" italic="for homes and for business" />
+              <TitlePair as="h1" size="hero" eyebrow="Interior design projects" lead="Rooms we have designed" italic="for homes and for business" />
               <p className="mt-8 max-w-[38rem] text-ink-soft">
                 Every project starts from a different place, a different budget and a different way of using a room.
-                These are the ones we can show you, each with the thinking behind it.
+                These are the ones we can show you: finished rooms first, then designs still on the drawing board.
               </p>
             </div>
           </div>
@@ -69,8 +74,10 @@ export default async function ProjectsPage() {
 
           <ul id="project-plates" data-filter="all" className="page-grid gap-y-20 sm:gap-y-28 [&[data-filter=commercial]_[data-sector=residential]]:hidden [&[data-filter=residential]_[data-sector=commercial]]:hidden">
             {ordered.map((p, i) => {
-              const [cols, aspect, offset] = rhythm[i % rhythm.length];
               const img = publicImage(p.card ?? p.hero);
+              // Small source files are shown at a size they can hold.
+              const lowRes = !!img && !("pending" in img) && img.width < 1400;
+              const [cols, aspect, offset] = lowRes ? (["lg:col-span-5 lg:col-start-2", "16/9", ""] as const) : rhythm[i % rhythm.length];
               const firstProposal = p.visualisation && !ordered[i - 1]?.visualisation;
               return (
                 <Fragment key={p.slug}>
@@ -78,8 +85,7 @@ export default async function ProjectsPage() {
                   <li className="col-span-12 border-t border-ink/15 pt-6">
                     <h2 className="t-sub">Design proposals</h2>
                     <p className="t-caption mt-2 max-w-[40rem] text-ink-muted">
-                      Projects at design stage, shown in the studio&rsquo;s own visualisations rather than photographs of
-                      finished rooms.
+                      Shown in the studio&rsquo;s own design visualisations rather than photographs of finished rooms.
                     </p>
                   </li>
                 ) : null}

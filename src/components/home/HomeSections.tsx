@@ -7,7 +7,7 @@ import { TitleBlock } from "@/components/projects/TitleBlock";
 import { ArrowLink } from "@/components/ui/Button";
 import { Figure } from "@/components/ui/Figure";
 import { Label, TitlePair } from "@/components/ui/Typography";
-import { Pending, Section } from "@/components/ui/Section";
+import { Crosses, Pending, Section } from "@/components/ui/Section";
 import { processSteps } from "@/config/process";
 import { studio, whatsappHref } from "@/config/studio";
 import { Walkthrough, type WalkFrame } from "@/components/projects/Walkthrough";
@@ -40,7 +40,7 @@ export function SelectedWork({ flagship, others }: { flagship: Project | null; o
           <article className="page-grid mt-16 gap-y-10 sm:mt-24" aria-labelledby="flagship-title">
             <Link
               href={`/projects/${flagship.slug}`}
-              className="group col-span-12 block sm:col-span-8 lg:col-span-6 lg:col-start-2"
+              className="group col-span-12 block sm:col-span-8 sm:col-start-3 lg:col-span-6 lg:col-start-2"
               aria-label={`${flagship.title}: read the case study`}
               tabIndex={-1}
             >
@@ -87,7 +87,7 @@ export function SelectedWork({ flagship, others }: { flagship: Project | null; o
 
 export function StudioName() {
   return (
-    <Section labelledBy="name-title" className="section-y overflow-hidden" guides>
+    <Section labelledBy="name-title" className="overflow-hidden pb-[var(--section-space)] pt-[calc(var(--section-space)*0.5)]" guides>
       <div className="page-x">
         <div className="page-grid gap-y-12">
           <Label index="02" className="col-span-12 text-ink-muted lg:col-span-3">
@@ -150,7 +150,16 @@ export function StudioName() {
 
 type DoorImage = Image | null | undefined;
 
-export function Pathways({ services, images = {} }: { services: Service[]; images?: { homes?: DoorImage; business?: DoorImage } }) {
+export function Pathways({
+  services,
+  images = {},
+  proof = null,
+}: {
+  services: Service[];
+  images?: { homes?: DoorImage; business?: DoorImage };
+  /** A built commercial project to name as proof. Only passed when that project is live. */
+  proof?: { title: string; location: string | null } | null;
+}) {
   const residential = services.filter((s) => s.sector === "residential");
   const commercial = services.filter((s) => s.sector === "commercial");
   const doors = [
@@ -167,8 +176,8 @@ export function Pathways({ services, images = {} }: { services: Service[]; image
       key: "business",
       tone: "dark" as const,
       label: "For businesses",
-      title: "Restaurants and commercial spaces",
-      body: "For operators who need a space that works hard: guests seated well, staff moving without collisions, a room people remember. We designed the interior of Rembayung in Kuala Lumpur.",
+      title: "Restaurants, cafés and food businesses",
+      body: `For operators who need a space that works hard: guests seated well, staff moving without collisions, a room people remember.${proof ? ` We designed the interior of ${proof.title}${proof.location ? ` in ${proof.location}` : ""}.` : ""}`,
       list: commercial,
       image: images.business,
     },
@@ -226,11 +235,18 @@ export function Pathways({ services, images = {} }: { services: Service[]; image
 
 const ROLE_LABEL = { space: "Space", material: "Material", whole: "Whole" } as const;
 
+/** "/images/projects/rembayung/rembayung-batik-frame.jpg" becomes "Batik frame". */
+function frameLabel(src: string, slug: string) {
+  const name = src.split("/").pop()?.replace(/\.jpg$/, "").replace(`${slug}-`, "").replace(/-/g, " ") ?? "";
+  return name.charAt(0).toUpperCase() + name.slice(1);
+}
+
 export function InsideProject({ project }: { project: Project | null }) {
   if (!project) return null;
   const frames: WalkFrame[] = project.gallery
     .map((g) => publicImage(g))
     .filter((g): g is Extract<NonNullable<typeof g>, { src: string }> => !!g && !("pending" in g) && !!g.walk)
+    .sort((a, b) => (a.walkOrder ?? 99) - (b.walkOrder ?? 99))
     .map((g) => ({
       src: g.src,
       alt: g.alt,
@@ -239,11 +255,13 @@ export function InsideProject({ project }: { project: Project | null }) {
       focus: g.focus,
       role: ROLE_LABEL[g.role ?? "space"],
       caption: g.walk as string,
+      label: frameLabel(g.src, project.slug),
     }));
   if (frames.length < 3) return null;
 
   return (
-    <section data-tone="dark" aria-labelledby="inside-title" className="relative">
+    <section data-tone="dark" aria-labelledby="inside-title" className="relative border-t border-kapur/10">
+      <Crosses />
       <div className="page-x pb-4 pt-[var(--section-space)]">
         <div className="page-grid gap-y-8">
           <Label index="05" className="col-span-12 text-mouse lg:col-span-3">
@@ -254,7 +272,7 @@ export function InsideProject({ project }: { project: Project | null }) {
               id="inside-title"
               lead={
                 <>
-                  A walk through <span className="font-serif italic">{project.title}</span>
+                  A walk through <span className="font-serif font-normal italic">{project.title}</span>
                 </>
               }
               italic="space, material, whole"
@@ -293,7 +311,7 @@ export function ProjectStory({ project }: { project: Project | null }) {
           </Label>
           <TitlePair
             id="story-title"
-            lead={<>How <span className="font-serif italic">{project.title}</span> came together</>}
+            lead={<>How <span className="font-serif font-normal italic">{project.title}</span> came together</>}
             italic="constraint, then response"
             className="col-span-12 lg:col-span-9"
           />
@@ -359,7 +377,7 @@ export function Process() {
             Process
           </Label>
           <div className="col-span-12 lg:col-span-9">
-            <TitlePair id="process-title" lead="How a project runs" italic="from the first visit to the day you move in" />
+            <TitlePair id="process-title" lead="How a project runs" italic="from the first visit to a design you can sign off" />
             <p className="mt-8 max-w-[40rem] text-ink-soft">
               Every project is different in size and budget, so the scope is agreed with you at the start. What stays the
               same is the order of work: understand first, plan second, finish last.
@@ -392,13 +410,13 @@ export function InsightsList({ insights, index = "07" }: { insights: Insight[]; 
   if (insights.length === 0) return null;
   const [lead, ...rest] = insights;
   return (
-    <Section labelledBy="insights-title" className="section-y bg-kapur">
+    <Section labelledBy="insights-title" className="bg-kapur pb-[var(--section-space)] pt-[calc(var(--section-space)*0.5)]">
       <div className="page-x">
         <div className="page-grid gap-y-8">
           <Label index={index} className="col-span-12 text-ink-muted lg:col-span-3">
             Insights
           </Label>
-          <TitlePair id="insights-title" lead="Notes for people planning a space" italic="written from the drawing board" className="col-span-12 lg:col-span-9" />
+          <TitlePair id="insights-title" lead="Notes for people planning a space" className="col-span-12 lg:col-span-9" />
         </div>
 
         <div className="page-grid mt-16 gap-y-12 sm:mt-20">

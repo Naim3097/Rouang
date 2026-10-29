@@ -1,4 +1,3 @@
-import { Suspense } from "react";
 import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
@@ -7,14 +6,17 @@ import { ArrowLink, ButtonLink } from "@/components/ui/Button";
 import { Breadcrumbs } from "@/components/ui/Breadcrumbs";
 import { JsonLd } from "@/components/ui/JsonLd";
 import { Label } from "@/components/ui/Typography";
-import { getInsight, getInsights, getProjects, getServices } from "@/lib/content";
+import { getInsight, getInsights, getProjects, getServices, staticSlugs } from "@/lib/content";
 import { articleSchema } from "@/lib/schema";
 import { pageMetadata } from "@/lib/seo";
 
 export const ensureStatic = "navigation";
+// Every slug is prerendered and project links prefetch in full, so a navigation that waits for
+// the static payload is acceptable. Content stays in the HTML instead of a hidden Suspense segment.
+export const instant = false;
 
 export async function generateStaticParams() {
-  return (await getInsights()).map((a) => ({ slug: a.slug }));
+  return staticSlugs(await getInsights());
 }
 
 export async function generateMetadata({ params }: PageProps<"/insights/[slug]">): Promise<Metadata> {
@@ -35,19 +37,7 @@ function formatDate(iso: string) {
   return new Intl.DateTimeFormat("en-MY", { day: "numeric", month: "long", year: "numeric", timeZone: "Asia/Kuala_Lumpur" }).format(new Date(`${iso}T12:00:00+08:00`));
 }
 
-/*
- * The params-dependent content sits inside Suspense so a default <Link> can show the page frame
- * instantly. Every slug is prerendered, so in practice the fallback is never seen.
- */
-export default function InsightPage({ params }: PageProps<"/insights/[slug]">) {
-  return (
-    <Suspense fallback={<div data-tone="light" className="min-h-[100svh] bg-kapur" aria-busy="true" />}>
-      <InsightPageContent params={params} />
-    </Suspense>
-  );
-}
-
-async function InsightPageContent({ params }: { params: PageProps<"/insights/[slug]">["params"] }) {
+export default async function InsightPage({ params }: PageProps<"/insights/[slug]">) {
   const { slug } = await params;
   const article = await getInsight(slug);
   if (!article) notFound();

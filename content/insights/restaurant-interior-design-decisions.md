@@ -4,6 +4,8 @@ status: draft
 description: Opening or refitting a restaurant in Malaysia? The layout, kitchen, seating and lighting decisions that decide whether a dining room works on a full night.
 category: Restaurants and hospitality
 publishedAt: 2026-10-29
+seo:
+  title: "Restaurant design considerations: 7 decisions to make first"
 purpose: Show restaurant operators how the studio thinks about F&B interiors, and lead them to the restaurant service page and the Rembayung case study.
 audience: Restaurant and café owners planning a new site or a refit in the Klang Valley
 searchIntent: Informational, early research before hiring a designer ("restaurant interior design considerations")
@@ -41,14 +43,14 @@ A room that feels bright and fresh at noon can feel flat and harsh at eight in t
 
 ## 6. Materials that survive service
 
-Restaurant finishes are cleaned more often and knocked harder than almost any others. Table tops, chair legs, the base of the counter and the floor near the kitchen door take the most punishment. Choose surfaces for how they look on the first day and for how they look after a year of mopping, spills and chairs dragged across them.
+Restaurant finishes take more cleaning and more knocks than most home finishes. Table tops, chair legs, the base of the counter and the floor near the kitchen door take the most punishment. Choose surfaces for how they look on the first day and for how they look after a year of mopping, spills and chairs dragged across them.
 
 ## 7. Sound
 
-Hard surfaces look clean but make a full room loud, and a loud room makes guests leave sooner and talk less. Fabric, timber, acoustic panels and even planting can soften the sound. Decide how lively you want the room to feel before the finishes are fixed, because adding acoustic treatment afterwards rarely looks as good.
+Hard surfaces look clean but make a full room loud, and a room that is too loud can make conversation hard and a long meal less appealing. Fabric, timber, acoustic panels and even planting can soften the sound. Decide how lively you want the room to feel before the finishes are fixed, because adding acoustic treatment afterwards rarely looks as good.
 
 ## Bringing it together
 
 None of these decisions is about style, yet together they decide whether the style can work. Settle them with your designer at the start and the creative part of the job, the part guests remember, has room to do its work.
 
-If you are planning a restaurant or café, [tell us about it](/contact). You can also see how we approached the interior of [Rembayung](/projects/rembayung).
+If you are planning a restaurant or café, [tell us about it](/contact). You can also see the interior of [Rembayung](/projects/rembayung).

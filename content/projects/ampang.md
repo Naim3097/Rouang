@@ -15,11 +15,11 @@ photography:
   credit: null
   permissionConfirmed: false
 hero:
-  src: /images/projects/ampang/ampang-porch.jpg
-  alt: "The porch: an arched, black-framed front door beside full-height black-framed windows on a white wall"
-  width: 2400
-  height: 1601
-  focus: "50% 55%"
+  src: /images/projects/ampang/ampang-foyer-to-dining.jpg
+  alt: "The foyer, with a black and white floor inlay and crystal chandelier, looking through an arch to the dining table"
+  width: 1600
+  height: 2400
+  focus: "50% 58%"
 card:
   src: /images/projects/ampang/ampang-arched-doors.jpg
   alt: "Arched black-framed double doors under a brass lantern"
@@ -37,11 +37,11 @@ gallery:
     width: 1600
     height: 2400
     span: narrow
-  - src: /images/projects/ampang/ampang-foyer-to-dining.jpg
-    alt: "The foyer, with a black and white floor inlay and crystal chandelier, looking through an arch to the dining table"
-    width: 1600
-    height: 2400
-    span: half
+  - src: /images/projects/ampang/ampang-porch.jpg
+    alt: "The porch: an arched, black-framed front door beside full-height black-framed windows on a white wall"
+    width: 2400
+    height: 1601
+    span: wide
   - src: /images/projects/ampang/ampang-corridor.jpg
     alt: "A narrow panelled corridor ending in an arched glass door, over a black and white geometric floor"
     width: 1600

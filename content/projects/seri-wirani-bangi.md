@@ -5,10 +5,9 @@ order: 3
 sector: residential
 type: "House: refurbishment and extension"
 location: Bangi, Selangor
-year: "Proposal, 2026"
+year: "2026"
 scope:
   - Interior design
-  - Refurbishment and extension design
 summary: A design proposal to refurbish and extend a pitched-roof house in Bangi, in a modern tropical language of textured white, timber and glass block.
 standfirst: A restrained transformation, not a total reinvention. The house keeps its familiar roof; light, shade and the garden do the rest.
 visualisation: true
@@ -103,9 +102,11 @@ quote:
 services:
   - residential-interior-design
 seo:
-  title: "Seri Wirani, Bangi: house refurbishment design proposal"
+  title: "Seri Wirani, Bangi: house design proposal"
   description: A modern tropical design proposal by ROUANG to refurbish and extend a house in Bangi. Textured white, timber and glass block. Design visualisations.
 todo:
+  - Confirm the owners accept the estate name being shown alongside the exterior visualisations
+  - "Confirm ROUANG's role in the exterior, facade and extension design shown in the presentation, and who the architect of record is. Until then the role is listed as interior design"
   - Confirm the spelling to publish (Seri Wirani or Sri Wirani)
   - Confirm the owners are happy for the proposal to be published, without their names
   - Confirm the summary, concept and constraint notes, which are paraphrased from the design presentation

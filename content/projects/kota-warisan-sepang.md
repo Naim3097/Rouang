@@ -5,10 +5,9 @@ order: 4
 sector: residential
 type: "House: refurbishment and extension"
 location: Sepang, Selangor
-year: "Proposal, 2026"
+year: "2026"
 scope:
   - Interior design
-  - Refurbishment and extension design
 summary: A design proposal for a two-storey family house in Kota Warisan, in a modern European language of white walls, arches and fine black frames.
 standfirst: Timeless details that make room for everyday family life. White walls, arches and dark frames, inside and out.
 visualisation: true
@@ -71,6 +70,7 @@ seo:
   title: "Kota Warisan, Sepang: house design proposal"
   description: A modern European design proposal by ROUANG for a family house in Kota Warisan, Sepang. White walls, arches and fine black frames. Design visualisations.
 todo:
+  - "Confirm ROUANG's role in the exterior, facade and extension design shown in the presentation, and who the architect of record is. Until then the role is listed as interior design"
   - Confirm the owners are happy for the proposal to be published, without their names
   - Confirm the concept and planning notes, which are paraphrased from the design presentation
   - "Supply the full-size renders (all but four are over the connector's 10 MB limit). Only small previews are on the site now"

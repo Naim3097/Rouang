@@ -107,7 +107,7 @@ export function articleSchema(a: {
     url,
     image: absoluteUrl(`/insights/${a.slug}/opengraph-image`),
     inLanguage: "en-MY",
-    author: { "@type": "Organization", name: a.author, url: absoluteUrl("/about") },
+    author: { "@id": ORG_ID },
     publisher: { "@id": ORG_ID },
   };
 }
