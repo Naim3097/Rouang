@@ -66,11 +66,38 @@ as the kit asks: "grade slightly warm"), and a lighter version to renders, so ph
 professional shoot and renders sit together. No photograph has been altered beyond grading,
 resizing and cropping, and all metadata (including GPS on the iPhone originals) is stripped.
 
-## On AI-generated video
+## Motion from real footage
 
-Not used. A generated "cinematic" interior would show details that do not exist in the built room,
-which would misrepresent the project, and it would mean uploading the client's photographs to a
-third-party generator. The motion on the site comes from the real photographs instead. The best
-motion asset available is real: the edited film `ROUANG_1.mp4` in the Ampang videographer folder,
-plus the Rembayung clips. Both are over the Drive connector's 10 MB limit; once downloaded they can
-be cut into short silent loops for the `film` slot that every project supports.
+The site's films are short silent loops cut from real footage of the finished rooms, never
+AI-generated. A generated "cinematic" interior would show details that do not exist in the built
+room and misrepresent the project.
+
+**Where the loops play**
+- **Case-study opener:** a loop plays over its own first frame, so the still is the first paint and
+  the film fades in once it is playing.
+- **"In motion" band:** short loops sit together lower down the case study.
+- **When they stop:** loops pause off screen, have a pause control, and never play with reduced
+  motion.
+
+**Ampang.** The videographer's edited film (`ROUANG_1.mp4`) gives the opener and three loops:
+- **Opener:** the master bedroom, slowed to half speed. It has a 16:9 version for desktop and a 9:16
+  crop for phones.
+- **Loops:** the foyer into the living room, the walk-in wardrobe, and the master dressing alcove.
+
+Left out: every exterior shot (the house number and the development name are legible), the stretches
+with people in them, the children's bedroom and the home cinema.
+
+**Rembayung.** Of the 59 phone clips, 58 were filmed during fit-out (October and November 2025), with
+shrink-wrapped chairs, crew at work or recognisable faces, and cannot be shown under "interior
+design only". One clip from the open restaurant (IMG_2216, 9 January 2026) gives a single loop,
+cropped to keep the table-number cards out of frame.
+
+**Specification.**
+- **Format:** H.264 MP4 with fast start, graded with the ROUANG grade (lighter on the already-graded
+  Ampang film).
+- **The loop point:** the last half second to one second crossfades into the opening, so the loop
+  has no jump.
+- **Audio and metadata:** none. The iPhone clips carried GPS coordinates; the web files do not.
+- **Sizes:** the desktop opener is 1.5 MB; the phone opener and the band loops are 350–700 KB each.
+
+Footage reviewed: 59 Rembayung clips and the whole 5-minute Ampang film.

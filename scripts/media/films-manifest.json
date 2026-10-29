@@ -1,0 +1,62 @@
+{
+ "ampang-master-bedroom-wide": {
+  "src": "/films/projects/ampang/ampang-master-bedroom-wide.mp4",
+  "poster": "/films/projects/ampang/ampang-master-bedroom-wide.jpg",
+  "width": 1920,
+  "height": 1080,
+  "seconds": 7,
+  "kb": 1514,
+  "posterKb": 171,
+  "source": "ROUANG_1.mp4 258.1-262.1s at 0.5x"
+ },
+ "ampang-master-bedroom-narrow": {
+  "src": "/films/projects/ampang/ampang-master-bedroom-narrow.mp4",
+  "poster": "/films/projects/ampang/ampang-master-bedroom-narrow.jpg",
+  "width": 608,
+  "height": 1080,
+  "seconds": 7,
+  "kb": 415,
+  "posterKb": 62,
+  "source": "ROUANG_1.mp4 258.1-262.1s at 0.5x"
+ },
+ "ampang-wardrobe-island": {
+  "src": "/films/projects/ampang/ampang-wardrobe-island.mp4",
+  "poster": "/films/projects/ampang/ampang-wardrobe-island.jpg",
+  "width": 720,
+  "height": 900,
+  "seconds": 5.3,
+  "kb": 348,
+  "posterKb": 47,
+  "source": "ROUANG_1.mp4 190.1-195.9s"
+ },
+ "ampang-foyer-to-living": {
+  "src": "/films/projects/ampang/ampang-foyer-to-living.mp4",
+  "poster": "/films/projects/ampang/ampang-foyer-to-living.jpg",
+  "width": 720,
+  "height": 900,
+  "seconds": 4.5,
+  "kb": 513,
+  "posterKb": 80,
+  "source": "ROUANG_1.mp4 38.5-44s"
+ },
+ "ampang-dressing-alcove": {
+  "src": "/films/projects/ampang/ampang-dressing-alcove.mp4",
+  "poster": "/films/projects/ampang/ampang-dressing-alcove.jpg",
+  "width": 720,
+  "height": 900,
+  "seconds": 5.1,
+  "kb": 365,
+  "posterKb": 68,
+  "source": "ROUANG_1.mp4 266.7-269.5s at 0.5x"
+ },
+ "rembayung-pendant-and-batik-screen": {
+  "src": "/films/projects/rembayung/rembayung-pendant-and-batik-screen.mp4",
+  "poster": "/films/projects/rembayung/rembayung-pendant-and-batik-screen.jpg",
+  "width": 720,
+  "height": 900,
+  "seconds": 5.1,
+  "kb": 700,
+  "posterKb": 102,
+  "source": "IMG_2216.MOV 0.3-5.9s"
+ }
+}

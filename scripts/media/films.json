@@ -1,0 +1,76 @@
+{
+  "_about": "Silent web loops cut from real project footage by scripts/media/films.cjs. Sources: the Ampang film ROUANG_1.mp4 (videographer, VIDEOGRAPHER folder on the studio's Drive) and the Rembayung phone clips (Rembayung/Videos). Each segment was reviewed frame by frame: no people, no crew or installation, no house numbers, street names, table numbers or prices. Exterior shots, the children's bedroom and the home cinema were left out.",
+  "films": [
+    {
+      "project": "ampang",
+      "file": "ROUANG_1.mp4",
+      "start": 258.1,
+      "end": 262.1,
+      "speed": 0.5,
+      "shape": "wide",
+      "out": "ampang-master-bedroom-wide",
+      "grade": 0.5,
+      "crossfade": 1,
+      "note": "Case-study opener on large screens: a slow push onto the master bedroom's backlit headboard wall"
+    },
+    {
+      "project": "ampang",
+      "file": "ROUANG_1.mp4",
+      "start": 258.1,
+      "end": 262.1,
+      "speed": 0.5,
+      "shape": "narrow",
+      "focusX": 0.48,
+      "out": "ampang-master-bedroom-narrow",
+      "grade": 0.5,
+      "crossfade": 1,
+      "note": "The same shot cropped 9:16 for phones"
+    },
+    {
+      "project": "ampang",
+      "file": "ROUANG_1.mp4",
+      "start": 190.1,
+      "end": 195.9,
+      "shape": "tile",
+      "focusX": 0.47,
+      "out": "ampang-wardrobe-island",
+      "grade": 0.5,
+      "note": "Walk-in wardrobe: the fluted, lit island under the crystal chandelier"
+    },
+    {
+      "project": "ampang",
+      "file": "ROUANG_1.mp4",
+      "start": 38.5,
+      "end": 44,
+      "shape": "tile",
+      "focusX": 0.55,
+      "out": "ampang-foyer-to-living",
+      "grade": 0.5,
+      "crossfade": 1,
+      "note": "From the foyer into the formal living room (the framed picture on the side table is a landscape print)"
+    },
+    {
+      "project": "ampang",
+      "file": "ROUANG_1.mp4",
+      "start": 266.7,
+      "end": 269.5,
+      "speed": 0.5,
+      "shape": "tile",
+      "out": "ampang-dressing-alcove",
+      "grade": 0.5,
+      "note": "The master dressing alcove through its arched walnut frame"
+    },
+    {
+      "project": "rembayung",
+      "file": "IMG_2216.MOV",
+      "start": 0.3,
+      "end": 5.9,
+      "fps": 30,
+      "shape": "tile",
+      "crop": { "x": 0, "y": 0, "w": 920, "h": 1150 },
+      "out": "rembayung-pendant-and-batik-screen",
+      "grade": 1,
+      "note": "Filmed 9 Jan 2026 in the open restaurant. The crop keeps both table-number cards out of frame"
+    }
+  ]
+}

@@ -95,6 +95,20 @@ the files in GitHub's web editor or locally; a commit to `main` redeploys on Ver
    which large screens load instead of the portrait. Add it to the image as `wide: { src, width, height }`.
    `--only <project>` re-exports a single project.
 
+### Adding film loops
+
+Real footage only. Each loop is listed in `scripts/media/films.json`, with:
+- **The segment:** the source file, start and end, and optionally `speed` (0.5 plays a 50 fps film at
+  half speed).
+- **The shape:** `wide` 16:9, `narrow` 9:16 or `tile` 4:5, with an optional explicit `crop` box.
+- **The grade.**
+
+Run `node scripts/media/films.cjs <folder-with-originals> [<another-folder>]` (ffmpeg on the PATH).
+It writes the MP4s and their first-frame posters to `public/films/projects/<slug>/`, with no audio
+and no metadata. It also records what was made in `films-manifest.json`, so you can copy the values
+from there into the project's `film` (the case-study opener, `wide` and/or `narrow`) or its `loops`
+(the "In motion" band).
+
 ## Environment variables
 
 See [.env.example](.env.example) for the full list with notes. In Vercel, set them per environment.

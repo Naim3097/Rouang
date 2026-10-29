@@ -44,11 +44,16 @@ production build until they are resolved.
   the response. These are the most valuable words on the site.
 - Confirm the "Inside" description, and which elements were ROUANG's design and which the building's.
 - Year and floor area, if publishable.
+- Footage of the open restaurant, if any exists: 58 of the 59 clips on Drive were filmed during
+  fit-out and cannot be used. A few slow, steady shots of the finished rooms (lights on, no people)
+  would give Rembayung an opening film like Ampang's.
 
 **Ampang (Beverly Heights)**
 - Project name to publish, owners' consent, photographer's name and permission. (blocker)
-- Full-size photographs over 10 MB (the wide room shots and HDR frames) and the edited film
-  `ROUANG_1.mp4`: download from Drive into `ROUANG/drive-large/`.
+- Videographer's name and permission to use clips from the film `ROUANG_1.mp4` on the website: the
+  case study now opens with one and shows three more. (blocker)
+- Full-size photographs over 10 MB (the wide room shots and HDR frames): download from Drive into
+  `ROUANG/drive-large/` if more choice is wanted.
 - The brief, concept and main design decisions.
 
 **Seri Wirani, Bangi** and **Kota Warisan, Sepang** (design proposals)

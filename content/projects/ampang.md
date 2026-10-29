@@ -26,6 +26,43 @@ card:
   width: 1600
   height: 2400
   focus: "50% 50%"
+# Real footage from the videographer's film (ROUANG_1.mp4), reviewed frame by frame: no people,
+# no house number or street. Cut by scripts/media/films.cjs from scripts/media/films.json.
+film:
+  caption: "A slow move onto the master bedroom's backlit headboard wall"
+  source: "ROUANG_1.mp4 258.1-262.1s at 0.5x"
+  wide:
+    src: /films/projects/ampang/ampang-master-bedroom-wide.mp4
+    poster: /films/projects/ampang/ampang-master-bedroom-wide.jpg
+    width: 1920
+    height: 1080
+  narrow:
+    src: /films/projects/ampang/ampang-master-bedroom-narrow.mp4
+    poster: /films/projects/ampang/ampang-master-bedroom-narrow.jpg
+    width: 608
+    height: 1080
+loops:
+  - src: /films/projects/ampang/ampang-foyer-to-living.mp4
+    poster: /films/projects/ampang/ampang-foyer-to-living.jpg
+    width: 720
+    height: 900
+    alt: "From the foyer into the formal living room: black-framed doors, gold and sheer curtains and the sofa set"
+    caption: "From the foyer into the living room"
+    source: "ROUANG_1.mp4 38.5-44s"
+  - src: /films/projects/ampang/ampang-wardrobe-island.mp4
+    poster: /films/projects/ampang/ampang-wardrobe-island.jpg
+    width: 720
+    height: 900
+    alt: "The walk-in wardrobe: a fluted, lit island under a crystal chandelier, with full-height white wardrobes"
+    caption: "The walk-in wardrobe"
+    source: "ROUANG_1.mp4 190.1-195.9s"
+  - src: /films/projects/ampang/ampang-dressing-alcove.mp4
+    poster: /films/projects/ampang/ampang-dressing-alcove.jpg
+    width: 720
+    height: 900
+    alt: "The master dressing alcove through its arched walnut frame: a brass lantern, fluted sconces and a backlit mirror"
+    caption: "The master dressing alcove"
+    source: "ROUANG_1.mp4 266.7-269.5s at 0.5x"
 gallery:
   - src: /images/projects/ampang/ampang-facade.jpg
     alt: "The white facade with black window frames, wrought-iron balconies and a tiled roof, seen through trees"
@@ -103,6 +140,7 @@ todo:
   - Confirm the project name to publish (the photographer's folder says Ampang, the videographer's says Beverly Heights)
   - Confirm the owners are happy for their home to be published; the house number and street are kept out of every image
   - Photographer's name for the credit, and permission to use the photographs
+  - Videographer's name for the credit, and permission to use clips from the film (ROUANG_1.mp4) on the website
   - "Supply the full-size photographs over 10 MB (the wide room shots); only the smaller files could be downloaded"
   - The brief, the concept and the main design decisions, in the studio's words
 ---

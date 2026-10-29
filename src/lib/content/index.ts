@@ -5,6 +5,13 @@ import matter from "gray-matter";
 import { cacheLife } from "next/cache";
 import type { z } from "zod";
 import { SHOW_DRAFTS } from "@/lib/env";
+
+// Content is Markdown on disk, not a module, so a dev server would otherwise keep serving the
+// first read until restarted. In development the cache lasts seconds; builds keep it for good.
+function contentLife() {
+  if (process.env.NODE_ENV === "development") cacheLife("seconds");
+  else cacheLife("max");
+}
 import { renderMarkdown, type Heading } from "./markdown";
 import {
   insightSchema,
@@ -101,39 +108,39 @@ export function projectImage(project: Project | null | undefined, file: string):
 
 export async function getProjects(): Promise<Project[]> {
   "use cache";
-  cacheLife("max");
+  contentLife();
   const all = await loadCollection("projects", projectSchema);
   return all.sort((a, b) => a.order - b.order || a.title.localeCompare(b.title));
 }
 
 export async function getProject(slug: string): Promise<Project | null> {
   "use cache";
-  cacheLife("max");
+  contentLife();
   return (await getProjects()).find((p) => p.slug === slug) ?? null;
 }
 
 export async function getServices(): Promise<Service[]> {
   "use cache";
-  cacheLife("max");
+  contentLife();
   const all = await loadCollection("services", serviceSchema);
   return all.sort((a, b) => a.order - b.order);
 }
 
 export async function getService(slug: string): Promise<Service | null> {
   "use cache";
-  cacheLife("max");
+  contentLife();
   return (await getServices()).find((s) => s.slug === slug) ?? null;
 }
 
 export async function getInsights(): Promise<Insight[]> {
   "use cache";
-  cacheLife("max");
+  contentLife();
   const all = await loadCollection("insights", insightSchema);
   return all.sort((a, b) => b.publishedAt.localeCompare(a.publishedAt));
 }
 
 export async function getInsight(slug: string): Promise<Insight | null> {
   "use cache";
-  cacheLife("max");
+  contentLife();
   return (await getInsights()).find((i) => i.slug === slug) ?? null;
 }

@@ -224,12 +224,24 @@ export default async function ProjectPage({ params }: PageProps<"/projects/[slug
                   <span id="motion-title">In motion</span>
                 </Label>
               </div>
-              <ul className="col-span-12 grid grid-cols-2 gap-[var(--grid-gap)] sm:grid-cols-3 lg:col-span-9">
+              {/* One loop is shown on its own at a readable size; more sit in a row. */}
+              <ul
+                className={`col-span-12 grid gap-[var(--grid-gap)] lg:col-span-9 ${
+                  project.loops.length === 1 ? "max-w-[26rem] grid-cols-1" : project.loops.length === 2 ? "grid-cols-2" : "grid-cols-2 sm:grid-cols-3"
+                }`}
+              >
                 {project.loops.map((l) => (
                   <li key={l.src}>
                     <figure>
                       <div className="relative aspect-[4/5] overflow-hidden bg-ink-raised">
-                        <Image src={l.poster} alt={l.alt} fill sizes="(min-width: 1024px) 24vw, (min-width: 640px) 31vw, 48vw" quality={78} className="object-cover" />
+                        <Image
+                          src={l.poster}
+                          alt={l.alt}
+                          fill
+                          sizes={project.loops.length === 1 ? "(min-width: 640px) 26rem, 100vw" : "(min-width: 1024px) 24vw, (min-width: 640px) 31vw, 48vw"}
+                          quality={78}
+                          className="object-cover"
+                        />
                         <Film sources={[{ src: l.src }]} label={l.alt} compact />
                       </div>
                       {l.caption ? <figcaption className="t-caption mt-3 text-mouse">{l.caption}</figcaption> : null}
@@ -384,7 +396,9 @@ function openerStill(hero: ImageData, film: Project["film"]): ImageData {
     ? { src: film.narrow.poster, width: film.narrow.width, height: film.narrow.height, focus: "50% 50%" }
     : { src: hero.src, width: hero.width, height: hero.height, focus: hero.focus };
   const wide = film.wide ? { src: film.wide.poster, width: film.wide.width, height: film.wide.height } : heroWide;
-  return { ...hero, ...narrow, wide };
+  // When the film covers every screen, the still is always its first frame, so it takes the film's description.
+  const alt = film.wide && film.narrow && film.caption ? film.caption : hero.alt;
+  return { ...hero, ...narrow, wide, alt };
 }
 
 function GalleryRow({ items, flip = false, tight = false }: { items: GalleryItem[]; flip?: boolean; tight?: boolean }) {

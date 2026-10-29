@@ -2,11 +2,13 @@
 /**
  * Cut silent web loops from real project footage.
  *
- *   node scripts/media/films.cjs <source-dir> [--only <out-name>]
+ *   node scripts/media/films.cjs <source-dir> [<source-dir> ...] [--only <out-name>]
  *
- * <source-dir> holds the original files named in films.json (the studio's Drive footage, kept
- * outside the repository). For every entry this:
- *   - trims the segment and crops it (16:9 for wide screens, 9:16 or 4:5 for phones and grids)
+ * The source folders hold the original files named in films.json (the studio's Drive footage,
+ * kept outside the repository); each file is looked up in them in turn. For every entry this:
+ *   - trims the segment and crops it (16:9 for wide screens, 9:16 or 4:5 for phones and grids),
+ *     either the largest crop around focusX / focusY or an explicit crop box
+ *   - optionally slows it down (speed 0.5 plays a 50 fps source at half speed, still smooth)
  *   - applies the ROUANG grade (as export.cjs does for photographs)
  *   - crossfades the last half second into the first, so the loop has no visible jump
  *   - drops the audio and ALL metadata (the iPhone clips carry GPS coordinates)
@@ -18,13 +20,15 @@ const path = require("path");
 const { execFileSync } = require("child_process");
 
 const root = path.resolve(__dirname, "../..");
-const srcDir = process.argv[2];
-const onlyAt = process.argv.indexOf("--only");
-const only = onlyAt > 0 ? process.argv[onlyAt + 1] : null;
-if (!srcDir) {
-  console.error("Usage: node scripts/media/films.cjs <source-dir> [--only <out-name>]");
+const args = process.argv.slice(2);
+const onlyAt = args.indexOf("--only");
+const only = onlyAt >= 0 ? args[onlyAt + 1] : null;
+const srcDirs = args.filter((a, i) => a !== "--only" && (onlyAt < 0 || i !== onlyAt + 1));
+if (!srcDirs.length) {
+  console.error("Usage: node scripts/media/films.cjs <source-dir> [<source-dir> ...] [--only <out-name>]");
   process.exit(1);
 }
+const findSource = (file) => srcDirs.map((d) => path.join(d, file)).find((p) => fs.existsSync(p));
 const config = JSON.parse(fs.readFileSync(path.join(__dirname, "films.json"), "utf8"));
 const manifestPath = path.join(__dirname, "films-manifest.json");
 const manifest = fs.existsSync(manifestPath) ? JSON.parse(fs.readFileSync(manifestPath, "utf8")) : {};
@@ -51,27 +55,36 @@ function probe(file) {
 }
 
 function encode(entry) {
-  const src = path.join(srcDir, entry.file);
-  if (!fs.existsSync(src)) return { missing: entry.file };
+  const src = findSource(entry.file);
+  if (!src) return { missing: entry.file };
   const shape = SHAPES[entry.shape];
   const { w, h } = probe(src);
-  // Largest crop of the requested shape, placed by focusX / focusY (0-1, default centre).
-  let cw = w;
-  let ch = Math.round(w / shape.aspect);
-  if (ch > h) {
-    ch = h;
-    cw = Math.round(h * shape.aspect);
+  let cw, ch, cx, cy;
+  if (entry.crop) {
+    // An explicit box in displayed pixels, e.g. to keep table numbers out of frame.
+    ({ x: cx, y: cy, w: cw, h: ch } = entry.crop);
+  } else {
+    // Largest crop of the requested shape, placed by focusX / focusY (0-1, default centre).
+    cw = w;
+    ch = Math.round(w / shape.aspect);
+    if (ch > h) {
+      ch = h;
+      cw = Math.round(h * shape.aspect);
+    }
+    cx = Math.round(Math.min(Math.max((entry.focusX ?? 0.5) * w - cw / 2, 0), w - cw));
+    cy = Math.round(Math.min(Math.max((entry.focusY ?? 0.5) * h - ch / 2, 0), h - ch));
   }
   cw -= cw % 2;
   ch -= ch % 2;
-  const cx = Math.round(Math.min(Math.max((entry.focusX ?? 0.5) * w - cw / 2, 0), w - cw));
-  const cy = Math.round(Math.min(Math.max((entry.focusY ?? 0.5) * h - ch / 2, 0), h - ch));
   const outW = Math.min(shape.width, cw) - (Math.min(shape.width, cw) % 2);
   const outH = Math.round(outW / shape.aspect / 2) * 2;
   const fps = entry.fps ?? 25;
   const fade = entry.crossfade ?? 0.5;
-  const dur = entry.end - entry.start;
-  const base = `crop=${cw}:${ch}:${cx}:${cy},scale=${outW}:${outH}:flags=lanczos,fps=${fps},${gradeFilter(entry.grade ?? 1)},format=yuv420p`;
+  const speed = entry.speed ?? 1;
+  const span = entry.end - entry.start;
+  // Everything after the speed change works on the output timeline.
+  const dur = span / speed;
+  const base = `crop=${cw}:${ch}:${cx}:${cy},scale=${outW}:${outH}:flags=lanczos,setpts=PTS/${speed},fps=${fps},${gradeFilter(entry.grade ?? 1)},format=yuv420p`;
   // Loop seam: play from `fade` to the end, and dissolve the last `fade` seconds into the opening.
   const graph =
     `[0:v]${base},split[a][b];` +
@@ -84,7 +97,7 @@ function encode(entry) {
   const jpg = path.join(dir, `${entry.out}.jpg`);
   execFileSync("ffmpeg", [
     "-v", "error", "-y",
-    "-ss", String(entry.start), "-t", String(dur), "-i", src,
+    "-ss", String(entry.start), "-t", String(span), "-i", src,
     "-filter_complex", graph, "-map", "[out]",
     "-an", "-map_metadata", "-1", "-map_chapters", "-1",
     "-c:v", "libx264", "-preset", "slow", "-crf", String(entry.crf ?? 24),
@@ -102,7 +115,7 @@ function encode(entry) {
     seconds: Number((dur - fade).toFixed(2)),
     kb: Math.round(fs.statSync(mp4).size / 1024),
     posterKb: Math.round(fs.statSync(jpg).size / 1024),
-    source: `${entry.file} ${entry.start}-${entry.end}s`,
+    source: `${entry.file} ${entry.start}-${entry.end}s${speed !== 1 ? ` at ${speed}x` : ""}`,
   };
 }
 
