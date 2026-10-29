@@ -145,10 +145,43 @@ gallery:
     span: half
     role: space
 brief: null
-concept: null
-planning: null
-materials: []
-lighting: null
+concept: >-
+  The interior sits under the building's tall pitched roof, which is lined in timber, carried on a
+  dark steel frame and glazed at its gable ends. Within that one large volume, slatted timber
+  screens, open timber frames and booths divide the floor into smaller dining rooms and bays.
+
+
+  Batik is the repeated motif: laid over timber frames overhead, set into the screens, folded on
+  open shelves and draped over the top of a coloured-glass partition. The furniture is timber, cane
+  and bentwood, and the pendants are woven rattan.
+planning: >-
+  The dining rooms are on two levels under the same roof: the ground-floor hall, and an upper level
+  on the building's mezzanine, which looks down into the hall over black railings. Seen from above,
+  the centre of the hall is a field of terracotta tiles between bands of polished concrete, holding
+  a long table, a large tree in a round white planter and an open frame of pale timber.
+
+
+  Elsewhere, slatted screens, booths and planted banquettes gather the tables into smaller groups.
+  In the long hall, a banquette backed by a planter runs down the room and divides it lengthways.
+materials:
+  - name: Timber
+    note: Tables, chairs, slatted screens, open frames and counters, from pale frames to darker joinery.
+  - name: Batik
+    note: Laid over frames overhead, set into slatted screens and folded on open shelves.
+  - name: Rattan and cane
+    note: Woven pendants, and cane on chair backs, benches and banquettes.
+  - name: Coloured glass
+    note: >-
+      Textured panes in green, blue and amber, framed in timber, on a partition, the service counter
+      and a red brick wall.
+  - name: Terracotta and concrete
+    note: Terracotta tiles and polished concrete share the floor, meeting along straight edges.
+  - name: Black metal
+    note: Open frames that carry pairs of pendants among the booths.
+lighting: >-
+  Daylight comes in through the building's glazed gable ends and its side windows, which have timber
+  blinds, and falls across the tables beside the glass. Woven rattan pendants hang from timber posts
+  with braced arms, and in pairs from open black metal frames set among the booths.
 challenges: []
 quote: null
 services:
@@ -170,6 +203,7 @@ seo:
   title: "Rembayung, Kampung Baru: restaurant interior design"
   description: The interior of Rembayung, a Malay kampung restaurant in Kampung Baru, Kuala Lumpur, designed by ROUANG. Photographs of the dining rooms and details.
 todo:
+  - "Approve or rewrite the drafted concept, plan, lighting and materials (from the January 2026 photographs). They were written by the agency only from what the photographs show, and each line was checked against them; they describe the space, not the brief."
   - Confirm the restaurant's owners are happy for the project to be named, photographed and published here, and keep the written agreement or appointment on file
   - Written consent to name Khairul Aming as the owner (he is named in the summary, never in titles or search snippets)
   - Confirm the photographs can be used and who should be credited (they were taken on an iPhone)

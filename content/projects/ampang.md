@@ -125,10 +125,54 @@ gallery:
     height: 2400
     span: narrow
 brief: null
-concept: null
-planning: null
-materials: []
-lighting: null
+concept: >-
+  White and cream panelled walls, mouldings and cornices form the background, and black draws the
+  outline: arched door frames, window frames and dark joinery. Brass handles, lanterns and wall
+  lights sit against both.
+
+
+  The arch repeats through the house, from the front door to the timber-lined entry of the master
+  dressing alcove. Colour comes in through upholstery, tile, wallpaper and fabric: a red velvet seat
+  in the walk-in wardrobe, green tiles and floral wallpaper in the powder room, and sage curtains in
+  the master bedroom.
+planning: >-
+  From the foyer, two steps rise through a black-framed arch into the dining room, and the polished
+  cream floor with its black and white inlay gives way to a pale herringbone. A wide rounded black
+  arch opens into the kitchen, which ends in an arched, black-framed glazed door.
+
+
+  In the master bedroom, an arched, timber-lined doorway opens into a dressing alcove. In the study,
+  a black bookcase with brass rails is also a door, and pivots open beside the window desk.
+materials:
+  - name: White panelling
+    note: Walls and columns in white and cream, with panel mouldings and deep cornices.
+  - name: Black joinery
+    note: >-
+      Door frames, wall panelling and kitchen cabinets, some with ribbed vents and turned brass
+      handles.
+  - name: Brass
+    note: Handles, lanterns, wall lights and the gallery rails on the study's black bookcase.
+  - name: Marble
+    note: >-
+      A black and white inlay on the foyer floor, and veined marble on the kitchen worktops and
+      splashbacks.
+  - name: Walnut-tone timber
+    note: >-
+      Lines the arched entry and lit shelves of the master dressing alcove, and forms its vanity and
+      the master bedroom desk.
+  - name: Velvet and leather
+    note: >-
+      Tufted red velvet on the seat in an arched recess of the walk-in wardrobe, and stitched
+      leather handles on cream wardrobe doors.
+lighting: >-
+  Light is built into the walls and joinery: the master bedroom's headboard wall and the dressing
+  alcove's mirror are backlit, the arched niche in the dining room is lit from within, and strip
+  lights run up the alcove's open timber shelves.
+
+
+  Crystal chandeliers hang in the foyer, dining room, walk-in wardrobe and master bedroom, and the
+  living room and master bedroom have recessed ceilings edged in warm cove light. In the foyer,
+  brass wall lights with black shades sit against black panelling.
 challenges: []
 quote: null
 services:
@@ -137,6 +181,8 @@ seo:
   title: "House in Ampang: residential interior design"
   description: A family house in Ampang by ROUANG. Arched black-framed doors, dark joinery and brass against white walls. Professional photographs.
 todo:
+  - "Approve or rewrite the drafted concept, plan, lighting and materials (from the photographs and the videographer's film). They were written by the agency only from what the photographs show, and each line was checked against them; they describe the space, not the brief."
+  - "Confirm the owners are happy for the prayer room photograph and its description to be published"
   - Confirm the project name to publish (the photographer's folder says Ampang, the videographer's says Beverly Heights)
   - Confirm the owners are happy for their home to be published; the house number and street are kept out of every image
   - Photographer's name for the credit, and permission to use the photographs
