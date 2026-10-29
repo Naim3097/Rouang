@@ -9,7 +9,6 @@ type FigureProps = {
   aspect?: string;
   priority?: boolean;
   reveal?: boolean;
-  revealDelay?: number;
   className?: string;
   imgClassName?: string;
   tone?: "light" | "dark";
@@ -29,7 +28,6 @@ export function Figure({
   aspect,
   priority = false,
   reveal = true,
-  revealDelay = 0,
   className = "",
   imgClassName = "",
   tone = "light",
@@ -58,7 +56,7 @@ export function Figure({
   const box = (
     <div
       className="relative h-full w-full overflow-hidden"
-      style={{ aspectRatio: ratio, ["--reveal-delay" as string]: `${revealDelay}ms` }}
+      style={{ aspectRatio: ratio }}
       data-reveal={reveal && !priority ? "image" : undefined}
     >
       <div className="absolute inset-0">{frame}</div>

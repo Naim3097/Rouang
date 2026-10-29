@@ -32,9 +32,11 @@ export function ProjectIndex({ projects, startAt = 1 }: { projects: Project[]; s
               <span className="t-caption col-span-10 col-start-3 text-ink-muted sm:col-span-3 sm:col-start-auto lg:col-span-3">
                 {p.type}
                 {p.location ? ` · ${p.location}` : ""}
+                {p.visualisation ? <span className="sm:hidden"> · Design proposal</span> : null}
               </span>
               <span className="t-caption col-span-10 col-start-3 hidden text-ink-muted sm:col-span-1 sm:col-start-auto sm:block lg:col-span-2">
                 {p.sector === "residential" ? "Residential" : "Commercial"}
+                {p.visualisation ? <span className="block">Design proposal</span> : null}
               </span>
               <span className="col-span-1 hidden justify-self-end sm:block">
                 <Arrow className="transition-transform duration-500 ease-[var(--ease-brand)] group-hover:translate-x-1" />

@@ -397,46 +397,10 @@
   background-size: 100% 1px;
 }
 
-/* ——— Motion. Everything works without it; reduced motion removes it. ——— */
-
-@media (prefers-reduced-motion: no-preference) {
-  .js [data-reveal] {
-    opacity: 0;
-    translate: 0 1.25rem;
-    transition:
-      opacity 0.9s var(--ease-brand),
-      translate 1.1s var(--ease-brand);
-    transition-delay: var(--reveal-delay, 0ms);
-  }
-
-  .js [data-reveal][data-in] {
-    opacity: 1;
-    translate: 0 0;
-  }
-
-  /* Images open from the horizon upward: light doing the work. */
-  .js [data-reveal="image"] {
-    opacity: 1;
-    translate: none;
-    clip-path: inset(100% 0 0 0);
-    transition: clip-path 1.25s var(--ease-settle);
-    transition-delay: var(--reveal-delay, 0ms);
-  }
-
-  .js [data-reveal="image"][data-in] {
-    clip-path: inset(0 0 0 0);
-  }
-
-  .js [data-reveal="image"] > * {
-    scale: 1.06;
-    transition: scale 1.8s var(--ease-brand);
-    transition-delay: var(--reveal-delay, 0ms);
-  }
-
-  .js [data-reveal="image"][data-in] > * {
-    scale: 1;
-  }
-}
+/* ——— Motion. Everything works without it; reduced motion removes it. ———
+ * Reveals are CSS scroll-driven animations tied to each element's own view timeline: no JavaScript,
+ * nothing to hydrate. Browsers without animation-timeline simply show everything at rest.
+ */
 
 /* The curve, lifted out of the mark and drawn as a rule (kit p.14). */
 .curve-rule path {
@@ -444,14 +408,83 @@
   stroke-dashoffset: 0;
 }
 
-@media (prefers-reduced-motion: no-preference) {
-  .js .curve-rule path {
-    stroke-dashoffset: 1;
-    transition: stroke-dashoffset 2.2s var(--ease-settle);
-  }
+@supports (animation-timeline: view()) {
+  @media (prefers-reduced-motion: no-preference) {
+    [data-reveal]:not([data-reveal="image"]) {
+      animation: reveal-rise linear both;
+      animation-timeline: view();
+      animation-range: entry 0% entry 70%;
+    }
 
-  .js .curve-rule[data-in] path {
+    /* Images open from the horizon upward: light doing the work. */
+    [data-reveal="image"] {
+      animation: reveal-open linear both;
+      animation-timeline: view();
+      animation-range: entry 5% cover 38%;
+    }
+
+    [data-reveal="image"] > * {
+      animation: reveal-settle linear both;
+      animation-timeline: view();
+      animation-range: entry 0% cover 55%;
+    }
+
+    .curve-rule path {
+      animation: curve-draw linear both;
+      animation-timeline: view();
+      animation-range: entry 20% cover 45%;
+    }
+
+    .curve-rule > span:first-child {
+      transform-origin: left center;
+      animation: rule-grow linear both;
+      animation-timeline: view();
+      animation-range: entry 10% cover 30%;
+    }
+
+    .curve-rule > span:last-child {
+      transform-origin: left center;
+      animation: rule-grow linear both;
+      animation-timeline: view();
+      animation-range: cover 30% cover 50%;
+    }
+  }
+}
+
+@keyframes reveal-rise {
+  from {
+    opacity: 0;
+    translate: 0 1.5rem;
+  }
+}
+
+@keyframes reveal-open {
+  from {
+    clip-path: inset(100% 0 0 0);
+  }
+  to {
+    clip-path: inset(0 0 0 0);
+  }
+}
+
+@keyframes reveal-settle {
+  from {
+    scale: 1.08;
+  }
+}
+
+@keyframes curve-draw {
+  from {
+    stroke-dashoffset: 1;
+  }
+  to {
     stroke-dashoffset: 0;
+  }
+}
+
+@keyframes rule-grow {
+  from {
+    scale: 0 1;
   }
 }
 

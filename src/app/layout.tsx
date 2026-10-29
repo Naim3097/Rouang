@@ -7,7 +7,6 @@ import { PreviewBar } from "@/components/layout/PreviewBar";
 import { SiteFooter } from "@/components/layout/SiteFooter";
 import { SiteHeader } from "@/components/layout/SiteHeader";
 import { JsonLd } from "@/components/ui/JsonLd";
-import { RevealObserver } from "@/components/ui/RevealObserver";
 import { studio, whatsappHref } from "@/config/studio";
 import { GA_MEASUREMENT_ID, GOOGLE_SITE_VERIFICATION, IS_PRODUCTION, SITE_URL } from "@/lib/env";
 import { organizationSchema, websiteSchema } from "@/lib/schema";
@@ -44,20 +43,10 @@ export const viewport: Viewport = {
   colorScheme: "light",
 };
 
-/*
- * Motion is progressive enhancement. This runs before paint and marks the document as able to
- * animate; if the client bundle has not taken over within four seconds, the mark is removed so
- * nothing stays hidden.
- */
-const motionBoot = `(function(d){d.documentElement.classList.add('js');setTimeout(function(){if(!window.__rouangReveal){d.documentElement.classList.remove('js')}},4000)})(document)`;
-
 export default function RootLayout({ children }: LayoutProps<"/">) {
   const whatsapp = whatsappHref("Hello ROUANG, I'd like to talk about a project.");
   return (
     <html lang="en-MY" className={`${outfit.variable} ${garamond.variable}`} suppressHydrationWarning>
-      <head>
-        <script dangerouslySetInnerHTML={{ __html: motionBoot }} />
-      </head>
       <body>
         <a href="#main" className="skip-link">
           Skip to content
@@ -70,7 +59,6 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
         </ViewTransition>
         <SiteFooter />
         <MobileActionBar whatsapp={whatsapp} />
-        <RevealObserver />
         <Analytics measurementId={IS_PRODUCTION ? GA_MEASUREMENT_ID : null} />
         {!IS_PRODUCTION ? <PreviewBar /> : null}
         <JsonLd data={[organizationSchema(), websiteSchema()]} />

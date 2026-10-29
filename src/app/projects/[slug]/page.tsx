@@ -78,11 +78,38 @@ async function ProjectPageContent({ params }: { params: PageProps<"/projects/[sl
   const threaded = visibleChapters.map((_, i) => gallery.slice(1 + i * 2, 3 + i * 2));
   const remainder = gallery.slice(1 + visibleChapters.length * 2);
 
-  const facts = [project.sector === "commercial" ? "Commercial" : "Residential", project.type, project.location].filter(Boolean).join(" · ");
+  const facts = [project.sector === "commercial" ? "Commercial" : "Residential", project.type, project.location, project.visualisation ? "Design proposal" : null]
+    .filter(Boolean)
+    .join(" · ");
+
+  // Images too small to fill a large screen open inset, at a size they can hold.
+  const insetHero = !!hero && !("pending" in hero) && hero.width < 1800 && !project.film;
 
   return (
     <article>
-      {/* ——— Opening: the photograph, full screen, with the title set on it ——— */}
+      {insetHero && hero && !("pending" in hero) ? (
+        <header data-tone="dark" className="relative">
+          <div className="page-x pb-16 pt-[calc(var(--header-h)+1.5rem)] sm:pb-24">
+            <Breadcrumbs tone="dark" items={[{ name: "Projects", href: "/projects" }, { name: project.title, href: `/projects/${project.slug}` }]} />
+            <div className="page-grid mt-16 gap-y-8 sm:mt-24">
+              <div className="col-span-12 lg:col-span-8">
+                <p className="t-label text-kapur/75">{facts}</p>
+                <h1 className="mt-5 font-serif text-[clamp(3.25rem,1.5rem+7vw,8.5rem)] italic leading-[0.88] tracking-[-0.02em]">
+                  {project.title}
+                  {project.isDraft ? <DraftTag placeholder={project.placeholder} /> : null}
+                </h1>
+              </div>
+              <p className="t-sub col-span-12 max-w-[40rem] self-end text-kapur/85 lg:col-span-4">{project.standfirst ?? project.summary}</p>
+            </div>
+            <ViewTransition name={`project-${project.slug}`} share="project-image" default="none">
+              <div className="relative mx-auto mt-14 w-full sm:mt-20" style={{ maxWidth: `${hero.width}px`, aspectRatio: `${hero.width}/${hero.height}` }}>
+                <Image src={hero.src} alt={hero.alt} fill priority fetchPriority="high" sizes={`(min-width: ${hero.width}px) ${hero.width}px, 100vw`} quality={85} className="object-cover" />
+              </div>
+            </ViewTransition>
+          </div>
+        </header>
+      ) : (
+      /* ——— Opening: the photograph, full screen, with the title set on it ——— */
       <header data-tone="dark" className="relative min-h-[100svh] overflow-hidden">
         <div className="absolute inset-0">
           {project.film ? (
@@ -120,6 +147,7 @@ async function ProjectPageContent({ params }: { params: PageProps<"/projects/[sl
           </div>
         </div>
       </header>
+      )}
 
       {/* ——— Facts and scope ——— */}
       <section data-tone="light" className="bg-kapur text-ink">
@@ -335,7 +363,6 @@ function GalleryRow({ items, flip = false, tight = false }: { items: GalleryItem
             image={img}
             sizes={img.span === "full" ? "100vw" : img.span === "narrow" ? "(min-width: 1024px) 33vw, 100vw" : "(min-width: 640px) 50vw, 100vw"}
             className={`${spanClass[img.span]} ${start} ${flip && k === 0 && items.length > 1 ? "sm:order-2" : ""}`}
-            revealDelay={k * 120}
             showCaption
           />
         );
@@ -367,6 +394,7 @@ function NextProject({ project }: { project: Project }) {
             <p className="t-caption mt-4 text-mouse">
               {project.type}
               {project.location ? ` · ${project.location}` : ""}
+              {project.visualisation ? " · Design proposal" : ""}
             </p>
           </div>
         </div>

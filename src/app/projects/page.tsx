@@ -1,3 +1,4 @@
+import { Fragment } from "react";
 import type { Metadata } from "next";
 import Link from "next/link";
 import { DraftTag } from "@/components/projects/ProjectIndex";
@@ -36,6 +37,8 @@ export default async function ProjectsPage() {
     residential: projects.filter((p) => p.sector === "residential").length,
     commercial: projects.filter((p) => p.sector === "commercial").length,
   };
+  // Finished work first; design proposals follow under their own heading.
+  const ordered = [...projects].sort((a, b) => Number(a.visualisation) - Number(b.visualisation) || a.order - b.order);
 
   return (
     <>
@@ -65,11 +68,22 @@ export default async function ProjectsPage() {
           </div>
 
           <ul id="project-plates" data-filter="all" className="page-grid gap-y-20 sm:gap-y-28 [&[data-filter=commercial]_[data-sector=residential]]:hidden [&[data-filter=residential]_[data-sector=commercial]]:hidden">
-            {projects.map((p, i) => {
+            {ordered.map((p, i) => {
               const [cols, aspect, offset] = rhythm[i % rhythm.length];
               const img = publicImage(p.card ?? p.hero);
+              const firstProposal = p.visualisation && !ordered[i - 1]?.visualisation;
               return (
-                <li key={p.slug} data-sector={p.sector} className={`col-span-12 ${cols} ${offset}`}>
+                <Fragment key={p.slug}>
+                {firstProposal ? (
+                  <li className="col-span-12 border-t border-ink/15 pt-6">
+                    <h2 className="t-sub">Design proposals</h2>
+                    <p className="t-caption mt-2 max-w-[40rem] text-ink-muted">
+                      Projects at design stage, shown in the studio&rsquo;s own visualisations rather than photographs of
+                      finished rooms.
+                    </p>
+                  </li>
+                ) : null}
+                <li data-sector={p.sector} className={`col-span-12 ${cols} ${offset}`}>
                   <Link href={`/projects/${p.slug}`} className="group block" prefetch={true}>
                     {img ? (
                       <Figure
@@ -94,6 +108,7 @@ export default async function ProjectsPage() {
                     </div>
                   </Link>
                 </li>
+                </Fragment>
               );
             })}
           </ul>

@@ -193,7 +193,6 @@ export function Pathways({ services, images = {} }: { services: Service[]; image
                 sizes="(min-width: 1024px) 45vw, 100vw"
                 tone={d.tone}
                 className="mb-14"
-                revealDelay={i * 150}
               />
             ) : null}
             <Label index={`0${i + 3}`} className={d.tone === "dark" ? "text-mouse" : "text-ink-muted"}>
@@ -372,7 +371,7 @@ export function Process() {
 
         <ol className={`mt-10 grid gap-x-[var(--grid-gap)] gap-y-12 sm:grid-cols-2 ${processSteps.length >= 5 ? "lg:grid-cols-5" : "lg:grid-cols-4"}`}>
           {processSteps.map((step, i) => (
-            <li key={step.title} data-reveal style={{ ["--reveal-delay" as string]: `${i * 90}ms` }}>
+            <li key={step.title} data-reveal>
               <div className="flex items-center justify-between">
                 <Icon name={step.icon} className="h-14 w-14 -ml-2" />
                 <span className="t-label tabular-nums text-ink-muted">{String(i + 1).padStart(2, "0")}</span>
