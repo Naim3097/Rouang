@@ -1,0 +1,426 @@
+{
+ "rembayung": {
+  "hero": {
+   "src": "/images/projects/rembayung/rembayung-glazed-gable.jpg",
+   "width": 1800,
+   "height": 2400,
+   "bytes": 536712,
+   "alt": "Rembayung's glazed timber gable, with the Petronas Twin Towers seen through the glass and the window frames casting shadows across the terracotta floor",
+   "focus": "50% 45%"
+  },
+  "card": {
+   "src": "/images/projects/rembayung/rembayung-a-frame-ceiling.jpg",
+   "width": 1800,
+   "height": 2400,
+   "bytes": 755101,
+   "alt": "The timber-lined A-frame ceiling of the dining hall, rising to a glazed gable",
+   "focus": "50% 40%"
+  },
+  "gallery-0": {
+   "src": "/images/projects/rembayung/rembayung-a-frame-ceiling.jpg",
+   "width": 1800,
+   "height": 2400,
+   "bytes": 755101,
+   "alt": "The timber-lined A-frame ceiling of the dining hall, rising to a glazed gable above a mezzanine",
+   "caption": "The main hall under its timber-lined roof.",
+   "span": "wide"
+  },
+  "gallery-1": {
+   "src": "/images/projects/rembayung/rembayung-table-in-sun.jpg",
+   "width": 1800,
+   "height": 2400,
+   "bytes": 274297,
+   "alt": "A timber table and rattan-backed chair by the window in afternoon sun, with planting outside",
+   "caption": "Timber and rattan by the window.",
+   "span": "narrow"
+  },
+  "gallery-2": {
+   "src": "/images/projects/rembayung/rembayung-batik-frame.jpg",
+   "width": 1800,
+   "height": 2400,
+   "bytes": 394816,
+   "alt": "Blue and white batik stretched across a timber frame beneath the roof, with a rattan lamp below",
+   "caption": "Batik carried on timber frames overhead.",
+   "span": "half"
+  },
+  "gallery-3": {
+   "src": "/images/projects/rembayung/rembayung-long-hall.jpg",
+   "width": 1350,
+   "height": 2400,
+   "bytes": 496948,
+   "alt": "A long dining hall under the A-frame roof, divided down its length by a planted banquette",
+   "caption": "The long hall, divided by a planted banquette.",
+   "span": "half"
+  },
+  "gallery-4": {
+   "src": "/images/projects/rembayung/rembayung-counter-edge.jpg",
+   "width": 1800,
+   "height": 2400,
+   "bytes": 361081,
+   "alt": "Close-up of a timber counter top with a routed groove along its edge, against slatted timber",
+   "caption": "Edge detail on a timber counter.",
+   "span": "narrow"
+  },
+  "gallery-5": {
+   "src": "/images/projects/rembayung/rembayung-rattan-pendant.jpg",
+   "width": 1350,
+   "height": 2400,
+   "bytes": 549299,
+   "alt": "A large rattan pendant lamp hanging under the steel and timber roof, with tables below",
+   "span": "half"
+  },
+  "gallery-6": {
+   "src": "/images/projects/rembayung/rembayung-gable-dining.jpg",
+   "width": 1350,
+   "height": 2400,
+   "bytes": 500497,
+   "alt": "Dining tables with rattan-backed chairs beneath the glazed gable, behind a slatted timber screen",
+   "span": "half"
+  },
+  "gallery-7": {
+   "src": "/images/projects/rembayung/rembayung-stained-glass-screen.jpg",
+   "width": 1350,
+   "height": 2400,
+   "bytes": 576563,
+   "alt": "A partition of corrugated and stained glass in green, blue and amber, hung with woven trays and the Rembayung name",
+   "caption": "Stained glass, woven trays and the restaurant's name.",
+   "span": "half"
+  },
+  "gallery-8": {
+   "src": "/images/projects/rembayung/rembayung-batik-shelves.jpg",
+   "width": 1800,
+   "height": 2400,
+   "bytes": 349601,
+   "alt": "Timber shelving stacked with folded batik cloth above a slatted base",
+   "span": "narrow"
+  },
+  "gallery-9": {
+   "src": "/images/projects/rembayung/rembayung-ground-floor.jpg",
+   "width": 1350,
+   "height": 2400,
+   "bytes": 464388,
+   "alt": "The ground-floor dining room with bentwood chairs, timber blinds and a terracotta and concrete floor",
+   "span": "half"
+  },
+  "gallery-10": {
+   "src": "/images/projects/rembayung/rembayung-upper-dining.jpg",
+   "width": 1350,
+   "height": 2400,
+   "bytes": 542679,
+   "alt": "Upstairs dining under the pitched timber roof, with rows of tables and planters along the edge",
+   "span": "half"
+  },
+  "gallery-11": {
+   "src": "/images/projects/rembayung/rembayung-brick-wall.jpg",
+   "width": 1350,
+   "height": 2400,
+   "bytes": 567172,
+   "alt": "The dining hall beneath a red brick wall with green and blue stained-glass windows and a mezzanine above",
+   "span": "half"
+  },
+  "gallery-12": {
+   "src": "/images/projects/rembayung/rembayung-service-counter.jpg",
+   "width": 1800,
+   "height": 2400,
+   "bytes": 348532,
+   "alt": "A timber service counter with a slatted front and patterned glass inserts",
+   "span": "narrow"
+  },
+  "gallery-13": {
+   "src": "/images/projects/rembayung/rembayung-screen-and-lantern.jpg",
+   "width": 1350,
+   "height": 2400,
+   "bytes": 426774,
+   "alt": "A slatted timber screen and rattan lantern against the tall glass facade",
+   "span": "half"
+  }
+ },
+ "ampang": {
+  "hero": {
+   "src": "/images/projects/ampang/ampang-porch.jpg",
+   "width": 2400,
+   "height": 1601,
+   "bytes": 188334,
+   "alt": "The porch: an arched, black-framed front door beside full-height black-framed windows on a white wall",
+   "focus": "50% 55%"
+  },
+  "card": {
+   "src": "/images/projects/ampang/ampang-arched-doors.jpg",
+   "width": 1600,
+   "height": 2400,
+   "bytes": 204474,
+   "alt": "Arched black-framed double doors under a brass lantern",
+   "focus": "50% 50%"
+  },
+  "gallery-0": {
+   "src": "/images/projects/ampang/ampang-facade.jpg",
+   "width": 2400,
+   "height": 1600,
+   "bytes": 486028,
+   "alt": "The white facade with black window frames, wrought-iron balconies and a tiled roof, seen through trees",
+   "span": "wide"
+  },
+  "gallery-1": {
+   "src": "/images/projects/ampang/ampang-arched-doors.jpg",
+   "width": 1600,
+   "height": 2400,
+   "bytes": 204474,
+   "alt": "Arched black-framed double doors under a brass lantern, with a bench beside them",
+   "span": "narrow"
+  },
+  "gallery-2": {
+   "src": "/images/projects/ampang/ampang-foyer-to-dining.jpg",
+   "width": 1600,
+   "height": 2400,
+   "bytes": 293865,
+   "alt": "The foyer, with a black and white floor inlay and crystal chandelier, looking through an arch to the dining table",
+   "span": "half"
+  },
+  "gallery-3": {
+   "src": "/images/projects/ampang/ampang-corridor.jpg",
+   "width": 1600,
+   "height": 2400,
+   "bytes": 310710,
+   "alt": "A narrow panelled corridor ending in an arched glass door, over a black and white geometric floor",
+   "span": "half"
+  },
+  "gallery-4": {
+   "src": "/images/projects/ampang/ampang-prayer-niche.jpg",
+   "width": 1600,
+   "height": 2400,
+   "bytes": 301147,
+   "alt": "A prayer niche with a pointed arch, set into a geometric lattice wall and lit from within",
+   "span": "narrow"
+  },
+  "gallery-5": {
+   "src": "/images/projects/ampang/ampang-powder-room.jpg",
+   "width": 1600,
+   "height": 2400,
+   "bytes": 421902,
+   "alt": "A powder room with floral wallpaper, an arched mirror between wall lanterns, green tiles and a black vanity",
+   "span": "half"
+  },
+  "gallery-6": {
+   "src": "/images/projects/ampang/ampang-black-joinery.jpg",
+   "width": 1600,
+   "height": 2400,
+   "bytes": 199937,
+   "alt": "Black joinery with ribbed vents and turned brass handles",
+   "span": "narrow"
+  },
+  "gallery-7": {
+   "src": "/images/projects/ampang/ampang-velvet-seat.jpg",
+   "width": 1600,
+   "height": 2400,
+   "bytes": 196960,
+   "alt": "A tufted red velvet seat set into an arched recess in white joinery",
+   "span": "half"
+  },
+  "gallery-8": {
+   "src": "/images/projects/ampang/ampang-dressing-arch.jpg",
+   "width": 1600,
+   "height": 2400,
+   "bytes": 224117,
+   "alt": "A timber-lined arch opening into a dressing area with a lit mirror and brass lantern",
+   "span": "half"
+  },
+  "gallery-9": {
+   "src": "/images/projects/ampang/ampang-dressing-room.jpg",
+   "width": 1600,
+   "height": 2400,
+   "bytes": 207410,
+   "alt": "A dark timber wardrobe with lit open shelves beside a dressing table",
+   "span": "narrow"
+  },
+  "gallery-10": {
+   "src": "/images/projects/ampang/ampang-wall-lights.jpg",
+   "width": 1600,
+   "height": 2400,
+   "bytes": 242060,
+   "alt": "Black-shaded brass wall lights against black panelling",
+   "span": "narrow"
+  },
+  "gallery-11": {
+   "src": "/images/projects/ampang/ampang-leather-handles.jpg",
+   "width": 1600,
+   "height": 2400,
+   "bytes": 87577,
+   "alt": "Stitched black leather handles on cream wardrobe doors",
+   "span": "narrow"
+  }
+ },
+ "seri-wirani-bangi": {
+  "hero": {
+   "src": "/images/projects/seri-wirani-bangi/seri-wirani-dining.jpg",
+   "width": 2400,
+   "height": 1200,
+   "bytes": 234471,
+   "alt": "Design visualisation: the dining room, with a glass-block wall to one side and the garden beyond",
+   "focus": "50% 50%"
+  },
+  "card": {
+   "src": "/images/projects/seri-wirani-bangi/seri-wirani-dining.jpg",
+   "width": 2400,
+   "height": 1200,
+   "bytes": 234471,
+   "alt": "Design visualisation: the dining room beside the garden",
+   "focus": "50% 50%"
+  },
+  "gallery-0": {
+   "src": "/images/projects/seri-wirani-bangi/seri-wirani-living.jpg",
+   "width": 2400,
+   "height": 1200,
+   "bytes": 163505,
+   "alt": "Design visualisation: the living room, with a textured feature wall and sheer curtains to the garden",
+   "span": "wide"
+  },
+  "gallery-1": {
+   "src": "/images/projects/seri-wirani-bangi/seri-wirani-axis.jpg",
+   "width": 1200,
+   "height": 2400,
+   "bytes": 155607,
+   "alt": "Design visualisation: a long view through the house from the entrance towards the garden",
+   "span": "narrow"
+  },
+  "gallery-2": {
+   "src": "/images/projects/seri-wirani-bangi/seri-wirani-dining-kitchen.jpg",
+   "width": 2400,
+   "height": 1200,
+   "bytes": 203863,
+   "alt": "Design visualisation: the dining table, with the kitchen and its timber island behind",
+   "span": "half"
+  },
+  "gallery-3": {
+   "src": "/images/projects/seri-wirani-bangi/seri-wirani-dry-kitchen.jpg",
+   "width": 2400,
+   "height": 1200,
+   "bytes": 177202,
+   "alt": "Design visualisation: the dry kitchen, with a dark timber island and recessed timber shelf against white cabinetry",
+   "span": "half"
+  },
+  "gallery-4": {
+   "src": "/images/projects/seri-wirani-bangi/seri-wirani-kitchen.jpg",
+   "width": 2400,
+   "height": 1200,
+   "bytes": 177671,
+   "alt": "Design visualisation: the kitchen, with timber upper cabinets, pendant lights and an island with stools",
+   "span": "half"
+  },
+  "gallery-5": {
+   "src": "/images/projects/seri-wirani-bangi/seri-wirani-bathroom.jpg",
+   "width": 1350,
+   "height": 2400,
+   "bytes": 293352,
+   "alt": "Design visualisation: the master bathroom, with stone-toned surfaces, black fittings and daylight from a planted lightwell",
+   "span": "narrow"
+  },
+  "gallery-6": {
+   "src": "/images/projects/seri-wirani-bangi/seri-wirani-master-bedroom.jpg",
+   "width": 2400,
+   "height": 1200,
+   "bytes": 199401,
+   "alt": "Design visualisation: the master bedroom, with a textured feature wall, concealed linear lighting and light timber furniture",
+   "span": "half"
+  },
+  "gallery-7": {
+   "src": "/images/projects/seri-wirani-bangi/seri-wirani-facade.jpg",
+   "width": 1200,
+   "height": 2400,
+   "bytes": 128961,
+   "alt": "Design visualisation: the front of the house, white with a timber-framed focal feature",
+   "span": "narrow"
+  }
+ },
+ "kota-warisan-sepang": {
+  "hero": {
+   "src": "/images/projects/kota-warisan-sepang/kota-warisan-family-hall.jpg",
+   "width": 1469,
+   "height": 720,
+   "bytes": 86671,
+   "alt": "Design visualisation: the upstairs family hall, with a layered ceiling, pale walls and black doors",
+   "focus": "50% 50%"
+  },
+  "card": {
+   "src": "/images/projects/kota-warisan-sepang/kota-warisan-guest-room.jpg",
+   "width": 1404,
+   "height": 768,
+   "bytes": 112568,
+   "alt": "Design visualisation: the guest bedroom, with panelled walls and warm bedside lights",
+   "focus": "50% 50%"
+  },
+  "gallery-0": {
+   "src": "/images/projects/kota-warisan-sepang/kota-warisan-guest-room.jpg",
+   "width": 1404,
+   "height": 768,
+   "bytes": 112568,
+   "alt": "Design visualisation: the guest bedroom, with panelled walls, a ceiling fan and warm bedside lights",
+   "span": "wide"
+  },
+  "gallery-1": {
+   "src": "/images/projects/kota-warisan-sepang/kota-warisan-guest-wardrobe.jpg",
+   "width": 1456,
+   "height": 735,
+   "bytes": 70619,
+   "alt": "Design visualisation: full-height wardrobes with panelled doors in the guest room",
+   "span": "half"
+  },
+  "gallery-2": {
+   "src": "/images/projects/kota-warisan-sepang/kota-warisan-guest-dressing.jpg",
+   "width": 1562,
+   "height": 688,
+   "bytes": 91927,
+   "alt": "Design visualisation: a dressing corner with an arched mirror beside the window",
+   "span": "half"
+  }
+ },
+ "warung-soho": {
+  "hero": {
+   "src": "/images/projects/warung-soho/warung-soho-dining.jpg",
+   "width": 1080,
+   "height": 607,
+   "bytes": 101107,
+   "alt": "Design visualisation: the dining room, with green chairs, marble-topped tables and a red service counter",
+   "focus": "50% 50%"
+  },
+  "card": {
+   "src": "/images/projects/warung-soho/warung-soho-dining.jpg",
+   "width": 1080,
+   "height": 607,
+   "bytes": 101107,
+   "alt": "Design visualisation: the dining room of Warung Soho",
+   "focus": "50% 50%"
+  },
+  "gallery-0": {
+   "src": "/images/projects/warung-soho/warung-soho-terrace.jpg",
+   "width": 1080,
+   "height": 607,
+   "bytes": 125853,
+   "alt": "Design visualisation: rattan chairs on the covered terrace, open to the street",
+   "span": "half"
+  },
+  "gallery-1": {
+   "src": "/images/projects/warung-soho/warung-soho-buffet.jpg",
+   "width": 1080,
+   "height": 607,
+   "bytes": 97969,
+   "alt": "Design visualisation: the buffet counter in front of a leaf-pattern mural",
+   "span": "half"
+  },
+  "gallery-2": {
+   "src": "/images/projects/warung-soho/warung-soho-glasshouse.jpg",
+   "width": 1080,
+   "height": 607,
+   "bytes": 124379,
+   "alt": "Design visualisation: tables along a glazed wall with hanging planting and rattan pendants",
+   "span": "half"
+  },
+  "gallery-3": {
+   "src": "/images/projects/warung-soho/warung-soho-counter.jpg",
+   "width": 1080,
+   "height": 607,
+   "bytes": 81681,
+   "alt": "Design visualisation: the red-tiled service counter with timber slatted panels",
+   "span": "half"
+  }
+ }
+}

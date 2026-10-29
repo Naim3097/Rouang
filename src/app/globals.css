@@ -1,0 +1,701 @@
+@import "tailwindcss";
+
+/*
+ * ROUANG design tokens.
+ * Source of truth: ROUANG brand kit (colour palette p.10, typography p.11–13, graphic elements p.14–15).
+ * Four colours and nothing else. Tints are allowed where a layout needs a step between them.
+ * Rikyū Grey is the only colour: a seal, a hairline, one panel. Never a whole page.
+ */
+@theme {
+  --color-ink: #141414;          /* Chinese Black: wordmark, text, dark panels */
+  --color-kapur: #f3f3f3;        /* Milky White: pages, walls, breathing space */
+  --color-mouse: #949495;        /* Mouse Grey: captions and dividers on dark */
+  --color-rikyu: #888e7e;        /* Rikyū Grey: the only colour */
+  --color-rikyu-deep: #404732;   /* end of the Rikyū gradient shown in the kit */
+
+  /* Tints of the four. Used where Mouse Grey would fail contrast on Milky White. */
+  --color-ink-soft: #474747;     /* secondary text on kapur, 8.9:1 */
+  --color-ink-muted: #686868;    /* captions on kapur, 5.0:1 */
+  --color-ink-raised: #1d1d1d;   /* a step up from ink for dark panels */
+  --color-kapur-deep: #e7e7e6;   /* a step down from kapur for quiet panels */
+
+  --font-sans: var(--font-outfit), ui-sans-serif, system-ui, sans-serif;
+  --font-serif: var(--font-garamond), "Iowan Old Style", Georgia, serif;
+
+  --ease-brand: cubic-bezier(0.2, 0.7, 0.1, 1);
+  --ease-settle: cubic-bezier(0.65, 0, 0.15, 1);
+
+  --breakpoint-xs: 26rem;
+}
+
+:root {
+  --page-gutter: clamp(1.25rem, 4.6vw, 5rem);
+  --grid-gap: clamp(1rem, 2vw, 2rem);
+  --section-space: clamp(6rem, 12vw, 11.5rem);
+  --header-h: 4.75rem;
+  --hairline-light: rgb(20 20 20 / 0.14);
+  --hairline-dark: rgb(243 243 243 / 0.16);
+  color-scheme: light;
+}
+
+@layer base {
+  html {
+    -webkit-text-size-adjust: 100%;
+    text-size-adjust: 100%;
+    scroll-padding-top: calc(var(--header-h) + 1rem);
+  }
+
+  @media (prefers-reduced-motion: no-preference) {
+    html {
+      scroll-behavior: smooth;
+    }
+  }
+
+  body {
+    background: var(--color-kapur);
+    color: var(--color-ink);
+    font-family: var(--font-sans);
+    font-size: 1.0625rem;      /* 17px, per kit */
+    line-height: 1.7059;       /* 29px */
+    font-weight: 400;
+    font-feature-settings: "ss01" 0;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    text-rendering: optimizeLegibility;
+  }
+
+  ::selection {
+    background: var(--color-rikyu);
+    color: var(--color-kapur);
+  }
+
+  :focus-visible {
+    outline: 2px solid currentColor;
+    outline-offset: 3px;
+    border-radius: 2px;
+  }
+
+  [data-tone="dark"] :focus-visible {
+    outline-color: var(--color-kapur);
+  }
+
+  img,
+  svg,
+  video {
+    display: block;
+    max-width: 100%;
+  }
+
+  em,
+  i {
+    font-style: italic;
+  }
+
+  hr {
+    border: 0;
+    border-top: 1px solid var(--hairline-light);
+  }
+}
+
+/* ——— Type scale. Five levels and no more (kit p.13), plus caps labels. ——— */
+
+/* Headline: Outfit Medium 62/64, tracking -3%, sentence case. Fluid between phone and wide desktop. */
+@utility t-headline {
+  font-family: var(--font-sans);
+  font-weight: 500;
+  font-size: clamp(2.375rem, 1.55rem + 3.1vw, 3.875rem);
+  line-height: 1.04;
+  letter-spacing: -0.03em;
+  text-wrap: balance;
+}
+
+/* The hero is the same level, set larger because it is the only one on the page. */
+@utility t-headline-hero {
+  font-family: var(--font-sans);
+  font-weight: 500;
+  font-size: clamp(2.625rem, 1.4rem + 4.6vw, 5.75rem);
+  line-height: 1.01;
+  letter-spacing: -0.035em;
+  text-wrap: balance;
+}
+
+/* Sub-headline: Outfit Regular 28/36. */
+@utility t-sub {
+  font-family: var(--font-sans);
+  font-weight: 400;
+  font-size: clamp(1.3125rem, 1.1rem + 0.75vw, 1.75rem);
+  line-height: 1.29;
+  letter-spacing: -0.012em;
+  text-wrap: pretty;
+}
+
+/* Body: Outfit Regular 17/29. */
+@utility t-body {
+  font-family: var(--font-sans);
+  font-weight: 400;
+  font-size: 1.0625rem;
+  line-height: 1.7059;
+  text-wrap: pretty;
+}
+
+/* Quote and Malay: EB Garamond Italic 23/34, one step larger than the Outfit around it. */
+@utility t-quote {
+  font-family: var(--font-serif);
+  font-style: italic;
+  font-weight: 400;
+  font-size: clamp(1.3125rem, 1.15rem + 0.55vw, 1.4375rem);
+  line-height: 1.48;
+  text-wrap: pretty;
+}
+
+/* The italic half of a title pair, sized to sit beside an Outfit headline. */
+@utility t-italic-display {
+  font-family: var(--font-serif);
+  font-style: italic;
+  font-weight: 400;
+  letter-spacing: -0.01em;
+  line-height: 1;
+}
+
+/* Caption: Outfit Regular 13/20. */
+@utility t-caption {
+  font-family: var(--font-sans);
+  font-weight: 400;
+  font-size: 0.8125rem;
+  line-height: 1.54;
+}
+
+/* Labels: Regular 400, caps, tracking 0.12em. Capitals are reserved for very small labels. */
+@utility t-label {
+  font-family: var(--font-sans);
+  font-weight: 400;
+  font-size: 0.75rem;
+  line-height: 1.4;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+/* ——— Layout ——— */
+
+@utility page-x {
+  padding-inline: var(--page-gutter);
+}
+
+@utility page-grid {
+  display: grid;
+  grid-template-columns: repeat(12, minmax(0, 1fr));
+  column-gap: var(--grid-gap);
+}
+
+@utility section-y {
+  padding-block: var(--section-space);
+}
+
+@utility hairline {
+  border-color: var(--hairline-light);
+}
+
+@utility hairline-dark {
+  border-color: var(--hairline-dark);
+}
+
+/* ——— Tones ——— */
+
+[data-tone="dark"] {
+  background: var(--color-ink);
+  color: var(--color-kapur);
+  color-scheme: dark;
+}
+
+[data-tone="rikyu"] {
+  background:
+    linear-gradient(115deg, var(--color-rikyu) 0%, color-mix(in oklab, var(--color-rikyu) 55%, var(--color-rikyu-deep)) 55%, var(--color-rikyu-deep) 100%);
+  color: var(--color-kapur);
+  color-scheme: dark;
+}
+
+/* ——— Drawing-sheet layer: hairline guides and registration crosses, taken from how the work is drawn. ——— */
+
+.sheet-guides {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  padding-inline: var(--page-gutter);
+}
+
+.sheet-guides::before,
+.sheet-guides::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  width: 1px;
+  background: currentColor;
+  opacity: 0.09;
+}
+
+.sheet-guides::before {
+  left: var(--page-gutter);
+}
+
+.sheet-guides::after {
+  right: var(--page-gutter);
+}
+
+.cross {
+  position: absolute;
+  width: 13px;
+  height: 13px;
+  pointer-events: none;
+  opacity: 0.5;
+  translate: -50% -50%;
+}
+
+.cross::before,
+.cross::after {
+  content: "";
+  position: absolute;
+  background: currentColor;
+}
+
+.cross::before {
+  left: 6px;
+  top: 0;
+  width: 1px;
+  height: 13px;
+}
+
+.cross::after {
+  top: 6px;
+  left: 0;
+  width: 13px;
+  height: 1px;
+}
+
+/* Crosshair field used once per layout as the quiet pattern (kit p.15). */
+.pattern-cross {
+  --cross-gap: 88px;
+  background-image:
+    linear-gradient(currentColor, currentColor),
+    linear-gradient(currentColor, currentColor);
+  background-size: 1px 9px, 9px 1px;
+  background-position: 0 0, 0 0;
+  background-repeat: no-repeat;
+  -webkit-mask-image: radial-gradient(ellipse at center, #000 0%, transparent 72%);
+  mask-image: radial-gradient(ellipse at center, #000 0%, transparent 72%);
+}
+
+.pattern-cross-field {
+  background-image:
+    linear-gradient(to right, transparent 4px, currentColor 4px, currentColor 5px, transparent 5px),
+    linear-gradient(to bottom, transparent 4px, currentColor 4px, currentColor 5px, transparent 5px);
+  background-size: 88px 88px, 88px 88px;
+  -webkit-mask-image:
+    linear-gradient(to bottom, transparent 4px, #000 4px, #000 5px, transparent 5px),
+    linear-gradient(to right, transparent 4px, #000 4px, #000 5px, transparent 5px);
+  opacity: 0.18;
+}
+
+/* Halftone dots that fade across a Rikyū panel (kit p.15). */
+.pattern-halftone {
+  background-image: radial-gradient(circle at center, rgb(243 243 243 / 0.55) 0 1.6px, transparent 2.1px);
+  background-size: 14px 14px;
+  -webkit-mask-image: linear-gradient(100deg, transparent 18%, rgb(0 0 0 / 0.65) 60%, #000 100%);
+  mask-image: linear-gradient(100deg, transparent 18%, rgb(0 0 0 / 0.65) 60%, #000 100%);
+  opacity: 0.55;
+}
+
+/* ——— Buttons: pill with an open ring at the end. The label says exactly what happens next (kit p.14). ——— */
+
+.btn {
+  --btn-h: 3.375rem;
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  gap: 1.25rem;
+  min-height: var(--btn-h);
+  padding: 0.5rem 0.5625rem 0.5rem 1.5rem;
+  border-radius: 999px;
+  border: 1px solid currentColor;
+  font-size: 1rem;
+  line-height: 1.2;
+  font-weight: 400;
+  letter-spacing: -0.005em;
+  white-space: nowrap;
+  transition:
+    background-color 0.45s var(--ease-brand),
+    color 0.45s var(--ease-brand),
+    border-color 0.45s var(--ease-brand);
+}
+
+.btn-ring {
+  display: grid;
+  place-items: center;
+  width: 2.25rem;
+  height: 2.25rem;
+  margin-left: auto;
+  flex: none;
+  transition: translate 0.5s var(--ease-brand);
+}
+
+.btn:hover .btn-ring,
+.btn:focus-visible .btn-ring {
+  translate: 0.25rem 0;
+}
+
+.btn-solid-light {
+  background: var(--color-kapur);
+  color: var(--color-ink);
+  border-color: var(--color-kapur);
+}
+
+.btn-solid-light:hover {
+  background: #ffffff;
+}
+
+.btn-solid-dark {
+  background: var(--color-ink);
+  color: var(--color-kapur);
+  border-color: var(--color-ink);
+}
+
+.btn-solid-dark:hover {
+  background: var(--color-ink-raised);
+}
+
+.btn-outline:hover {
+  background: color-mix(in oklab, currentColor 8%, transparent);
+}
+
+/* ——— Text links: a hairline that draws in on hover. ——— */
+
+.link-line {
+  background-image: linear-gradient(currentColor, currentColor);
+  background-size: 100% 1px;
+  background-position: 0 100%;
+  background-repeat: no-repeat;
+  padding-bottom: 2px;
+  transition: background-size 0.55s var(--ease-brand);
+}
+
+.link-line:hover {
+  background-size: 0% 1px;
+  background-position: 100% 100%;
+}
+
+.link-reveal {
+  background-image: linear-gradient(currentColor, currentColor);
+  background-size: 0% 1px;
+  background-position: 0 100%;
+  background-repeat: no-repeat;
+  padding-bottom: 2px;
+  transition: background-size 0.55s var(--ease-brand);
+}
+
+.link-reveal:hover,
+.link-reveal[aria-current="page"] {
+  background-size: 100% 1px;
+}
+
+/* ——— Motion. Everything works without it; reduced motion removes it. ——— */
+
+@media (prefers-reduced-motion: no-preference) {
+  .js [data-reveal] {
+    opacity: 0;
+    translate: 0 1.25rem;
+    transition:
+      opacity 0.9s var(--ease-brand),
+      translate 1.1s var(--ease-brand);
+    transition-delay: var(--reveal-delay, 0ms);
+  }
+
+  .js [data-reveal][data-in] {
+    opacity: 1;
+    translate: 0 0;
+  }
+
+  /* Images open from the horizon upward: light doing the work. */
+  .js [data-reveal="image"] {
+    opacity: 1;
+    translate: none;
+    clip-path: inset(100% 0 0 0);
+    transition: clip-path 1.25s var(--ease-settle);
+    transition-delay: var(--reveal-delay, 0ms);
+  }
+
+  .js [data-reveal="image"][data-in] {
+    clip-path: inset(0 0 0 0);
+  }
+
+  .js [data-reveal="image"] > * {
+    scale: 1.06;
+    transition: scale 1.8s var(--ease-brand);
+    transition-delay: var(--reveal-delay, 0ms);
+  }
+
+  .js [data-reveal="image"][data-in] > * {
+    scale: 1;
+  }
+}
+
+/* The curve, lifted out of the mark and drawn as a rule (kit p.14). */
+.curve-rule path {
+  stroke-dasharray: 1;
+  stroke-dashoffset: 0;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .js .curve-rule path {
+    stroke-dashoffset: 1;
+    transition: stroke-dashoffset 2.2s var(--ease-settle);
+  }
+
+  .js .curve-rule[data-in] path {
+    stroke-dashoffset: 0;
+  }
+}
+
+/* ——— Hero aperture: the circle of the mark opens onto the work as you scroll. ——— */
+
+@media (min-width: 64rem) {
+  .aperture-window {
+    clip-path: circle(var(--aperture-r, 50%) at var(--aperture-x, 50%) var(--aperture-y, 50%));
+  }
+}
+
+@supports (animation-timeline: view()) {
+  @media (prefers-reduced-motion: no-preference) and (min-width: 64rem) {
+    /* The hero is the first thing on the page, so scroll position maps straight onto it. */
+    .aperture-track {
+      height: 220svh;
+    }
+
+    .aperture-stage {
+      position: sticky;
+      top: 0;
+      height: 100svh;
+      overflow: clip;
+    }
+
+    .aperture-window {
+      animation: aperture-open linear both;
+      animation-timeline: scroll(root block);
+      animation-range: 0 95svh;
+    }
+
+    .aperture-fade {
+      animation: aperture-fade linear both;
+      animation-timeline: scroll(root block);
+      animation-range: 0 42svh;
+    }
+
+    .aperture-caption {
+      animation: aperture-caption linear both;
+      animation-timeline: scroll(root block);
+      animation-range: 80svh 112svh;
+    }
+  }
+}
+
+@property --aperture-r {
+  syntax: "<length-percentage>";
+  inherits: true;
+  initial-value: 50%;
+}
+
+@keyframes aperture-open {
+  from {
+    clip-path: circle(var(--aperture-r-start, 30%) at var(--aperture-x, 50%) var(--aperture-y, 50%));
+  }
+  to {
+    clip-path: circle(150% at 50% 50%);
+  }
+}
+
+@keyframes aperture-fade {
+  to {
+    opacity: 0;
+    translate: 0 -2.5rem;
+  }
+}
+
+@keyframes aperture-caption {
+  from {
+    opacity: 0;
+    translate: 0 1rem;
+  }
+  to {
+    opacity: 1;
+    translate: 0 0;
+  }
+}
+
+/* ——— View transitions: a quiet crossfade between pages, a morph for project imagery. ——— */
+
+::view-transition-old(root),
+::view-transition-new(root) {
+  animation-duration: 420ms;
+  animation-timing-function: var(--ease-brand);
+}
+
+::view-transition-group(.project-image) {
+  animation-duration: 650ms;
+  animation-timing-function: var(--ease-settle);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  ::view-transition-group(*),
+  ::view-transition-old(*),
+  ::view-transition-new(*) {
+    animation: none !important;
+  }
+}
+
+@keyframes walk-in {
+  from {
+    opacity: 0;
+    translate: 0 0.6rem;
+  }
+  to {
+    opacity: 1;
+    translate: 0 0;
+  }
+}
+
+/* ——— Long-form content (articles and project narratives) ——— */
+
+.prose-rouang {
+  max-width: 40rem;
+}
+
+.prose-rouang > * + * {
+  margin-top: 1.25em;
+}
+
+.prose-rouang h2 {
+  margin-top: 2.6em;
+  font-weight: 500;
+  font-size: clamp(1.5rem, 1.2rem + 1vw, 2rem);
+  line-height: 1.18;
+  letter-spacing: -0.02em;
+  text-wrap: balance;
+}
+
+.prose-rouang h3 {
+  margin-top: 2em;
+  font-weight: 500;
+  font-size: 1.25rem;
+  line-height: 1.3;
+  letter-spacing: -0.01em;
+}
+
+.prose-rouang h2 + *,
+.prose-rouang h3 + * {
+  margin-top: 0.75em;
+}
+
+.prose-rouang a {
+  text-decoration: underline;
+  text-decoration-thickness: 1px;
+  text-underline-offset: 0.2em;
+}
+
+.prose-rouang ul,
+.prose-rouang ol {
+  padding-left: 1.25em;
+}
+
+.prose-rouang ul {
+  list-style: none;
+}
+
+.prose-rouang ul > li {
+  position: relative;
+}
+
+.prose-rouang ul > li::before {
+  content: "";
+  position: absolute;
+  left: -1.1em;
+  top: 0.8em;
+  width: 0.45em;
+  height: 1px;
+  background: currentColor;
+}
+
+.prose-rouang ol {
+  list-style: decimal;
+}
+
+.prose-rouang li + li {
+  margin-top: 0.5em;
+}
+
+.prose-rouang blockquote {
+  margin-block: 2em;
+  padding-left: 1.25rem;
+  border-left: 1px solid var(--color-rikyu);
+  font-family: var(--font-serif);
+  font-style: italic;
+  font-size: 1.4375rem;
+  line-height: 1.48;
+}
+
+.prose-rouang strong {
+  font-weight: 500;
+}
+
+.prose-rouang table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.9375rem;
+}
+
+.prose-rouang th,
+.prose-rouang td {
+  text-align: left;
+  vertical-align: top;
+  padding: 0.75rem 1rem 0.75rem 0;
+  border-bottom: 1px solid var(--hairline-light);
+}
+
+.prose-rouang th {
+  font-weight: 500;
+}
+
+/* ——— Utilities ——— */
+
+.visually-hidden {
+  position: absolute !important;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+.skip-link {
+  position: absolute;
+  left: 1rem;
+  top: -10rem;
+  z-index: 100;
+  padding: 0.75rem 1.25rem;
+  background: var(--color-ink);
+  color: var(--color-kapur);
+  border-radius: 999px;
+}
+
+.skip-link:focus {
+  top: 1rem;
+}
+
+.no-scrollbar {
+  scrollbar-width: none;
+}
+
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}

@@ -1,0 +1,87 @@
+{
+  "_about": "Curated project imagery. Source files come from the studio's Google Drive folder 'MARKETING & BRANDING'. Each project follows the brand kit's three kinds of picture: Space, Material, Whole. Run scripts/media/export.cjs to regenerate the web files in public/images/projects.",
+  "grade": { "photo": 1, "render": 0.35 },
+  "projects": {
+    "rembayung": {
+      "kind": "photo",
+      "source": "Drive: MARKETING & BRANDING/Rembayung (iPhone 13 Pro Max)",
+      "hero": { "file": "IMG_3339.JPG", "out": "rembayung-glazed-gable", "alt": "Rembayung's glazed timber gable, with the Petronas Twin Towers seen through the glass and the window frames casting shadows across the terracotta floor", "focus": "50% 45%" },
+      "card": { "file": "IMG_2424.heic", "out": "rembayung-a-frame-ceiling", "alt": "The timber-lined A-frame ceiling of the dining hall, rising to a glazed gable", "focus": "50% 40%" },
+      "gallery": [
+        { "file": "IMG_2424.heic", "out": "rembayung-a-frame-ceiling", "span": "wide", "role": "space", "alt": "The timber-lined A-frame ceiling of the dining hall, rising to a glazed gable above a mezzanine", "caption": "The main hall under its timber-lined roof." },
+        { "file": "IMG_2185.heic", "out": "rembayung-table-in-sun", "span": "narrow", "role": "material", "alt": "A timber table and rattan-backed chair by the window in afternoon sun, with planting outside", "caption": "Timber and rattan by the window." },
+        { "file": "IMG_2196.heic", "out": "rembayung-batik-frame", "span": "half", "role": "material", "alt": "Blue and white batik stretched across a timber frame beneath the roof, with a rattan lamp below", "caption": "Batik carried on timber frames overhead." },
+        { "file": "IMG_2142.heic", "out": "rembayung-long-hall", "span": "half", "role": "whole", "alt": "A long dining hall under the A-frame roof, divided down its length by a planted banquette", "caption": "The long hall, divided by a planted banquette." },
+        { "file": "IMG_2409.HEIC", "out": "rembayung-counter-edge", "span": "narrow", "role": "material", "alt": "Close-up of a timber counter top with a routed groove along its edge, against slatted timber", "caption": "Edge detail on a timber counter." },
+        { "file": "IMG_2135.heic", "out": "rembayung-rattan-pendant", "span": "half", "role": "space", "alt": "A large rattan pendant lamp hanging under the steel and timber roof, with tables below" },
+        { "file": "IMG_2130.heic", "out": "rembayung-gable-dining", "span": "half", "role": "space", "alt": "Dining tables with rattan-backed chairs beneath the glazed gable, behind a slatted timber screen" },
+        { "file": "IMG_2223.heic", "out": "rembayung-stained-glass-screen", "span": "half", "role": "material", "alt": "A partition of corrugated and stained glass in green, blue and amber, hung with woven trays and the Rembayung name", "caption": "Stained glass, woven trays and the restaurant's name." },
+        { "file": "IMG_2191.heic", "out": "rembayung-batik-shelves", "span": "narrow", "role": "material", "alt": "Timber shelving stacked with folded batik cloth above a slatted base" },
+        { "file": "IMG_2200.heic", "out": "rembayung-ground-floor", "span": "half", "role": "whole", "alt": "The ground-floor dining room with bentwood chairs, timber blinds and a terracotta and concrete floor" },
+        { "file": "IMG_2331.heic", "out": "rembayung-upper-dining", "span": "half", "role": "whole", "alt": "Upstairs dining under the pitched timber roof, with rows of tables and planters along the edge" },
+        { "file": "IMG_2382.heic", "out": "rembayung-brick-wall", "span": "half", "role": "space", "alt": "The dining hall beneath a red brick wall with green and blue stained-glass windows and a mezzanine above" },
+        { "file": "IMG_2189.heic", "out": "rembayung-service-counter", "span": "narrow", "role": "material", "alt": "A timber service counter with a slatted front and patterned glass inserts" },
+        { "file": "IMG_2084.heic", "out": "rembayung-screen-and-lantern", "span": "half", "role": "space", "alt": "A slatted timber screen and rattan lantern against the tall glass facade" }
+      ]
+    },
+    "ampang": {
+      "kind": "photo",
+      "source": "Drive: MARKETING & BRANDING/Ampang/PHOTOGRAPHER (professional shoot, 1 to 2 September 2026). Frames showing the house number and street name are deliberately excluded.",
+      "hero": { "file": "MR5_7700-HDR.jpg", "out": "ampang-porch", "alt": "The porch: an arched, black-framed front door beside full-height black-framed windows on a white wall", "focus": "50% 55%" },
+      "card": { "file": "MR5_7710-HDR.jpg", "out": "ampang-arched-doors", "alt": "Arched black-framed double doors under a brass lantern", "focus": "50% 50%" },
+      "gallery": [
+        { "file": "MR5_7674.jpg", "out": "ampang-facade", "span": "wide", "role": "whole", "alt": "The white facade with black window frames, wrought-iron balconies and a tiled roof, seen through trees" },
+        { "file": "MR5_7710-HDR.jpg", "out": "ampang-arched-doors", "span": "narrow", "role": "space", "alt": "Arched black-framed double doors under a brass lantern, with a bench beside them" },
+        { "file": "MR5_7941-HDR.jpg", "out": "ampang-foyer-to-dining", "span": "half", "role": "space", "alt": "The foyer, with a black and white floor inlay and crystal chandelier, looking through an arch to the dining table" },
+        { "file": "MR5_7766-HDR.jpg", "out": "ampang-corridor", "span": "half", "role": "space", "alt": "A narrow panelled corridor ending in an arched glass door, over a black and white geometric floor" },
+        { "file": "MR5_7740-HDR.jpg", "out": "ampang-prayer-niche", "span": "narrow", "role": "material", "alt": "A prayer niche with a pointed arch, set into a geometric lattice wall and lit from within" },
+        { "file": "MR5_7770-HDR.jpg", "out": "ampang-powder-room", "span": "half", "role": "space", "alt": "A powder room with floral wallpaper, an arched mirror between wall lanterns, green tiles and a black vanity" },
+        { "file": "MR5_7810.jpg", "out": "ampang-black-joinery", "span": "narrow", "role": "material", "alt": "Black joinery with ribbed vents and turned brass handles" },
+        { "file": "MR5_8230-HDR.jpg", "out": "ampang-velvet-seat", "span": "half", "role": "material", "alt": "A tufted red velvet seat set into an arched recess in white joinery" },
+        { "file": "MR5_8464-HDR.jpg", "out": "ampang-dressing-arch", "span": "half", "role": "space", "alt": "A timber-lined arch opening into a dressing area with a lit mirror and brass lantern" },
+        { "file": "MR5_8469-HDR.jpg", "out": "ampang-dressing-room", "span": "narrow", "role": "material", "alt": "A dark timber wardrobe with lit open shelves beside a dressing table" },
+        { "file": "MR5_7996-HDR.jpg", "out": "ampang-wall-lights", "span": "narrow", "role": "material", "alt": "Black-shaded brass wall lights against black panelling" },
+        { "file": "MR5_8411.jpg", "out": "ampang-leather-handles", "span": "narrow", "role": "material", "alt": "Stitched black leather handles on cream wardrobe doors" }
+      ]
+    },
+    "seri-wirani-bangi": {
+      "kind": "render",
+      "source": "Drive: MARKETING & BRANDING/Seri Wirani 8 - Bangi (design visualisations, September 2026 design presentation)",
+      "hero": { "file": "RO_Int (7).png", "out": "seri-wirani-dining", "alt": "Design visualisation: the dining room, with a glass-block wall to one side and the garden beyond", "focus": "50% 50%" },
+      "card": { "file": "RO_Int (7).png", "out": "seri-wirani-dining", "alt": "Design visualisation: the dining room beside the garden", "focus": "50% 50%" },
+      "gallery": [
+        { "file": "RO_Int (4)A.png", "out": "seri-wirani-living", "span": "wide", "role": "space", "alt": "Design visualisation: the living room, with a textured feature wall and sheer curtains to the garden" },
+        { "file": "RO_Int (6).png", "out": "seri-wirani-axis", "span": "narrow", "role": "space", "alt": "Design visualisation: a long view through the house from the entrance towards the garden" },
+        { "file": "RO_Int (8).png", "out": "seri-wirani-dining-kitchen", "span": "half", "role": "space", "alt": "Design visualisation: the dining table, with the kitchen and its timber island behind" },
+        { "file": "RO_Int (9).png", "out": "seri-wirani-dry-kitchen", "span": "half", "role": "material", "alt": "Design visualisation: the dry kitchen, with a dark timber island and recessed timber shelf against white cabinetry" },
+        { "file": "RO_Int (11).png", "out": "seri-wirani-kitchen", "span": "half", "role": "space", "alt": "Design visualisation: the kitchen, with timber upper cabinets, pendant lights and an island with stools" },
+        { "file": "RO (4).png", "out": "seri-wirani-bathroom", "span": "narrow", "role": "material", "alt": "Design visualisation: the master bathroom, with stone-toned surfaces, black fittings and daylight from a planted lightwell" },
+        { "file": "RO_MB (1).png", "out": "seri-wirani-master-bedroom", "span": "half", "role": "space", "alt": "Design visualisation: the master bedroom, with a textured feature wall, concealed linear lighting and light timber furniture" },
+        { "file": "RO (9).png", "out": "seri-wirani-facade", "span": "narrow", "role": "whole", "alt": "Design visualisation: the front of the house, white with a timber-framed focal feature" }
+      ]
+    },
+    "kota-warisan-sepang": {
+      "kind": "render",
+      "source": "Drive: MARKETING & BRANDING/Kota Warisan - Sepang (design visualisations, September 2026). Only the small preview JPEGs could be downloaded; the full-size renders are over the connector's 10 MB limit.",
+      "hero": { "file": "Family Hall 2.jpeg", "out": "kota-warisan-family-hall", "alt": "Design visualisation: the upstairs family hall, with a layered ceiling, pale walls and black doors", "focus": "50% 50%" },
+      "card": { "file": "BEDROOM 5_GUEST (1).jpeg", "out": "kota-warisan-guest-room", "alt": "Design visualisation: the guest bedroom, with panelled walls and warm bedside lights", "focus": "50% 50%" },
+      "gallery": [
+        { "file": "BEDROOM 5_GUEST (1).jpeg", "out": "kota-warisan-guest-room", "span": "wide", "role": "space", "alt": "Design visualisation: the guest bedroom, with panelled walls, a ceiling fan and warm bedside lights" },
+        { "file": "BEDROOM 5_GUEST (2).jpeg", "out": "kota-warisan-guest-wardrobe", "span": "half", "role": "material", "alt": "Design visualisation: full-height wardrobes with panelled doors in the guest room" },
+        { "file": "BEDROOM 5_GUEST (3).jpeg", "out": "kota-warisan-guest-dressing", "span": "half", "role": "space", "alt": "Design visualisation: a dressing corner with an arched mirror beside the window" }
+      ]
+    },
+    "warung-soho": {
+      "kind": "render",
+      "source": "Drive: MARKETING & BRANDING/Warung Soho (design visualisations at 1080 px wide)",
+      "hero": { "file": "Warung Soho (2).jpg", "out": "warung-soho-dining", "alt": "Design visualisation: the dining room, with green chairs, marble-topped tables and a red service counter", "focus": "50% 50%" },
+      "card": { "file": "Warung Soho (2).jpg", "out": "warung-soho-dining", "alt": "Design visualisation: the dining room of Warung Soho", "focus": "50% 50%" },
+      "gallery": [
+        { "file": "Warung Soho (3).jpg", "out": "warung-soho-terrace", "span": "half", "role": "space", "alt": "Design visualisation: rattan chairs on the covered terrace, open to the street" },
+        { "file": "Warung Soho (14).jpg", "out": "warung-soho-buffet", "span": "half", "role": "space", "alt": "Design visualisation: the buffet counter in front of a leaf-pattern mural" },
+        { "file": "Warung Soho (9).jpg", "out": "warung-soho-glasshouse", "span": "half", "role": "space", "alt": "Design visualisation: tables along a glazed wall with hanging planting and rattan pendants" },
+        { "file": "Warung Soho (4).jpg", "out": "warung-soho-counter", "span": "half", "role": "material", "alt": "Design visualisation: the red-tiled service counter with timber slatted panels" }
+      ]
+    }
+  }
+}
