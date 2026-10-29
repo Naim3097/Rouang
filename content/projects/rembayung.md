@@ -17,7 +17,7 @@ photography:
   permissionConfirmed: false
 hero:
   src: /images/projects/rembayung/rembayung-glazed-gable.jpg
-  alt: "Rembayung's glazed timber gable, with the Petronas Twin Towers seen through the glass and the window frames casting shadows across the terracotta floor"
+  alt: "Rembayung's glazed timber gable, with a city tower seen through the glass and the window frames casting shadows across the terracotta floor"
   width: 1800
   height: 2400
   focus: "50% 28%"
@@ -170,6 +170,6 @@ todo:
 
 ## Inside
 
-The dining rooms sit under the building's timber-lined pitched roof, whose glazed gable ends let the city in, including a view of the Petronas Twin Towers. Slatted timber screens break the large floor into smaller rooms, and the furniture is timber, rattan and bentwood.
+The dining rooms sit under the building's timber-lined pitched roof, whose glazed gable ends let the city skyline in. Slatted timber screens break the large floor into smaller rooms, and the furniture is timber, rattan and bentwood.
 
 Batik runs through the interior: stretched across timber frames overhead, folded on open shelving, set beside stained glass in green, blue and amber. Rattan pendants hang low over the tables, and terracotta tiles meet polished concrete underfoot.

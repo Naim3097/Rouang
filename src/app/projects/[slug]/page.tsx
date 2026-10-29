@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import Image, { getImageProps } from "next/image";
+import Image from "next/image";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { ViewTransition } from "react";
@@ -9,12 +9,12 @@ import { DraftTag } from "@/components/projects/ProjectIndex";
 import { ArrowLink, ButtonLink } from "@/components/ui/Button";
 import { Breadcrumbs } from "@/components/ui/Breadcrumbs";
 import { Figure } from "@/components/ui/Figure";
-import { Film } from "@/components/ui/Film";
+import { Film, type FilmSource } from "@/components/ui/Film";
 import { HeroImage } from "@/components/ui/HeroImage";
 import { Pending } from "@/components/ui/Section";
 import { Label } from "@/components/ui/Typography";
 import { getProject, getProjects, getServices, publicImage, type Project, staticSlugs } from "@/lib/content";
-import type { GalleryItem } from "@/lib/content/schema";
+import type { GalleryItem, Image as ImageData } from "@/lib/content/schema";
 import { SHOW_DRAFTS } from "@/lib/env";
 import { pageMetadata } from "@/lib/seo";
 
@@ -104,27 +104,19 @@ export default async function ProjectPage({ params }: PageProps<"/projects/[slug
       /* ——— Opening: the photograph, full screen, with the title set on it ——— */
       <header data-tone="dark" className="relative min-h-[100svh] overflow-hidden">
         <div className="absolute inset-0">
-          {project.film ? (
-            <Film
-              src={project.film.src}
-              // Served through the image optimiser (AVIF/WebP), not as the original JPEG.
-              poster={getImageProps({ src: project.film.poster, alt: "", width: project.film.width, height: project.film.height, quality: 78, sizes: "100vw" }).props.src}
-              width={project.film.width}
-              height={project.film.height}
-              label={project.film.caption ?? `Film of ${project.title}`}
-              fill
-            />
-          ) : hero ? (
+          {hero ? (
             <ViewTransition name={`project-${project.slug}`} share="project-image" default="none">
               <div className="absolute inset-0">
                 {"pending" in hero ? (
                   <Figure image={hero} sizes="100vw" aspect="auto" tone="dark" reveal={false} className="h-full" />
                 ) : (
-                  <HeroImage image={hero} narrowSizes="100vw" />
+                  // With a film, the still is the film's own first frame, so the loop takes over seamlessly.
+                  <HeroImage image={openerStill(hero, project.film)} narrowSizes="100vw" />
                 )}
               </div>
             </ViewTransition>
           ) : null}
+          {project.film ? <Film sources={filmSources(project.film)} label={project.film.caption ?? `Film of ${project.title}`} /> : null}
           <div className="absolute inset-0 bg-linear-to-t from-ink via-ink/35 to-ink/10" aria-hidden="true" />
           {/* A second scrim under the header, so navigation stays legible over bright ceilings. */}
           <div className="absolute inset-x-0 top-0 h-64 bg-linear-to-b from-ink/85 via-ink/60 to-transparent" aria-hidden="true" />
@@ -218,6 +210,34 @@ export default async function ProjectPage({ params }: PageProps<"/projects/[slug
                 {threaded[i]?.length ? <GalleryRow items={threaded[i]} flip={i % 2 === 1} /> : null}
               </div>
             ))}
+          </div>
+        </section>
+      ) : null}
+
+      {/* ——— Short loops of real footage ——— */}
+      {project.loops.length ? (
+        <section data-tone="dark" aria-labelledby="motion-title">
+          <div className="page-x section-y">
+            <div className="page-grid gap-y-10">
+              <div className="col-span-12 lg:col-span-3">
+                <Label as="h2" className="text-mouse">
+                  <span id="motion-title">In motion</span>
+                </Label>
+              </div>
+              <ul className="col-span-12 grid grid-cols-2 gap-[var(--grid-gap)] sm:grid-cols-3 lg:col-span-9">
+                {project.loops.map((l) => (
+                  <li key={l.src}>
+                    <figure>
+                      <div className="relative aspect-[4/5] overflow-hidden bg-ink-raised">
+                        <Image src={l.poster} alt={l.alt} fill sizes="(min-width: 1024px) 24vw, (min-width: 640px) 31vw, 48vw" quality={78} className="object-cover" />
+                        <Film sources={[{ src: l.src }]} label={l.alt} compact />
+                      </div>
+                      {l.caption ? <figcaption className="t-caption mt-3 text-mouse">{l.caption}</figcaption> : null}
+                    </figure>
+                  </li>
+                ))}
+              </ul>
+            </div>
           </div>
         </section>
       ) : null}
@@ -342,6 +362,29 @@ export default async function ProjectPage({ params }: PageProps<"/projects/[slug
       {next ? <NextProject project={next} /> : null}
     </article>
   );
+}
+
+/** Phones get the narrow clip and larger screens the wide one; a missing one leaves those screens the still. */
+function filmSources(film: NonNullable<Project["film"]>): FilmSource[] {
+  // The first source whose media query matches is the one played, so the wide clip is the fallback.
+  return [
+    ...(film.narrow ? [{ src: film.narrow.src, media: "(max-width: 1023px)" }] : []),
+    ...(film.wide ? [{ src: film.wide.src, media: film.narrow ? undefined : "(min-width: 1024px)" }] : []),
+  ];
+}
+
+/**
+ * The opening still. With a film it is the film's own first frame on the screens the film plays on,
+ * and the case study's photograph everywhere else.
+ */
+function openerStill(hero: ImageData, film: Project["film"]): ImageData {
+  if (!film) return hero;
+  const heroWide = hero.wide ?? { src: hero.src, width: hero.width, height: hero.height };
+  const narrow = film.narrow
+    ? { src: film.narrow.poster, width: film.narrow.width, height: film.narrow.height, focus: "50% 50%" }
+    : { src: hero.src, width: hero.width, height: hero.height, focus: hero.focus };
+  const wide = film.wide ? { src: film.wide.poster, width: film.wide.width, height: film.wide.height } : heroWide;
+  return { ...hero, ...narrow, wide };
 }
 
 function GalleryRow({ items, flip = false, tight = false }: { items: GalleryItem[]; flip?: boolean; tight?: boolean }) {

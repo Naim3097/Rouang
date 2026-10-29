@@ -1,6 +1,8 @@
 import type { NextConfig } from "next";
 
-const isProduction = (process.env.VERCEL_ENV ?? process.env.SITE_ENV) === "production";
+// SITE_ENV, when set, wins over Vercel's own environment, so a pre-launch site can run on the
+// production deployment as a noindexed preview (see README, "Deploy to Vercel").
+const isProduction = (process.env.SITE_ENV ?? process.env.VERCEL_ENV) === "production";
 
 const securityHeaders = [
   { key: "X-Content-Type-Options", value: "nosniff" },
@@ -21,6 +23,13 @@ const nextConfig: NextConfig = {
   // Content is read from /content at build time and for any page rendered on demand.
   outputFileTracingIncludes: {
     "/**": ["./content/**/*"],
+    // Share cards read their fonts and the project photograph from disk when they are requested,
+    // so those files have to travel with the function (public/ is not part of a server bundle).
+    "/**/opengraph-image*": [
+      "./node_modules/@fontsource/outfit/files/outfit-latin-{400,500}-normal.woff",
+      "./node_modules/@fontsource/eb-garamond/files/eb-garamond-latin-400-italic.woff",
+      "./public/images/projects/**/*.jpg",
+    ],
   },
   images: {
     formats: ["image/avif", "image/webp"],

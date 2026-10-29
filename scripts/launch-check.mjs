@@ -25,7 +25,8 @@ const { loadEnvConfig } = requireFromNext("@next/env");
 loadEnvConfig(root, false, { info: () => {}, error: console.error });
 
 const args = new Set(process.argv.slice(2));
-const env = process.env.VERCEL_ENV ?? process.env.SITE_ENV ?? "development";
+// The same precedence as src/lib/env.ts: SITE_ENV=preview keeps a Vercel production deploy in preview.
+const env = process.env.SITE_ENV ?? process.env.VERCEL_ENV ?? "development";
 const strict = args.has("--strict") || (args.has("--gate") && env === "production" && process.env.LAUNCH_CHECK !== "warn");
 
 const blockers = [];

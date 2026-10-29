@@ -133,15 +133,35 @@ visitor allows it (advertising features off). Events sent: `generate_lead` (enqu
 `whatsapp_click`, `contact_click` (phone or email), `cta_click`, `form_start`, `form_error`. Mark
 `generate_lead`, `whatsapp_click` and `contact_click` as key events in GA4.
 
-## Deployment (GitHub + Vercel)
+## Deploy to Vercel
 
-1. Push this repository to GitHub (not done yet: no remote is configured).
-2. Import it in Vercel. The framework preset is detected; no build settings need changing.
-3. Set environment variables for **Production** and **Preview** separately. Leave Production
-   unconfigured until launch if you want the gate to keep it closed.
-4. Every pull request gets a preview deployment: drafts visible, `noindex`, preview bar on.
-5. Point the domain at Vercel, set `NEXT_PUBLIC_SITE_URL`, verify the domain in Google Search Console
-   and submit `/sitemap.xml`.
+The repository is the Next.js project itself, so Vercel needs no build settings: framework Next.js,
+root directory `./`, build command `npm run build`, Node 22 or later.
+
+**Before launch: a review site on Vercel**
+
+1. In Vercel, **Add New → Project**, import `Naim3097/Rouang` and, before the first deploy, add one
+   environment variable for **Production**: `SITE_ENV=preview`.
+2. Deploy. The production URL (`<project>.vercel.app`) then behaves like a preview:
+   - drafts are visible, with the preview bar and the `/preview` checklist
+   - every page is `noindex` and robots.txt disallows crawling
+   - the launch gate only reports
+3. Every other branch and pull request gets its own preview deployment automatically.
+
+Without `SITE_ENV=preview`, a production deployment runs the launch gate strictly and **fails the
+build** while blockers remain (currently 24). That is deliberate, so nothing unconfirmed goes live
+by accident.
+
+**At launch**
+
+1. Clear the blockers (`npm run launch-check`).
+2. Set the real environment variables for Production (see the table above), including
+   `NEXT_PUBLIC_SITE_URL`.
+3. Delete `SITE_ENV` and redeploy. The site becomes indexable and hides everything unconfirmed.
+4. Point the domain at Vercel, verify it in Google Search Console and submit `/sitemap.xml`.
+
+`SITE_ENV`, when set, takes precedence over Vercel's own `VERCEL_ENV`, in the site code
+(`src/lib/env.ts`), the headers (`next.config.ts`) and the launch gate alike.
 
 ## Brand assets
 

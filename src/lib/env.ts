@@ -6,11 +6,13 @@
  * preview bar is shown, and every page is `noindex` so nothing unfinished reaches search engines.
  *
  * On Vercel, VERCEL_ENV is set automatically. Elsewhere, set SITE_ENV=production explicitly.
+ * SITE_ENV, when set, takes precedence: SITE_ENV=preview keeps a Vercel production deployment in
+ * preview mode (drafts visible, noindex) until launch.
  */
 type SiteEnv = "production" | "preview" | "development";
 
 function resolveSiteEnv(): SiteEnv {
-  const value = process.env.VERCEL_ENV ?? process.env.SITE_ENV;
+  const value = process.env.SITE_ENV ?? process.env.VERCEL_ENV;
   if (value === "production" || value === "preview" || value === "development") return value;
   return process.env.NODE_ENV === "production" ? "preview" : "development";
 }

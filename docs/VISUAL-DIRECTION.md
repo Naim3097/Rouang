@@ -48,7 +48,7 @@ site, not just good single frames:
 
 - **Rembayung leads.** It is the best-known project and its photos carry the brand's warmth: timber,
   rattan, batik and daylight. The hero is the glazed gable; as the aperture opens to full screen the
-  Petronas Twin Towers appear in the glass, which places the project in Kuala Lumpur. 14 frames were chosen from about 88 usable
+  city skyline appears in the glass, which places the project in Kuala Lumpur. 14 frames were chosen from about 88 usable
   ones, and each placement on the site uses its own frame (the homepage, the walkthrough, the
   service page and the case study never repeat a photograph). Construction and installation shots (people on site, wrapped furniture) were left out.
 - **Ampang balances it.** Professional photography of a white house drawn in black and brass: crisp

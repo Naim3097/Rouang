@@ -55,6 +55,14 @@ export const galleryItem = z.union([
   pendingImage.extend({ span: z.enum(["full", "wide", "half", "narrow"]).default("half") }),
 ]);
 
+/** One encoded loop: a silent H.264 MP4 and its first frame as a still (made by scripts/media/films.cjs). */
+const filmClip = z.strictObject({
+  src: z.string().startsWith("/"),
+  poster: z.string().startsWith("/"),
+  width: z.number().int().positive(),
+  height: z.number().int().positive(),
+});
+
 const seo = z
   .strictObject({
     title: z.string().max(65).optional(),
@@ -93,17 +101,23 @@ export const projectSchema = z.strictObject({
   hero: z.union([image, pendingImage]).nullable().default(null),
   /** The picture used for this project in listings, so a listing never repeats the case-study opener. */
   card: z.union([image, pendingImage]).nullable().default(null),
-  /** Short silent loop of real footage from the project. Never AI-generated. */
+  /**
+   * Silent loop of real footage from the project, opening the case study. Never AI-generated.
+   * `wide` plays on screens 1024 px and wider, `narrow` below; with only one of them, the other
+   * screens keep the opening photograph. `source` records which footage it was cut from.
+   */
   film: z
     .strictObject({
-      src: z.string().startsWith("/"),
-      poster: z.string().startsWith("/"),
-      width: z.number().int().positive(),
-      height: z.number().int().positive(),
+      wide: filmClip.optional(),
+      narrow: filmClip.optional(),
       caption: z.string().optional(),
+      source: z.string(),
     })
+    .refine((f) => f.wide || f.narrow, "Give the film a wide clip, a narrow clip or both")
     .nullable()
     .default(null),
+  /** Further short loops of real footage, shown together as a band in the case study. */
+  loops: z.array(filmClip.extend({ alt: z.string().min(3), caption: z.string().optional(), source: z.string() })).default([]),
   /** Renders or perspectives rather than photographs of the finished space. Always labelled as such. */
   visualisation: z.boolean().default(false),
   brief: z.string().nullable().default(null),
