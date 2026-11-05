@@ -2,7 +2,7 @@
 /**
  * Export curated project imagery for the web.
  *
- *   node scripts/media/export.cjs <raw-dir> [--only <project>]
+ *   node scripts/media/export.cjs <raw-dir> [--only <project> [--entry <out>]]
  *
  * <raw-dir> holds one folder per project (rembayung/, ampang/, ...) with the original files from
  * the studio's Drive. For every image listed in curation.json this:
@@ -11,8 +11,12 @@
  *   - resizes to at most 2400 px on the long edge
  *   - strips ALL metadata (the iPhone originals carry GPS coordinates)
  *   - for entries with `wide`, also writes <out>-wide.jpg: a landscape crop around the focus line,
- *     served to large screens instead of the portrait, so no bytes are spent on rows never shown
+ *     served to large screens instead of the portrait, so no bytes are spent on rows never shown.
+ *     The crop is cut from the full-resolution original, then held to 2400 px wide, so a crop of a
+ *     portrait keeps the original's detail instead of the resized portrait's
  * and writes public/images/projects/<project>/<out>.jpg plus media-manifest.json with dimensions.
+ * --entry re-exports one image of a project and keeps the rest of its manifest as it was, so a
+ * single photograph can be redone without every original on disk.
  */
 const fs = require("fs");
 const path = require("path");
@@ -24,6 +28,12 @@ const root = path.resolve(__dirname, "../..");
 const rawDir = process.argv[2];
 const onlyAt = process.argv.indexOf("--only");
 const only = onlyAt > 0 ? process.argv[onlyAt + 1] : null;
+const entryAt = process.argv.indexOf("--entry");
+const onlyEntry = entryAt > 0 ? process.argv[entryAt + 1] : null;
+if (onlyEntry && !only) {
+  console.error("--entry needs --only <project>");
+  process.exit(1);
+}
 if (!rawDir) {
   console.error("Usage: node scripts/media/export.cjs <raw-dir> [--only <project>]");
   process.exit(1);
@@ -58,14 +68,14 @@ async function exportOne(project, kind, entry) {
     input = tmp;
   }
   const k = kind === "render" ? curation.grade.render : curation.grade.photo;
-  // Graded once into lossless pixels, so the portrait and any wide crop are each encoded only once.
+  // Graded once into lossless full-size pixels, so the portrait and any wide crop are each encoded only once.
   const { data, info: px } = await grade(sharp(input, { limitInputPixels: false }).rotate(), k)
-    .resize({ width: 2400, height: 2400, fit: "inside", withoutEnlargement: true })
     .toColourspace("srgb")
     .raw()
     .toBuffer({ resolveWithObject: true });
   const raw = { raw: { width: px.width, height: px.height, channels: px.channels } };
-  const info = await sharp(data, raw).jpeg(JPEG).toFile(dest);
+  const fit = { width: 2400, height: 2400, fit: "inside", withoutEnlargement: true };
+  const info = await sharp(data, raw).resize(fit).jpeg(JPEG).toFile(dest);
   const out = { src: `/images/projects/${project}/${entry.out}.jpg`, width: info.width, height: info.height, bytes: info.size };
 
   if (entry.wide) {
@@ -79,7 +89,7 @@ async function exportOne(project, kind, entry) {
     const top = Math.min(Math.max(Math.round(entry.wide.focusY * px.height - height / 2), 0), px.height - height);
     const left = Math.round((px.width - width) / 2);
     const wideDest = path.join(outRoot, project, `${entry.out}-wide.jpg`);
-    const w = await sharp(data, raw).extract({ left, top, width, height }).jpeg(JPEG).toFile(wideDest);
+    const w = await sharp(data, raw).extract({ left, top, width, height }).resize(fit).jpeg(JPEG).toFile(wideDest);
     out.wide = { src: `/images/projects/${project}/${entry.out}-wide.jpg`, width: w.width, height: w.height, bytes: w.size };
   }
   if (tmp) fs.rmSync(tmp, { force: true });
@@ -91,9 +101,9 @@ async function exportOne(project, kind, entry) {
     if (only && project !== only) continue;
     const done = new Map();
     const entries = [["hero", cfg.hero], ["card", cfg.card], ...cfg.gallery.map((g, i) => [`gallery-${i}`, g])];
-    manifest[project] = {};
+    manifest[project] = onlyEntry ? manifest[project] ?? {} : {};
     for (const [key, entry] of entries) {
-      if (!entry) continue;
+      if (!entry || (onlyEntry && entry.out !== onlyEntry)) continue;
       if (!done.has(entry.out)) done.set(entry.out, await exportOne(project, cfg.kind, entry));
       manifest[project][key] = { ...done.get(entry.out), alt: entry.alt, caption: entry.caption, span: entry.span, focus: entry.focus };
       const r = done.get(entry.out);

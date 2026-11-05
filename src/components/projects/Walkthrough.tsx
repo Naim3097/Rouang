@@ -1,8 +1,6 @@
-"use client";
-
 import Image from "next/image";
 import Link from "next/link";
-import { useEffect, useRef, useState } from "react";
+import type { CSSProperties } from "react";
 import { Mark } from "@/components/brand/Brand";
 
 export type WalkFrame = {
@@ -19,15 +17,18 @@ export type WalkFrame = {
 };
 
 /**
- * A walk through a project, driven by the visitor's own scrolling. The frame stays pinned while
- * each photograph opens out of the last through the circle of the mark. Real photographs only.
+ * A walk through a project, driven by the visitor's own scrolling. The stage stays pinned and the
+ * photographs, framed in an arch, dissolve into one another: each holds still for most of its
+ * stretch of scroll, then the next rises gently through it and settles. The caption, the count and
+ * the index change with the photograph, on the same stretch of scroll. Real photographs only.
+ *
+ * All of it is CSS scroll-driven animation on opacity and transforms (globals.css, "Walkthrough"):
+ * no scroll handler, no re-render while scrolling, nothing for the main thread to repaint.
+ * Each frame's stretch is passed in as custom properties.
  *
  * Screen readers get every photograph and caption as a plain list in reading order; the moving
- * stack is decoration for sighted visitors and is hidden from them.
- *
- * The pinned layout is rendered on the server, so nothing moves when the page hydrates. With
- * reduced motion, or without JavaScript, CSS shows the photographs in sequence instead
- * (.walk-pinned / .walk-static in globals.css; the no-script rule sits with the server section).
+ * stack is decoration for sighted visitors and is hidden from them. With reduced motion, without
+ * scroll-driven animation, or without JavaScript, the photographs are shown in sequence instead.
  */
 export function Walkthrough({
   frames,
@@ -40,87 +41,21 @@ export function Walkthrough({
   href: string;
   kicker: string;
 }) {
-  const track = useRef<HTMLDivElement>(null);
-  const [active, setActive] = useState(0);
-  const layers = useRef<(HTMLDivElement | null)[]>([]);
-
-  useEffect(() => {
-    const el = track.current;
-    if (!el) return;
-    const n = frames.length;
-    const last = new Array<number>(n).fill(-1);
-    let shown = 0;
-    let frame = 0;
-    let live = false;
-
-    const update = () => {
-      frame = 0;
-      const rect = el.getBoundingClientRect();
-      const travel = Math.max(1, rect.height - window.innerHeight);
-      const p = Math.min(1, Math.max(0, -rect.top / travel));
-      const pos = p * (n - 1);
-      let showing = 0;
-      for (let i = 1; i < n; i++) {
-        // Each photograph opens over 40% of its step and then holds still, so most of the scroll
-        // shows one settled picture rather than two caught mid-wipe.
-        const t = Math.min(1, Math.max(0, (pos - (i - 1) - 0.3) / 0.4));
-        // The caption follows the photograph that has mostly opened, not the scroll position.
-        if (t >= 0.35) showing = i;
-        const eased = Math.round((1 - Math.pow(1 - t, 3)) * 1000) / 1000;
-        const layer = layers.current[i];
-        if (!layer || eased === last[i]) continue;
-        last[i] = eased;
-        layer.style.clipPath = `circle(${(eased * 75).toFixed(2)}% at 50% 50%)`;
-        const img = layer.firstElementChild as HTMLElement | null;
-        if (img) img.style.transform = `scale(${(1.12 - 0.12 * eased).toFixed(4)})`;
-      }
-      if (showing !== shown) {
-        shown = showing;
-        setActive(showing);
-      }
-    };
-    const onScroll = () => {
-      if (!frame) frame = requestAnimationFrame(update);
-    };
-    const attach = () => {
-      if (live) return;
-      live = true;
-      el.dataset.live = "";
-      update();
-      window.addEventListener("scroll", onScroll, { passive: true });
-      window.addEventListener("resize", onScroll);
-    };
-    const detach = () => {
-      if (!live) return;
-      live = false;
-      delete el.dataset.live;
-      window.removeEventListener("scroll", onScroll);
-      window.removeEventListener("resize", onScroll);
-      if (frame) cancelAnimationFrame(frame);
-      frame = 0;
-    };
-
-    // The scroll loop runs only while the track is on or near the screen. When CSS hides the
-    // pinned layout (reduced motion), the track never intersects and nothing runs.
-    const io = new IntersectionObserver(
-      ([entry]) => {
-        if (entry.isIntersecting) attach();
-        else detach();
-      },
-      { rootMargin: "100% 0px" },
-    );
-    io.observe(el);
-    return () => {
-      io.disconnect();
-      detach();
-    };
-  }, [frames.length]);
-
-  const current = frames[active];
+  const n = frames.length;
+  // Frame i holds from i/n to (i+1)/n of the pinned scroll; the dissolve into it takes the middle
+  // 36% of one step, centred on i/n.
+  const at = (i: number, offset: number) => `${(((i + offset) / n) * 100).toFixed(3)}%`;
+  const range = (i: number): CSSProperties =>
+    ({
+      ["--walk-in-start" as string]: at(i, -0.18),
+      ["--walk-in-end" as string]: at(i, 0.18),
+      ["--walk-out-start" as string]: at(i + 1, -0.18),
+      ["--walk-out-end" as string]: at(i + 1, 0.18),
+    }) as CSSProperties;
 
   return (
     <>
-      <div ref={track} className="walk-pinned relative" style={{ height: `${frames.length * 85 + 20}svh` }}>
+      <div className="walk-pinned relative" style={{ height: `${n * 62 + 38}svh`, ["--walk-n" as string]: n }}>
         <ol className="visually-hidden">
           {frames.map((f, i) => (
             <li key={f.src}>
@@ -136,17 +71,13 @@ export function Walkthrough({
         </ol>
         <div className="sticky top-0 flex h-[100svh] items-center overflow-hidden">
           <div className="page-x grid w-full grid-cols-[minmax(0,1fr)] items-center gap-6 lg:grid-cols-12 lg:gap-[var(--grid-gap)]">
-            {/* The picture: photographs stacked, each opening out of the last. */}
-            <div aria-hidden="true" className="relative mx-auto aspect-[4/5] w-[min(100%,44svh)] lg:order-2 lg:col-span-6 lg:col-start-4 lg:h-[min(84svh,56rem)] lg:w-auto">
+            {/* The picture: photographs stacked in an arch, each dissolving into the next. */}
+            <div
+              aria-hidden="true"
+              className="walk-arch relative mx-auto aspect-[4/5] w-[min(100%,42svh)] lg:order-2 lg:col-span-6 lg:col-start-4 lg:h-[min(82svh,56rem)] lg:w-auto"
+            >
               {frames.map((f, i) => (
-                <div
-                  key={f.src}
-                  ref={(node) => {
-                    layers.current[i] = node;
-                  }}
-                  className="walk-layer absolute inset-0 overflow-hidden"
-                  style={{ clipPath: i === 0 ? undefined : "circle(0% at 50% 50%)", zIndex: i }}
-                >
+                <div key={f.src} className="walk-layer absolute inset-0" style={range(i)}>
                   <Image
                     src={f.src}
                     alt=""
@@ -164,15 +95,17 @@ export function Walkthrough({
               <p className="t-label text-mouse">{kicker}</p>
               <p className="mt-2 font-serif text-[clamp(1.625rem,1.2rem+2vw,3.25rem)] italic leading-none lg:mt-4">{title}</p>
               <div className="mt-4 h-px w-full bg-kapur/15 lg:mt-8" aria-hidden="true">
-                <div className="h-px bg-rikyu transition-[width] duration-500" style={{ width: `${((active + 1) / frames.length) * 100}%` }} />
+                <div className="walk-progress h-px bg-rikyu" />
               </div>
-              <div aria-hidden="true" className="mt-4 min-h-[5.5rem] lg:mt-6 lg:min-h-[8.5rem]">
-                <p className="t-label tabular-nums text-mouse">
-                  {String(active + 1).padStart(2, "0")} / {String(frames.length).padStart(2, "0")} · {current.role}
-                </p>
-                <p key={current.src} className="mt-2 animate-[walk-in_0.7s_var(--ease-brand)_both] text-[1.0625rem] leading-relaxed text-kapur lg:mt-3 lg:text-[1.1875rem]">
-                  {current.caption}
-                </p>
+              <div aria-hidden="true" className="relative mt-4 min-h-[6.5rem] lg:mt-6 lg:min-h-[9.5rem]">
+                {frames.map((f, i) => (
+                  <div key={f.src} className="walk-cap absolute inset-x-0 top-0" style={range(i)}>
+                    <p className="t-label tabular-nums text-mouse">
+                      {String(i + 1).padStart(2, "0")} / {String(n).padStart(2, "0")} · {f.role}
+                    </p>
+                    <p className="mt-2 text-[1.0625rem] leading-relaxed text-kapur lg:mt-3 lg:text-[1.1875rem]">{f.caption}</p>
+                  </div>
+                ))}
               </div>
               <Link href={href} className="group mt-3 inline-flex min-h-11 items-center gap-3 text-kapur lg:mt-8">
                 <span className="link-line">Read the case study</span>
@@ -182,8 +115,8 @@ export function Walkthrough({
 
             <ol className="hidden lg:order-3 lg:col-span-2 lg:col-start-11 lg:block" aria-hidden="true">
               {frames.map((f, i) => (
-                <li key={f.src} className={`t-caption flex items-center gap-3 py-1.5 transition-colors duration-500 ${i === active ? "text-kapur" : "text-kapur/55"}`}>
-                  <span className={`block h-px transition-all duration-500 ${i === active ? "w-8 bg-kapur" : "w-4 bg-kapur/55"}`} />
+                <li key={f.src} className="walk-rail t-caption flex items-center gap-3 py-1.5" style={range(i)}>
+                  <span className="walk-rail-line block h-px w-8 origin-left bg-current" />
                   {f.label}
                 </li>
               ))}
@@ -192,11 +125,11 @@ export function Walkthrough({
         </div>
       </div>
 
-      {/* The same photographs in sequence, for reduced motion and for browsers without JavaScript. */}
+      {/* The same photographs in sequence, for reduced motion and where scroll-driven animation is missing. */}
       <div className="walk-static page-x space-y-16 pb-24">
         {frames.map((f, i) => (
           <figure key={f.src} className="grid gap-6 lg:grid-cols-12">
-            <div className="relative aspect-[4/5] lg:col-span-6 lg:col-start-4">
+            <div className="walk-arch relative aspect-[4/5] lg:col-span-6 lg:col-start-4">
               <Image src={f.src} alt={f.alt} fill sizes="(min-width: 1024px) 50vw, 100vw" className="object-cover" style={f.focus ? { objectPosition: f.focus } : undefined} />
             </div>
             <figcaption className="lg:col-span-3">

@@ -91,7 +91,7 @@ for (const a of read("insights")) {
 // ——— Cross-checks across collections ———
 const allProjects = read("projects");
 const liveProjects = new Set(allProjects.filter((p) => p.status === "published" && !p.placeholder).map((p) => p.slug));
-if (liveProjects.size === 0) block("Projects", "no project is published, so the portfolio, the home page hero and the Work section would be empty");
+if (liveProjects.size === 0) block("Projects", "no project is published, so the portfolio and the home page Work section would be empty");
 // Published pages must not link to case studies that are still drafts.
 for (const dir of ["projects", "services", "insights"]) {
   const folder = path.join(root, "content", dir);

@@ -109,7 +109,14 @@
           "out": "rembayung-upper-dining",
           "span": "half",
           "role": "whole",
-          "alt": "Upstairs dining under the pitched timber roof, with rows of tables and planters along the edge"
+          "alt": "Upstairs dining under the pitched timber roof, with rows of tables and planters along the edge",
+          "wide": {
+            "aspect": [
+              16,
+              9
+            ],
+            "focusY": 0.48
+          }
         },
         {
           "file": "IMG_2382.heic",

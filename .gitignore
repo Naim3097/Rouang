@@ -44,3 +44,9 @@ next-env.d.ts
 .claude/settings.local.json
 !.env.example
 .next-*/
+
+# Hero render outputs before publishing: scripts/render/o-installation/site-geometry.cjs
+# publishes content-hashed copies of these, which are what the site uses
+/public/images/hero/o-installation-desktop.webp
+/public/images/hero/o-installation-portrait.webp
+/public/images/hero/o-scenery.jpg

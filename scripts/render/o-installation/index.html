@@ -1,0 +1,32 @@
+<!doctype html>
+<!--
+  Render page for the ROUANG O installation still.
+  It is opened by render.cjs in headless Chrome through a small local web server
+  that serves this folder at "/" and the render tools' node_modules at "/nm/".
+  Opening it by hand (with that server running) shows nothing on screen: the
+  runner calls window.renderStill() / window.renderMatte() and reads the result.
+-->
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <title>O installation render</title>
+    <style>
+      html, body { margin: 0; background: #000; }
+      canvas { display: block; }
+    </style>
+    <script type="importmap">
+      {
+        "imports": {
+          "three": "/nm/three/build/three.module.js",
+          "three/addons/": "/nm/three/examples/jsm/",
+          "three/examples/jsm/": "/nm/three/examples/jsm/",
+          "three-mesh-bvh": "/nm/three-mesh-bvh/src/index.js",
+          "three-gpu-pathtracer": "/nm/three-gpu-pathtracer/src/index.js"
+        }
+      }
+    </script>
+  </head>
+  <body>
+    <script type="module" src="./scene.js"></script>
+  </body>
+</html>

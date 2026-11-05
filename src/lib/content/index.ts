@@ -7,9 +7,11 @@ import type { z } from "zod";
 import { SHOW_DRAFTS } from "@/lib/env";
 
 // Content is Markdown on disk, not a module, so a dev server would otherwise keep serving the
-// first read until restarted. In development the cache lasts seconds; builds keep it for good.
+// first read until restarted. In development it revalidates after a second; builds keep it for
+// good. The dev profile stays prerender-safe: an expiry under 5 minutes (the "seconds" preset)
+// would make it runtime data, which the fully static routes reject.
 function contentLife() {
-  if (process.env.NODE_ENV === "development") cacheLife("seconds");
+  if (process.env.NODE_ENV === "development") cacheLife({ stale: 300, revalidate: 1, expire: 300 });
   else cacheLife("max");
 }
 import { renderMarkdown, type Heading } from "./markdown";

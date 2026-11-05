@@ -134,7 +134,7 @@ export function SiteHeader({ whatsapp, nav }: { whatsapp: string | null; nav: Na
         </Link>
 
         <nav aria-label="Primary" className="hidden lg:block">
-          <ul className="flex items-center gap-9">
+          <ul className="flex items-center gap-6 xl:gap-9">
             {nav.map((item) => {
               const current = pathname === item.href || pathname.startsWith(`${item.href}/`);
               return (
@@ -148,14 +148,25 @@ export function SiteHeader({ whatsapp, nav }: { whatsapp: string | null; nav: Na
           </ul>
         </nav>
 
-        <div className="hidden items-center gap-5 lg:flex">
+        {/* Two ways forward, in order of weight: look at the work, then start a conversation. The hero has
+            no buttons of its own, so these are the primary calls to action. */}
+        <div className="hidden items-center gap-3 lg:flex">
           <Link
-            href="/contact"
-            className={`group inline-flex items-center gap-3 rounded-full border px-4 py-2 text-[0.9375rem] transition-colors duration-500 ${
-              dark ? "border-kapur/40 hover:border-kapur" : "border-ink/30 hover:border-ink"
+            href="/projects"
+            className={`sweep group inline-flex items-center gap-3 rounded-full border py-2 pl-4 pr-2.5 text-[0.9375rem] ${
+              dark ? "border-kapur/25" : "border-ink/20"
             }`}
           >
-            <span>Discuss your project</span>
+            <span className="whitespace-nowrap">See our projects</span>
+            <Mark className="h-5 w-5 transition-transform duration-500 group-hover:translate-x-0.5" />
+          </Link>
+          <Link
+            href="/contact"
+            className={`sweep group inline-flex items-center gap-3 rounded-full border py-2 pl-4 pr-2.5 text-[0.9375rem] ${
+              dark ? "border-kapur/60" : "border-ink/45"
+            }`}
+          >
+            <span className="whitespace-nowrap">Discuss your project</span>
             <Mark className="h-5 w-5 transition-transform duration-500 group-hover:translate-x-0.5" />
           </Link>
         </div>

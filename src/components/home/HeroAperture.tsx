@@ -1,146 +1,238 @@
-import Link from "next/link";
-import { ButtonLink } from "@/components/ui/Button";
-import { HeroImage } from "@/components/ui/HeroImage";
+import type { CSSProperties } from "react";
+import { MARK, WORDMARK } from "@/components/brand/paths";
 import { studio } from "@/config/studio";
-import { ProjectCaption } from "@/components/ui/Typography";
-import type { Image as ImageData, PendingImage } from "@/lib/content/schema";
-
-type HeroProject = { slug: string; title: string; type: string; location: string | null } | null;
+import { HeroIntroControl, HeroTextRelease } from "./HeroIntroControl";
+import { HERO_ALT, OPENING_MASKS, sceneryProps, wallProps } from "./heroMedia";
 
 /**
- * The opening. The circle from the mark is a window onto the work; scrolling opens it until the
- * photograph fills the screen: "the moment an empty space becomes one that is lived in" (kit p.3).
- * Construction lines are the dashed guides from the logo drawing (kit p.3–4).
+ * The opening, as one continuous piece.
  *
- * On phones, without scroll-driven animation support, or with reduced motion, the hero is a
- * still composition with the same content.
+ * Intro (first visit in a session, motion allowed): a blank white screen; the letters of ROUANG
+ * arrive one by one; the others fall away while the O glides to its place and opens out to the
+ * size of the emblem in the wall, becoming a hairline of the same silhouette; then the white gives
+ * way to the wall and the view, and the statement condenses in the opening.
+ *
+ * Hero: the ROUANG O built into a concrete wall (a path-traced render, scripts/render/
+ * o-installation, with its opening transparent), looking out to the client's scenery photograph.
+ * Scrolling disperses the statement into soft mist: its letters fade and drift while each word
+ * gives off a pale haze; the description condenses out of the same haze; then it thins away as the
+ * camera moves through the O until the view fills the screen, where Selected Work picks it up
+ * (SelectedWork.tsx; `handoff` says it is there to pick it up).
+ *
+ * All of it is CSS animation (time for the intro, scroll for the hero) on opacity, transforms and
+ * blur: nothing runs on the main thread while scrolling. See globals.css, "Hero" and "Intro". With
+ * reduced motion there is no intro and everything cross-fades; without scroll-driven animation the
+ * texts are shown in turn. The installation is a rendering and the mist is generated
+ * (scripts/media/mist.cjs): neither depicts a real place or a ROUANG project.
  */
-export function HeroAperture({
-  image,
-  project,
-  areas,
-  hasWork = true,
-}: {
-  image: ImageData | PendingImage | null;
-  /** Set only when the image is a photograph of this project, so the caption never mislabels a picture. */
-  project: HeroProject;
-  areas: string;
-  /** False while no project is published, so the first button never leads to an empty page. */
-  hasWork?: boolean;
-}) {
-  const photo = image && !("pending" in image) ? image : null;
+
+const STATEMENT = ["Tell us how you want to live,", "and we’ll translate it into space."] as const;
+const DESCRIPTION =
+  "Interior design for homes and businesses, including restaurants. We start with how a space will be used, then plan it, select its finishes and lighting, all within your working budget.";
+
+/** A stable pseudo-random number in [0, 1) for glyph i, so server and client render the same. */
+function rand(i: number, salt: number) {
+  const x = Math.sin(i * 127.1 + salt * 311.7) * 43758.5453;
+  return x - Math.floor(x);
+}
+
+/** Numbers every character across the lines (spaces included), so the dispersal front can travel
+ * through the whole statement rather than restart on each line. */
+function layOut(lines: readonly string[]) {
+  let offset = 0;
+  return lines.map((line) =>
+    line.split(" ").map((word) => {
+      const start = offset;
+      offset += word.length + 1;
+      return { word, start };
+    }),
+  );
+}
+
+/** Where a word whose middle is character i sits in the dispersal, 0..1: roughly left to right
+ * and top to bottom, with a slightly ragged front. */
+function order(i: number, total: number) {
+  return Math.min(1, Math.max(0, (i / total) * 0.82 + (rand(i, 1) - 0.5) * 0.12));
+}
+
+/** The statement, word by word. Each word fades as a whole and drifts up a little, and gives off a
+ * pale haze of its own shape (::after, from data-t) that rises and opens out into the air. */
+function Disperse({ lines }: { lines: readonly string[] }) {
+  const total = lines.join(" ").length;
+  const laid = layOut(lines);
 
   return (
-    <section data-tone="dark" aria-labelledby="hero-title" className="aperture-track relative">
-      {/* Padding, not margin, so the dark section starts under the header on phones. */}
-      <div className="aperture-stage relative pt-[calc(var(--header-h)+1.5rem)] lg:min-h-[100svh] lg:pt-0">
-        {/* Image layer: full-bleed, clipped to the aperture on large screens. */}
-        <div
-          className="aperture-window relative mx-auto aspect-square w-[min(84vw,30rem)] overflow-hidden rounded-full ring-1 ring-kapur/25 ring-offset-[10px] ring-offset-ink lg:ring-0 lg:ring-offset-0 lg:absolute lg:inset-0 lg:aspect-auto lg:w-auto lg:rounded-none"
-          style={{
-            ["--aperture-x" as string]: "71%",
-            ["--aperture-y" as string]: "53%",
-            ["--aperture-r" as string]: "min(27vw, 35svh)",
-            ["--aperture-r-start" as string]: "min(27vw, 35svh)",
-          }}
-        >
-          {photo ? (
-            // The circle is at most 30rem across below 1024px; the full screen above it.
-            <HeroImage image={photo} narrowSizes="min(84vw, 30rem)" defaultFocus="50% 40%" />
-          ) : (
-            <div className="absolute inset-0 bg-ink-raised" aria-hidden="true" />
-          )}
-          <div className="aperture-caption pointer-events-none absolute inset-x-0 bottom-0 hidden bg-linear-to-t from-ink/90 via-ink/50 to-transparent pb-10 pt-56 lg:block">
-            <div className="page-x pointer-events-auto flex items-end justify-between gap-8">
-              {project ? (
-                <>
-                  <ProjectCaption
-                    title={project.title}
-                    facts={[project.type, project.location, "Interior design by ROUANG"]}
-                    className="text-kapur"
-                  />
-                  <Link href={`/projects/${project.slug}`} className="link-line t-caption text-kapur">
-                    View the project
-                  </Link>
-                </>
-              ) : photo?.provisional ? (
-                <p className="t-caption text-kapur/80">Atmosphere image from the brand kit. Replace with project photography.</p>
-              ) : null}
-            </div>
-          </div>
-        </div>
-
-        {/* Construction lines around the aperture, as in the logo drawing. */}
-        <div className="aperture-fade pointer-events-none absolute inset-0 hidden text-kapur lg:block" aria-hidden="true">
-          <ConstructionLines />
-        </div>
-
-        {/* The studio's own line, in Malay, set under the aperture like a caption on a drawing. */}
-        <p
-          lang="ms"
-          className="aperture-fade t-quote absolute bottom-[3.5svh] right-[var(--page-gutter)] hidden max-w-[22rem] text-right text-mouse lg:block"
-        >
-          Anda cerita macam mana nak duduk. Kami terjemah jadi ruang.
-        </p>
-
-        {/* Text block */}
-        <div className="aperture-fade relative z-10 page-x pb-16 pt-12 lg:absolute lg:inset-0 lg:flex lg:items-center lg:pb-[4svh] lg:pt-[calc(var(--header-h)+2svh)]">
-          <div className="max-w-[38rem] lg:w-[46%] lg:max-w-none xl:w-[44%]">
-            <h1 id="hero-title">
-              <span className="t-label mb-[min(2rem,3.5svh)] block text-mouse">{studio.descriptor} · {areas}</span>
-              <span className="t-headline-hero block lg:text-[clamp(2.625rem,min(1.4rem+4.2vw,8.6svh),5.75rem)]">
-                Tell us how you want to live.
+    <>
+      {laid.map((words, li) => (
+        <span key={li} className={`hero-line hero-line-${li + 1} block`}>
+          {words.map(({ word, start }, wi) => {
+            const style = {
+              ["--d" as string]: order(start + word.length / 2, total).toFixed(3),
+              ["--dx" as string]: `${((rand(start, 6) - 0.35) * 0.5).toFixed(3)}em`,
+              ["--dy" as string]: `${(-0.45 - rand(start, 7) * 0.5).toFixed(3)}em`,
+            } as CSSProperties;
+            return (
+              <span key={wi}>
+                <span className="hero-wisp inline-block whitespace-nowrap" data-t={word} style={style}>
+                  <span className="hero-ink inline-block">{word}</span>
+                </span>
+                {wi < words.length - 1 ? " " : null}
               </span>
-              <span className="t-italic-display mt-[0.08em] block text-[clamp(2.75rem,1.45rem+4.85vw,6.1rem)] leading-[1.02] text-rikyu lg:text-[clamp(2.75rem,min(1.5rem+4.45vw,9.2svh),6.1rem)]">
-                We&rsquo;ll translate it into space.
+            );
+          })}
+        </span>
+      ))}
+    </>
+  );
+}
+
+/** The description as words that condense out of a haze of their own shape, a ragged front moving
+ * through the text. */
+function Condense({ text }: { text: string }) {
+  const words = text.split(" ");
+  return (
+    <>
+      {words.map((word, i) => {
+        const at = i / words.length;
+        const style = {
+          ["--d" as string]: Math.min(1, Math.max(0, at * 0.8 + (rand(i, 7) - 0.5) * 0.08)).toFixed(3),
+          ["--dx" as string]: "0em",
+          ["--dy" as string]: `${(0.12 + rand(i, 9) * 0.04).toFixed(3)}em`,
+        } as CSSProperties;
+        return (
+          <span key={i}>
+            <span className="hero-word inline-block" data-t={word} style={style}>
+              <span className="hero-ink inline-block">{word}</span>
+            </span>
+            {i < words.length - 1 ? " " : null}
+          </span>
+        );
+      })}
+    </>
+  );
+}
+
+// Decides before first paint whether this visit plays the intro: once per session, never with
+// reduced motion, never when arriving at an anchor. It marks its own section, which therefore
+// suppresses the hydration warning for that one attribute.
+const INTRO_SCRIPT = `(function(){var s=document.currentScript&&document.currentScript.parentElement;if(!s)return;try{if(window.matchMedia("(prefers-reduced-motion: reduce)").matches||sessionStorage.getItem("rouang-intro")||location.hash){s.setAttribute("data-intro","none");return}sessionStorage.setItem("rouang-intro","1");s.setAttribute("data-intro","play")}catch(e){s.setAttribute("data-intro","none")}})();`;
+
+/**
+ * `handoff`: Selected Work's pinned scene follows and takes over the view (SelectedWork's
+ * FlagshipScene). Only then does the hero stop being drawn at the end of its move; without it, the
+ * hero scrolls away as ordinary content.
+ */
+export function HeroAperture({ areas, handoff }: { areas: string; handoff: boolean }) {
+  const wall = wallProps();
+  const scenery = sceneryProps();
+  const masks = {
+    ["--o-mask-desktop" as string]: `url("${OPENING_MASKS.desktop}")`,
+    ["--o-mask-portrait" as string]: `url("${OPENING_MASKS.portrait}")`,
+  } as CSSProperties;
+
+  return (
+    <section
+      data-tone="dark"
+      data-hero
+      data-handoff={handoff ? "" : undefined}
+      aria-labelledby="hero-title"
+      className="hero-track relative"
+      style={masks}
+      suppressHydrationWarning
+    >
+      <script dangerouslySetInnerHTML={{ __html: INTRO_SCRIPT }} />
+      {/* The opening's shape clips the words, so it is needed with the first paint. React places
+          these in the head; the media queries match the CSS's switch between the two walls. */}
+      <link rel="preload" as="image" href={OPENING_MASKS.portrait} media="(max-aspect-ratio: 4/5)" fetchPriority="high" />
+      <link rel="preload" as="image" href={OPENING_MASKS.desktop} media="not all and (max-aspect-ratio: 4/5)" fetchPriority="high" />
+
+      <div className="hero-stage relative">
+        {/* The view through the O: the client's photograph, behind the wall. It moves less than the
+            wall as the visitor passes through, as a distant view does. */}
+        <div className="hero-scenery" aria-hidden="true">
+          {/* eslint-disable-next-line @next/next/no-img-element -- an optimised srcset from getImageProps */}
+          <img {...scenery} alt="" />
+        </div>
+
+        {/* The wall with the O built into it (scripts/render/o-installation). The opening is transparent. */}
+        <div className="hero-scene">
+          <picture className="hero-wall">
+            <source media="(max-aspect-ratio: 4/5)" srcSet={wall.portrait.srcSet} sizes={wall.portrait.sizes} />
+            {/* An art-directed <picture> built with getImageProps, as the Next.js image docs describe. */}
+            <img {...wall.desktop} alt={HERO_ALT} loading="eager" fetchPriority="high" />
+          </picture>
+
+          {/* The words, inside the opening. */}
+          <div className="hero-o">
+            <div className="hero-mist" aria-hidden="true">
+              <span className="hero-mist-1" />
+              <span className="hero-mist-2" />
+              <span className="hero-mist-3" />
+            </div>
+
+            {/* What assistive technology reads, once, whichever way the page is animated: the heading
+                and the description. The animated copies are for the eye only. */}
+            <h1 id="hero-title" className="hero-statement">
+              <span className="visually-hidden">{`${STATEMENT.join(" ")} ${studio.descriptor}, ${areas}.`}</span>
+              <span aria-hidden="true">
+                <Disperse lines={STATEMENT} />
               </span>
             </h1>
-            <p className="mt-[min(2rem,4svh)] max-w-[32rem] text-kapur/85">
-              Interior design for homes and for businesses such as restaurants. We start with how a space will be used,
-              then plan it, choose its finishes and light it, within the budget you are working to.
-            </p>
-            <div className="mt-[min(2.5rem,4.5svh)] flex flex-wrap gap-3">
-              {hasWork ? (
-                <ButtonLink href="/projects" variant="light">
-                  See our projects
-                </ButtonLink>
-              ) : null}
-              <ButtonLink href="/contact" variant={hasWork ? "outline" : "light"}>
-                Discuss your project
-              </ButtonLink>
-            </div>
-            <p lang="ms" className="t-quote mt-10 text-mouse lg:hidden">
-              Anda cerita macam mana nak duduk. Kami terjemah jadi ruang.
+            <p className="visually-hidden">{DESCRIPTION}</p>
+
+            <p className="hero-copy" aria-hidden="true">
+              {/* One flex item, so the words flow as a paragraph. */}
+              <span>
+                <Condense text={DESCRIPTION} />
+              </span>
             </p>
           </div>
         </div>
+
+        {/* A little shade under the header, so the white navigation reads on the concrete. */}
+        <div className="hero-shade" aria-hidden="true" />
       </div>
+
+      {/* Without scroll-driven animation, the description follows the hero instead. */}
+      <p className="hero-copy-static page-x" aria-hidden="true">
+        {DESCRIPTION}
+      </p>
+
+      {/* The intro. Decorative and silent for assistive technology: the page beneath is already there. */}
+      <div className="intro" aria-hidden="true">
+        <div className="intro-white" />
+        <div className="intro-word">
+          {/* One drawing per letter, each with room around it, so a letter can soften and fade
+              without being cut off at the edge of the word. */}
+          {WORDMARK.paths.map((p, i) => (
+            <svg
+              key={i}
+              className={`intro-letter intro-letter-${i}`}
+              viewBox={`${-PAD} ${-PAD} ${WORDMARK.width + PAD * 2} ${WORDMARK.height + PAD * 2}`}
+              fill="currentColor"
+            >
+              <path transform={`matrix(${p.m.join(",")})`} d={p.d} />
+            </svg>
+          ))}
+        </div>
+        {/* The O that grows into the opening: the glyph itself, which gives way to a fine outline of
+            the same silhouette (its stroke stays hairline thin at any size). */}
+        <svg className="intro-o" viewBox={`0 0 ${MARK.width} ${MARK.height}`} preserveAspectRatio="none">
+          {MARK.paths.map((p, i) => (
+            <g key={i} transform={`matrix(${p.m.join(",")})`}>
+              <path className="intro-o-fill" d={p.d} fill="currentColor" />
+              <path className="intro-o-line" d={p.d} fill="none" stroke="currentColor" strokeWidth={1.25} vectorEffect="non-scaling-stroke" />
+            </g>
+          ))}
+        </svg>
+      </div>
+      <HeroIntroControl />
+      {/* 100svh down: by then the statement and description have finished arriving or leaving. */}
+      <span className="hero-text-past" aria-hidden="true" />
+      <HeroTextRelease />
     </section>
   );
 }
 
-function ConstructionLines() {
-  // Bounding square of the aperture circle, drawn as dashed guides that run off the page edges.
-  const r = "min(27vw, 35svh)";
-  const cx = "71%";
-  const cy = "53%";
-  const dash = "bg-[repeating-linear-gradient(90deg,currentColor_0_6px,transparent_6px_12px)]";
-  const dashV = "bg-[repeating-linear-gradient(180deg,currentColor_0_6px,transparent_6px_12px)]";
-  return (
-    <div className="absolute inset-0 opacity-30">
-      <span className={`absolute inset-x-0 h-px ${dash}`} style={{ top: `calc(${cy} - ${r})` }} />
-      <span className={`absolute inset-x-0 h-px ${dash}`} style={{ top: `calc(${cy} + ${r})` }} />
-      <span className={`absolute inset-y-0 w-px ${dashV}`} style={{ left: `calc(${cx} - ${r})` }} />
-      <span className={`absolute inset-y-0 w-px ${dashV}`} style={{ left: `calc(${cx} + ${r})` }} />
-      <span
-        className="absolute rounded-full border border-dashed border-current"
-        style={{
-          left: `calc(${cx} - ${r} - 1.75rem)`,
-          top: `calc(${cy} - ${r} - 1.75rem)`,
-          width: `calc(2 * ${r} + 3.5rem)`,
-          height: `calc(2 * ${r} + 3.5rem)`,
-        }}
-      />
-    </div>
-  );
-}
+/** Room, in wordmark units, around each intro letter for its blur and soft mask. */
+const PAD = 16;

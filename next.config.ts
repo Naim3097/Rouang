@@ -34,8 +34,9 @@ const nextConfig: NextConfig = {
   images: {
     formats: ["image/avif", "image/webp"],
     qualities: [78, 85],
-    // Sources are exported at most 2400 px wide, so nothing larger than 1920 is ever needed.
-    deviceSizes: [640, 828, 1080, 1280, 1600, 1920],
+    // Photographs are exported at most 2400 px wide and the hero renders at 2560, so 2560 is the
+    // largest width worth serving (smaller sources are never enlarged).
+    deviceSizes: [640, 828, 1080, 1280, 1600, 1920, 2560],
     // Optimised images are kept for 31 days. A replaced photograph gets a new file name.
     minimumCacheTTL: 2678400,
   },

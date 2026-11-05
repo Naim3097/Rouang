@@ -71,6 +71,7 @@ export function MobileActionBar({ whatsapp }: { whatsapp: string | null }) {
 
   return (
     <aside
+      data-action-bar
       aria-label="Contact the studio"
       className={`fixed bottom-3 right-3 z-40 flex items-center gap-2 transition-[translate,opacity] duration-500 ease-[var(--ease-brand)] lg:hidden ${
         visible ? "translate-y-0 opacity-100" : "pointer-events-none translate-y-[130%] opacity-0"

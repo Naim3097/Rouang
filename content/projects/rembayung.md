@@ -31,6 +31,10 @@ card:
   width: 1350
   height: 2400
   focus: "50% 62%"
+  wide:
+    src: /images/projects/rembayung/rembayung-upper-dining-wide.jpg
+    width: 2268
+    height: 1276
 # Real footage: IMG_2216, filmed in the open restaurant on 9 Jan 2026. Cropped to keep the
 # table-number cards out of frame. The other 58 clips on Drive show fit-out and were not used.
 loops:

@@ -112,7 +112,13 @@
    "src": "/images/projects/rembayung/rembayung-upper-dining.jpg",
    "width": 1350,
    "height": 2400,
-   "bytes": 542679,
+   "bytes": 543064,
+   "wide": {
+    "src": "/images/projects/rembayung/rembayung-upper-dining-wide.jpg",
+    "width": 2268,
+    "height": 1276,
+    "bytes": 459670
+   },
    "alt": "Upstairs dining under the pitched timber roof, with rows of tables and planters along the edge",
    "span": "half"
   },

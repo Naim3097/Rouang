@@ -7,12 +7,11 @@ import {
   Pathways,
   Process,
   ProjectStory,
-  SelectedWork,
   StudioName,
 } from "@/components/home/HomeSections";
+import { SelectedWork } from "@/components/home/SelectedWork";
 import { areaLabel, studio } from "@/config/studio";
-import { brandImagery } from "@/config/media";
-import { getInsights, getProjects, getServices, projectImage, publicImage } from "@/lib/content";
+import { getInsights, getProjects, getServices, projectImage } from "@/lib/content";
 import { pageMetadata } from "@/lib/seo";
 
 export const ensureStatic = "navigation";
@@ -42,22 +41,12 @@ export default async function HomePage() {
     .filter((p) => p !== flagship)
     .sort((a, b) => Number(a.visualisation) - Number(b.visualisation) || a.order - b.order);
 
-  // The hero shows the flagship's photograph when one is cleared; otherwise brand atmosphere (previews only).
-  const flagshipPhoto = flagship ? publicImage(flagship.hero) : null;
-  const heroIsProject = !!flagshipPhoto && !("pending" in flagshipPhoto);
-  const heroImage = heroIsProject ? flagshipPhoto : publicImage(brandImagery.concreteFacade);
-
   const homeDoor = projectImage(projects.find((p) => p.slug === "ampang"), "ampang-porch");
   const businessDoor = projectImage(projects.find((p) => p.slug === "rembayung"), "rembayung-long-hall");
 
   return (
     <>
-      <HeroAperture
-        image={heroImage}
-        project={heroIsProject && flagship ? { slug: flagship.slug, title: flagship.title, type: flagship.type, location: flagship.location } : null}
-        areas={areaLabel()}
-        hasWork={projects.length > 0}
-      />
+      <HeroAperture areas={areaLabel()} handoff={flagship !== null} />
       <SelectedWork flagship={flagship} others={others} />
       <StudioName />
       <Pathways

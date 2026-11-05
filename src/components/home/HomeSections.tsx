@@ -2,8 +2,6 @@ import Link from "next/link";
 import { CurveRule, Icon, Mark } from "@/components/brand/Brand";
 import { EnquiryForm } from "@/components/contact/EnquiryForm";
 import { ContactLink } from "@/components/layout/ContactLink";
-import { ProjectIndex } from "@/components/projects/ProjectIndex";
-import { TitleBlock } from "@/components/projects/TitleBlock";
 import { ArrowLink } from "@/components/ui/Button";
 import { Figure } from "@/components/ui/Figure";
 import { Label, TitlePair } from "@/components/ui/Typography";
@@ -16,107 +14,47 @@ import { publicImage } from "@/lib/content";
 import type { Image } from "@/lib/content/schema";
 import { SHOW_DRAFTS, TURNSTILE_SITE_KEY } from "@/lib/env";
 
-/* ——— 01 Work ——— */
-
-export function SelectedWork({ flagship, others }: { flagship: Project | null; others: Project[] }) {
-  if (!flagship && others.length === 0) return null;
-  const hero = flagship ? publicImage(flagship.card ?? flagship.hero) : null;
-  return (
-    <Section labelledBy="work-title" className="section-y">
-      <div className="page-x">
-        <div className="page-grid items-end gap-y-8">
-          <Label index="01" className="col-span-12 text-ink-muted lg:col-span-3">
-            Work
-          </Label>
-          <TitlePair
-            id="work-title"
-            lead="Selected work"
-            italic="from dining rooms to homes"
-            className="col-span-12 lg:col-span-9"
-          />
-        </div>
-
-        {flagship ? (
-          <article className="page-grid mt-16 gap-y-10 sm:mt-24" aria-labelledby="flagship-title">
-            <Link
-              href={`/projects/${flagship.slug}`}
-              className="group col-span-12 block sm:col-span-8 sm:col-start-3 lg:col-span-6 lg:col-start-2"
-              aria-label={`${flagship.title}: read the case study`}
-              tabIndex={-1}
-            >
-              {hero ? (
-                <Figure
-                  image={hero}
-                  sizes="(min-width: 1024px) 45vw, (min-width: 640px) 66vw, 100vw"
-                  aspect="4/5"
-                  transitionName={`project-${flagship.slug}`}
-                  imgClassName="transition-transform duration-[1.6s] ease-[var(--ease-brand)] group-hover:scale-[1.02]"
-                />
-              ) : null}
-            </Link>
-            <div className="col-span-12 flex flex-col lg:col-span-4 lg:col-start-9 lg:self-end">
-              <p className="t-label text-ink-muted">Flagship project · {flagship.sector === "commercial" ? "Commercial" : "Residential"}</p>
-              <h3 id="flagship-title" className="mt-4 font-serif text-[clamp(2.75rem,2rem+3vw,4.75rem)] italic leading-[0.98] tracking-[-0.015em]">
-                <Link href={`/projects/${flagship.slug}`} className="link-reveal">
-                  {flagship.title}
-                </Link>
-              </h3>
-              <p className="t-sub mt-6 text-ink-soft">{flagship.summary}</p>
-              <TitleBlock project={flagship} className="mt-8" />
-              <ArrowLink href={`/projects/${flagship.slug}`} className="mt-8 self-start" prefetch={true}>
-                Read the case study
-              </ArrowLink>
-            </div>
-          </article>
-        ) : null}
-
-        {others.length > 0 ? (
-          <div className="mt-20 sm:mt-28">
-            <ProjectIndex projects={others} startAt={2} />
-            <ArrowLink href="/projects" className="mt-10">
-              All projects
-            </ArrowLink>
-          </div>
-        ) : null}
-      </div>
-    </Section>
-  );
-}
-
-/* ——— 02 The name ——— */
+/* ——— 02 The name ———
+ * A dictionary entry for the word the studio is named after, stacked at the gutter in reading order:
+ * the pronunciation, the meaning, the word. On large screens the stage pins and the entry travels
+ * left out of the frame as the three ideas of the O arrive from the right, one continuous pan
+ * (globals.css, "02 Studio"). Elsewhere the two simply follow each other.
+ */
 
 export function StudioName() {
   return (
-    <Section labelledBy="name-title" className="overflow-hidden pb-[var(--section-space)] pt-[calc(var(--section-space)*0.5)]" guides>
-      <div className="page-x">
-        <div className="page-grid gap-y-12">
-          <Label index="02" className="col-span-12 text-ink-muted lg:col-span-3">
+    <section data-tone="light" aria-labelledby="name-title" className="studio-scene relative bg-kapur text-ink">
+      <div className="studio-stage relative">
+        <div className="studio-word page-x pt-[var(--section-space)]">
+          <Label index="02" className="text-ink-muted">
             Studio
           </Label>
+          <h2 id="name-title" className="visually-hidden">
+            Why the studio is called ROUANG
+          </h2>
+          <p className="mt-12 flex flex-col items-start lg:mt-[min(4rem,7svh)]">
+            <span className="studio-line studio-line-1 t-caption text-ink-muted">
+              <span lang="ms">/ru·ang/</span> · noun, Malay
+            </span>
+            <span className="studio-line studio-line-2 t-italic-display mt-3 text-[clamp(2.25rem,1.6rem+2.4vw,4rem)] text-rikyu">
+              space
+            </span>
+            <span
+              lang="ms"
+              className="studio-line studio-line-3 -ml-[0.04em] mt-1 font-serif text-[clamp(5.5rem,2rem+17vw,19rem)] italic leading-[0.82] tracking-[-0.025em]"
+            >
+              ruang
+            </span>
+          </p>
+        </div>
 
-          <div className="col-span-12 lg:col-span-9">
-            <h2 id="name-title" className="visually-hidden">
-              Why the studio is called ROUANG
-            </h2>
-            {/* A dictionary entry for the word the studio is named after. */}
-            <p className="flex flex-wrap items-baseline gap-x-8 gap-y-2">
-              <span lang="ms" className="font-serif text-[clamp(5.5rem,3rem+13vw,15rem)] italic leading-[0.8] tracking-[-0.02em]">
-                ruang
-              </span>
-              <span className="t-caption text-ink-muted">
-                <span lang="ms">/ru·ang/</span> · noun, Malay
-                <br />
-                <span className="text-ink">space</span>
-              </span>
-            </p>
-          </div>
-
-          <div className="col-span-12 grid gap-10 lg:col-span-9 lg:col-start-4 lg:grid-cols-9 lg:gap-x-[var(--grid-gap)]">
-            <p className="t-sub lg:col-span-5">
+        <div className="studio-idea page-x pb-[var(--section-space)] pt-16 lg:pt-24">
+          <div className="page-grid gap-y-10">
+            <p className="t-sub col-span-12 lg:col-span-5">
               ROUANG comes from the Malay word <em lang="ms" className="font-serif">ruang</em>, space. The studio
               added an O, and with it the idea that space has no fixed limit.
             </p>
-            <div className="lg:col-span-4">
+            <div className="col-span-12 lg:col-span-5 lg:col-start-8">
               <p className="text-ink-soft">
                 The O carries three ideas that begin with the same letter. They describe how we work long before any
                 wall goes up.
@@ -142,7 +80,7 @@ export function StudioName() {
           </div>
         </div>
       </div>
-    </Section>
+    </section>
   );
 }
 
@@ -193,7 +131,7 @@ export function Pathways({
           <div
             key={d.key}
             data-tone={d.tone}
-            className={`relative flex flex-col px-[var(--page-gutter)] pb-[clamp(5rem,9vw,9rem)] pt-[clamp(3rem,5vw,5rem)] ${d.tone === "light" ? "bg-kapur-deep text-ink" : ""}`}
+            className={`relative flex flex-col px-[var(--page-gutter)] pb-[clamp(5rem,9vw,9rem)] pt-[clamp(3rem,5vw,5rem)] ${d.tone === "light" ? "bg-kapur text-ink" : ""}`}
           >
             {d.image ? (
               <Figure
@@ -290,10 +228,6 @@ export function InsideProject({ project }: { project: Project | null }) {
         href={`/projects/${project.slug}`}
         kicker={[project.type, project.location].filter(Boolean).join(" · ")}
       />
-      {/* Without JavaScript nothing drives the pinned walkthrough, so show the photographs in sequence. */}
-      <noscript>
-        <style>{".walk-pinned{display:none!important}.walk-static{display:block!important}"}</style>
-      </noscript>
     </section>
   );
 }

@@ -10,11 +10,14 @@ export function HeroImage({
   image,
   narrowSizes,
   defaultFocus = "50% 50%",
+  priority = true,
 }: {
   image: ImageData;
   /** `sizes` below 1024px, where the portrait is shown. */
   narrowSizes: string;
   defaultFocus?: string;
+  /** False for a full-bleed photograph further down the page, which then loads lazily. */
+  priority?: boolean;
 }) {
   const { wide } = image;
   const wideSet = wide
@@ -26,8 +29,8 @@ export function HeroImage({
     fill: true,
     quality: 78,
     sizes: wide ? narrowSizes : `(min-width: 1024px) 100vw, ${narrowSizes}`,
-    loading: "eager",
-    fetchPriority: "high",
+    loading: priority ? "eager" : "lazy",
+    fetchPriority: priority ? "high" : undefined,
   });
 
   return (
