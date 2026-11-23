@@ -6,11 +6,11 @@ category: Restaurants and hospitality
 publishedAt: 2026-10-29
 seo:
   title: "Restaurant interior design considerations, in order"
-purpose: Show restaurant operators how the studio thinks about F&B interiors, and lead them to the restaurant service page and the Rembayung case study.
+purpose: Show restaurant operators how the studio thinks about F&B interiors, and lead them to the Renovation & Interior service page and the Rembayung case study.
 audience: Restaurant and café owners planning a new site or a refit in the Klang Valley
 searchIntent: Informational, early research before hiring a designer ("restaurant interior design considerations")
 relatedServices:
-  - restaurant-interior-design
+  - renovation-and-interior
 relatedProjects:
   - rembayung
 todo:

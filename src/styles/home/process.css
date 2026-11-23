@@ -1,0 +1,323 @@
+/* Home, Process (Process.tsx); its steps are also drawn on the About page (ProcessSteps). Imported by globals.css. */
+
+/* ——— 05 Process: one line through every step. ———
+   Each step hangs off a numbered ring on the line, always in the same order: ring, icon, title, text.
+   The line is drawn in pieces, one per step, each running from its own ring's centre to the next
+   ring's centre, so it starts exactly at the first ring and ends exactly at the last, whatever the
+   layout. The rings sit on top of it and hide the joins.
+   Phones: the line runs down the left, the icon beside each ring, the words under the icon.
+   Tablets and small laptops: the same vertical line, each step one row (icon, title, text).
+   85rem and up: the steps stand side by side on a horizontal line; a subgrid keeps every icon, title
+   and text on shared rows, however a title wraps.
+   Centred (.process-centred, the home section): the flow sits on the section's centre line, under
+   the centred heading. See the end of the layouts below. */
+
+.process-steps {
+  --node: 2.25rem;
+  --icon: 2.75rem;
+  --step-gap: clamp(2.5rem, 7vw, 3.5rem);
+  /* The line without motion: a hairline strong enough to read as one continuous rule. */
+  --line: color-mix(in oklab, var(--color-ink) 30%, transparent);
+  --line-lit: var(--color-rikyu-deep);
+  display: grid;
+  row-gap: var(--step-gap);
+  margin-top: clamp(4rem, 9vw, 7rem);
+}
+
+.process-step {
+  position: relative;
+  display: grid;
+  grid-template-columns: var(--node) minmax(0, 1fr);
+  grid-template-rows: var(--icon) auto auto;
+  column-gap: 1.25rem;
+}
+
+.process-node {
+  position: relative;
+  z-index: 1;
+  grid-column: 1;
+  grid-row: 1;
+  align-self: start;
+  display: grid;
+  place-items: center;
+  width: var(--node);
+  height: var(--node);
+  /* Centred on the icon beside it, so the line meets every step at the same point. */
+  margin-top: calc((var(--icon) - var(--node)) / 2);
+  border: 1px solid var(--line);
+  border-radius: 50%;
+  background: var(--color-kapur);
+  color: var(--color-ink-muted);
+  font-variant-numeric: tabular-nums;
+  /* The label's tracking trails after the last digit; this puts the pair back in the middle. */
+  padding-left: 0.12em;
+}
+
+/* The ring once the line has reached it: Rikyū deep, the number in Milky White (8.7:1). It opens
+   from the centre as a circle, over the open ring, so the two numbers stay exactly in register. */
+.process-node-on {
+  position: absolute;
+  inset: -1px;
+  display: grid;
+  place-items: center;
+  padding-left: 0.12em;
+  border-radius: inherit;
+  background: var(--line-lit);
+  color: var(--color-kapur);
+  clip-path: circle(0% at 50% 50%);
+}
+
+/* The brand icons carry their own margin inside the drawing; pull it back so the drawn edge lines up
+   with the title under it. */
+.process-icon {
+  grid-column: 2;
+  grid-row: 1;
+  width: var(--icon);
+  height: var(--icon);
+  margin-left: calc(var(--icon) * -0.16);
+  color: var(--color-ink);
+}
+
+.process-title {
+  grid-column: 2;
+  grid-row: 2;
+  margin-top: 1rem;
+}
+
+.process-body {
+  grid-column: 2;
+  grid-row: 3;
+  max-width: 34rem;
+  margin-top: 0.5rem;
+  /* No last line of one word ("you."). */
+  text-wrap: pretty;
+}
+
+/* A piece of the line, from this ring's centre to the next ring's centre (down the step and across
+   the gap). Its child is the lit part, drawn by the scroll where motion is allowed. */
+.process-link {
+  position: absolute;
+  top: calc(var(--icon) / 2);
+  left: calc(var(--node) / 2 - 0.5px);
+  width: 1px;
+  height: calc(100% + var(--step-gap));
+  background: var(--line);
+}
+
+.process-link > span {
+  position: absolute;
+  inset: 0;
+  background: var(--line-lit);
+  transform-origin: top;
+  scale: 1 0;
+}
+
+/* The text takes the right half of the list; the ring, icon and title share the left half. */
+@media (min-width: 40rem) and (max-width: 84.99rem) {
+  .process-step {
+    grid-template-columns: var(--node) var(--icon) minmax(0, 1fr) calc((100% - var(--grid-gap)) / 2);
+    grid-template-rows: auto;
+    column-gap: max(var(--grid-gap), 1.25rem);
+  }
+
+  .process-icon {
+    margin-left: 0;
+  }
+
+  /* Title and text start level with the ring: their first lines are centred on it. */
+  .process-title {
+    grid-column: 3;
+    grid-row: 1;
+    margin-top: calc(var(--icon) / 2 - 0.625em);
+  }
+
+  .process-body {
+    grid-column: 4;
+    grid-row: 1;
+    margin-top: calc(var(--icon) / 2 - 0.775em);
+  }
+}
+
+@media (min-width: 85rem) {
+  .process-steps {
+    grid-template-columns: repeat(var(--steps), minmax(0, 1fr));
+    grid-template-rows: repeat(4, auto);
+    column-gap: var(--grid-gap);
+    row-gap: 0;
+  }
+
+  .process-step {
+    grid-row: span 4;
+    grid-template-columns: minmax(0, 1fr);
+    grid-template-rows: subgrid;
+    column-gap: 0;
+  }
+
+  .process-node {
+    margin-top: 0;
+  }
+
+  .process-icon {
+    grid-column: 1;
+    grid-row: 2;
+    margin-top: clamp(2rem, 2.6vw, 3rem);
+  }
+
+  .process-title {
+    grid-column: 1;
+    grid-row: 3;
+    margin-top: 1.25rem;
+  }
+
+  .process-body {
+    grid-column: 1;
+    grid-row: 4;
+    margin-top: 0.625rem;
+  }
+
+  /* Across the column and the gap after it, through the middle of the rings. */
+  .process-link {
+    top: calc(var(--node) / 2 - 0.5px);
+    left: calc(var(--node) / 2);
+    width: calc(100% + var(--grid-gap));
+    height: 1px;
+  }
+
+  .process-link > span {
+    transform-origin: left;
+    scale: 0 1;
+  }
+}
+
+/* ——— Centred: the flow on the section's centre line. ———
+   Side by side, each step stands centred under its ring, so the line runs from the middle of the
+   first column to the middle of the last and the row is symmetrical about the centre of the page.
+   Running down, the list is one block of a set width in the middle of the page (the full width on
+   a tablet), its two halves either side of the centre line. Phones keep the line down the left:
+   there the block already fills the page between its margins. The heading sits a little closer
+   than it would beside the steps, so the two read as one composition. */
+.process-centred {
+  margin-top: clamp(4rem, 6.5vw, 6rem);
+}
+
+@media (min-width: 40rem) and (max-width: 84.99rem) {
+  .process-centred {
+    max-width: 58rem;
+    margin-inline: auto;
+  }
+}
+
+@media (min-width: 85rem) {
+  .process-centred .process-step {
+    justify-items: center;
+    text-align: center;
+  }
+
+  /* The icons are drawn in the middle of their box, so the box is centred as it is. */
+  .process-centred .process-icon {
+    margin-left: 0;
+  }
+
+  /* Centred lines of even length, so no step trails a short last word. */
+  .process-centred .process-title {
+    text-wrap: balance;
+  }
+
+  .process-centred .process-body {
+    max-width: 16rem;
+    text-wrap: balance;
+  }
+
+  .process-centred .process-link {
+    left: 50%;
+  }
+}
+
+/* Motion: the line is lit as the visitor reads down the steps. The full line is always there, a
+   quiet hairline, so it never looks cut short; the Rikyū line travels along it and each ring fills
+   as the line arrives. Without scroll-driven animation, or with reduced motion, the line is simply
+   whole and the rings stay open. Only transforms and clip-paths move. */
+@supports (animation-timeline: view()) {
+  @media (prefers-reduced-motion: no-preference) {
+    .process-steps {
+      --line: color-mix(in oklab, var(--color-ink) 16%, transparent);
+    }
+
+    /* Vertical line: everything lights as it crosses a reading line a little below the middle of the
+       screen (55% down). "cover 45vh" is the moment an element's top reaches it, and
+       "cover 100% - 55vh" the moment its bottom does, for an element of any height, so the lit
+       line's tip and each ring meet that reading line together. */
+    .process-link {
+      view-timeline: --process-link block;
+    }
+
+    .process-node {
+      view-timeline: --process-node block;
+    }
+
+    .process-link > span {
+      animation: process-fill-y linear both;
+      animation-timeline: --process-link;
+      animation-range: cover 45vh cover calc(100% - 55vh);
+    }
+
+    .process-node-on {
+      animation: process-node-on linear both;
+      animation-timeline: --process-node;
+      animation-range: cover 45vh cover calc(100% - 55vh);
+    }
+  }
+
+  /* Horizontal line: one timeline for the whole row. The line runs from the first ring to the last
+     while the row rises from 80% to 30% of the screen's height, one equal stretch per step, and each
+     ring fills as the line reaches it. */
+  @media (min-width: 85rem) and (prefers-reduced-motion: no-preference) {
+    .process-steps {
+      view-timeline: --process block;
+      --run-start: 20vh;
+      --run-step: calc(50vh / (var(--steps) - 1));
+    }
+
+    .process-link > span {
+      animation-name: process-fill-x;
+      animation-timeline: --process;
+      animation-range:
+        cover calc(var(--run-start) + var(--i) * var(--run-step))
+        cover calc(var(--run-start) + (var(--i) + 1) * var(--run-step));
+    }
+
+    .process-node-on {
+      animation-timeline: --process;
+      animation-range:
+        cover calc(var(--run-start) + var(--i) * var(--run-step) - 1.5vh)
+        cover calc(var(--run-start) + var(--i) * var(--run-step) + 1.5vh);
+    }
+  }
+}
+
+@keyframes process-fill-y {
+  from {
+    scale: 1 0;
+  }
+  to {
+    scale: 1 1;
+  }
+}
+
+@keyframes process-fill-x {
+  from {
+    scale: 0 1;
+  }
+  to {
+    scale: 1 1;
+  }
+}
+
+@keyframes process-node-on {
+  from {
+    clip-path: circle(0% at 50% 50%);
+  }
+  to {
+    clip-path: circle(50% at 50% 50%);
+  }
+}

@@ -62,10 +62,10 @@ lighting: |
 challenges: []
 quote:
   text: A modern European home where timeless details make room for everyday family life.
-  attribution: From the studio's design presentation, September 2026
+  attribution: From ROUANG's design presentation, September 2026
   approved: false
 services:
-  - residential-interior-design
+  - renovation-and-interior
 seo:
   title: "Kota Warisan, Sepang: house design proposal"
   description: A modern European design proposal by ROUANG for a family house in Kota Warisan, Sepang. White walls, arches and fine black frames. Design visualisations.

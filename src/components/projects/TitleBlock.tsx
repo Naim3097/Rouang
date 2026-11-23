@@ -33,7 +33,7 @@ export function TitleBlock({
           className={`border-b border-r ${line} px-4 py-3.5 ${visible.length % 2 === 1 && i === visible.length - 1 ? "col-span-2" : ""}`}
         >
           <dt className={`t-label ${label}`}>{k}</dt>
-          <dd className="mt-1.5 text-[0.9375rem] leading-snug">{v}</dd>
+          <dd className="t-meta mt-1.5">{v}</dd>
         </div>
       ))}
     </dl>

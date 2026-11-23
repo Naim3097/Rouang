@@ -3,22 +3,35 @@
  *
  * Structured around the eight items a written notice must cover under s.7(1) of the Personal
  * Data Protection Act 2010 (Act 709), and published in both the national language and English
- * as s.7(3) requires. Draft: needs the studio's legal name and contact details and a review by
- * its legal adviser before launch (see docs/CONFIRMATIONS.md).
+ * as s.7(3) requires. The controller's name, registration, address and email come from the company
+ * profile (November 2026); the text still needs a review by its legal adviser before launch
+ * (see docs/CONFIRMATIONS.md).
  */
 
 export type NoticeSection = { id: string; title: string; paragraphs: string[]; list?: string[] };
 
-type Vars = { controller: string; contact: string };
+type Vars = {
+  controller: string;
+  /** SSM registration number, when known. */
+  registrationNo: string | null;
+  /** Postal address on one line, when known. */
+  address: string | null;
+  contact: string;
+};
 
-export function privacyNotice({ controller, contact }: Vars): { en: NoticeSection[]; ms: NoticeSection[] } {
+export function privacyNotice({ controller, registrationNo, address, contact }: Vars): { en: NoticeSection[]; ms: NoticeSection[] } {
+  // "ROUANG GLOBAL (SSM registration no. …) ("we"), of <address>, is the data controller …"
+  const who = {
+    en: `${controller}${registrationNo ? ` (SSM registration no. ${registrationNo})` : ""} ("we")${address ? `, of ${address},` : ""}`,
+    ms: `${controller}${registrationNo ? ` (no. pendaftaran SSM ${registrationNo})` : ""} ("kami")${address ? `, beralamat di ${address},` : ""}`,
+  };
   return {
     en: [
       {
         id: "who",
         title: "Who we are",
         paragraphs: [
-          `${controller} ("we") is the data controller for personal data collected through this website. This notice is given under the Personal Data Protection Act 2010.`,
+          `${who.en} is the data controller for personal data collected through this website. This notice is given under the Personal Data Protection Act 2010.`,
         ],
       },
       {
@@ -53,7 +66,7 @@ export function privacyNotice({ controller, contact }: Vars): { en: NoticeSectio
         id: "sharing",
         title: "Who else handles it",
         paragraphs: [
-          "Your details are processed on our behalf by service providers (data processors): our website host (Vercel), our database provider (Supabase) and our email provider, which notifies the studio of new enquiries. If you allow analytics cookies, Google Analytics also receives information about how the site is used. These providers may store data on servers outside Malaysia; we use them only on terms that protect your data.",
+          "Your details are processed on our behalf by service providers (data processors): our website host (Vercel), our database provider (Supabase) and our email provider, which notifies us of new enquiries. If you allow analytics cookies, Google Analytics also receives information about how the site is used. These providers may store data on servers outside Malaysia; we use them only on terms that protect your data.",
           "If your project goes ahead and you agree, we may share the details needed with contractors or suppliers working on it. We do not disclose your data to anyone else unless the law requires it.",
         ],
       },
@@ -68,7 +81,7 @@ export function privacyNotice({ controller, contact }: Vars): { en: NoticeSectio
         id: "rights",
         title: "Your choices and rights",
         paragraphs: [
-          `You can ask to see the personal data we hold about you, ask us to correct it, ask us to limit how we use it, or withdraw your consent. Contact us at ${contact}. We may need to confirm who you are before acting on a request, and we will reply within the time the law allows.`,
+          `You can ask to see the personal data we hold about you, ask us to correct it, ask us to limit how we use it, or withdraw your consent. Contact us at ${contact}${address ? ", or write to us at the address above" : ""}. We may need to confirm who you are before acting on a request, and we will reply within the time the law allows.`,
         ],
       },
       {
@@ -82,7 +95,7 @@ export function privacyNotice({ controller, contact }: Vars): { en: NoticeSectio
         id: "security",
         title: "Keeping it safe",
         paragraphs: [
-          "Enquiries are sent over an encrypted connection and stored in a database that is not publicly readable. Only people at the studio who need them can see them. If a data breach happens that is likely to cause you significant harm, we will tell you and the Personal Data Protection Commissioner as the law requires.",
+          "Enquiries are sent over an encrypted connection and stored in a database that is not publicly readable. Only people at ROUANG who need them can see them. If a data breach happens that is likely to cause you significant harm, we will tell you and the Personal Data Protection Commissioner as the law requires.",
         ],
       },
       {
@@ -96,7 +109,7 @@ export function privacyNotice({ controller, contact }: Vars): { en: NoticeSectio
         id: "siapa",
         title: "Siapa kami",
         paragraphs: [
-          `${controller} ("kami") ialah pengawal data bagi data peribadi yang dikumpul melalui laman web ini. Notis ini diberikan di bawah Akta Perlindungan Data Peribadi 2010.`,
+          `${who.ms} ialah pengawal data bagi data peribadi yang dikumpul melalui laman web ini. Notis ini diberikan di bawah Akta Perlindungan Data Peribadi 2010.`,
         ],
       },
       {
@@ -131,7 +144,7 @@ export function privacyNotice({ controller, contact }: Vars): { en: NoticeSectio
         id: "pihak-lain",
         title: "Pihak lain yang mengendalikan data",
         paragraphs: [
-          "Maklumat anda diproses bagi pihak kami oleh pembekal perkhidmatan (pemproses data): hos laman web kami (Vercel), pembekal pangkalan data kami (Supabase) dan pembekal e-mel kami yang memaklumkan studio tentang pertanyaan baharu. Jika anda membenarkan kuki analitik, Google Analytics turut menerima maklumat tentang cara laman ini digunakan. Pembekal ini mungkin menyimpan data di pelayan di luar Malaysia; kami hanya menggunakan mereka atas terma yang melindungi data anda.",
+          "Maklumat anda diproses bagi pihak kami oleh pembekal perkhidmatan (pemproses data): hos laman web kami (Vercel), pembekal pangkalan data kami (Supabase) dan pembekal e-mel kami yang memaklumkan kami tentang pertanyaan baharu. Jika anda membenarkan kuki analitik, Google Analytics turut menerima maklumat tentang cara laman ini digunakan. Pembekal ini mungkin menyimpan data di pelayan di luar Malaysia; kami hanya menggunakan mereka atas terma yang melindungi data anda.",
           "Jika projek anda diteruskan dan anda bersetuju, kami mungkin berkongsi maklumat yang diperlukan dengan kontraktor atau pembekal yang terlibat. Kami tidak mendedahkan data anda kepada pihak lain melainkan jika dikehendaki oleh undang-undang.",
         ],
       },
@@ -146,7 +159,7 @@ export function privacyNotice({ controller, contact }: Vars): { en: NoticeSectio
         id: "hak",
         title: "Pilihan dan hak anda",
         paragraphs: [
-          `Anda boleh meminta untuk melihat data peribadi yang kami simpan tentang anda, meminta kami membetulkannya, mengehadkan penggunaannya, atau menarik balik persetujuan anda. Hubungi kami di ${contact}. Kami mungkin perlu mengesahkan identiti anda sebelum bertindak atas permintaan, dan kami akan membalas dalam tempoh yang dibenarkan oleh undang-undang.`,
+          `Anda boleh meminta untuk melihat data peribadi yang kami simpan tentang anda, meminta kami membetulkannya, mengehadkan penggunaannya, atau menarik balik persetujuan anda. Hubungi kami di ${contact}${address ? " atau tulis kepada kami di alamat di atas" : ""}. Kami mungkin perlu mengesahkan identiti anda sebelum bertindak atas permintaan, dan kami akan membalas dalam tempoh yang dibenarkan oleh undang-undang.`,
         ],
       },
       {
@@ -160,7 +173,7 @@ export function privacyNotice({ controller, contact }: Vars): { en: NoticeSectio
         id: "keselamatan",
         title: "Keselamatan",
         paragraphs: [
-          "Pertanyaan dihantar melalui sambungan yang disulitkan dan disimpan dalam pangkalan data yang tidak boleh dibaca oleh orang awam. Hanya kakitangan studio yang memerlukannya boleh melihatnya. Jika berlaku pelanggaran data yang mungkin menyebabkan kemudaratan ketara kepada anda, kami akan memaklumkan anda dan Pesuruhjaya Perlindungan Data Peribadi seperti yang dikehendaki oleh undang-undang.",
+          "Pertanyaan dihantar melalui sambungan yang disulitkan dan disimpan dalam pangkalan data yang tidak boleh dibaca oleh orang awam. Hanya kakitangan ROUANG yang memerlukannya boleh melihatnya. Jika berlaku pelanggaran data yang mungkin menyebabkan kemudaratan ketara kepada anda, kami akan memaklumkan anda dan Pesuruhjaya Perlindungan Data Peribadi seperti yang dikehendaki oleh undang-undang.",
         ],
       },
       {

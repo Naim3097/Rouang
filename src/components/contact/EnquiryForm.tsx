@@ -96,8 +96,12 @@ export function EnquiryForm({
   }, [state, location]);
 
   const dark = tone === "dark";
-  // Resting lines meet the 3:1 minimum for controls; labels and hints meet 4.5:1 on both tones.
-  const fieldLine = dark ? "border-kapur/70 focus-within:border-kapur" : "border-ink/60 focus-within:border-ink";
+  // Resting lines meet the 3:1 minimum for controls; labels and hints meet 4.5:1 on both tones. The
+  // field being typed in (or reached by Tab) draws its line twice as heavy and at full strength, the
+  // fields' own focus mark in place of the outline they leave out.
+  const fieldLine = dark
+    ? "border-kapur/70 focus-within:border-kapur focus-within:shadow-[0_1px_0_var(--color-kapur)]"
+    : "border-ink/60 focus-within:border-ink focus-within:shadow-[0_1px_0_var(--color-ink)]";
   const muted = dark ? "text-kapur" : "text-ink-muted";
   const placeholder = dark ? "placeholder:text-kapur/85" : "placeholder:text-ink-muted";
   const err = state.fieldErrors ?? {};
@@ -107,11 +111,11 @@ export function EnquiryForm({
     return (
       <div className="py-6" role="status">
         <Mark className={`h-10 w-10 ${dark ? "text-kapur" : "text-ink"}`} />
-        <h3 ref={successRef} tabIndex={-1} className="t-sub mt-6 outline-none">
-          Thank you, {state.firstName}. Your enquiry is with the studio.
+        <h3 ref={successRef} tabIndex={-1} className="t-title mt-6 outline-none">
+          Thank you, {state.firstName}. Your enquiry is with ROUANG.
         </h3>
         <p className={`mt-4 max-w-[34rem] ${muted}`}>
-          The studio will reply using the details you gave. If something changes in the meantime, you can send
+          We will reply using the details you gave. If something changes in the meantime, you can send
           another note.
         </p>
       </div>
@@ -145,7 +149,7 @@ export function EnquiryForm({
         className="outline-none empty:hidden"
       >
         {state.status === "error" && state.message ? (
-          <div className={`rounded-[2px] border px-4 py-3 text-[0.9375rem] ${dark ? "border-kapur/70" : "border-ink/60"}`}>
+          <div className={`t-meta rounded-[2px] border px-4 py-3 ${dark ? "border-kapur/70" : "border-ink/60"}`}>
             <p>{state.message}</p>
             {errorLinks.length ? (
               <ul className="mt-2 space-y-1">
@@ -174,7 +178,7 @@ export function EnquiryForm({
             defaultValue={v.name}
             aria-invalid={!!err.name}
             aria-describedby={err.name ? `${uid}-name-error` : undefined}
-            className="w-full bg-transparent py-2 text-[1.0625rem] outline-none"
+            className="w-full bg-transparent py-2 t-body outline-none"
           />
         </Field>
         <Field id={`${uid}-email`} label="Email" error={err.email} line={fieldLine} tint={muted} hint="Email or phone, whichever you prefer">
@@ -188,7 +192,7 @@ export function EnquiryForm({
             defaultValue={v.email}
             aria-invalid={!!err.email}
             aria-describedby={`${uid}-email-hint${err.email ? ` ${uid}-email-error` : ""}`}
-            className="w-full bg-transparent py-2 text-[1.0625rem] outline-none"
+            className="w-full bg-transparent py-2 t-body outline-none"
           />
         </Field>
         <Field id={`${uid}-phone`} label="Phone or WhatsApp" error={err.phone} line={fieldLine} tint={muted}>
@@ -202,7 +206,7 @@ export function EnquiryForm({
             defaultValue={v.phone}
             aria-invalid={!!err.phone}
             aria-describedby={err.phone ? `${uid}-phone-error` : undefined}
-            className="w-full bg-transparent py-2 text-[1.0625rem] outline-none"
+            className="w-full bg-transparent py-2 t-body outline-none"
           />
         </Field>
       </div>
@@ -251,7 +255,10 @@ export function EnquiryForm({
           defaultValue={v.message}
           aria-invalid={!!err.message}
           aria-describedby={`${uid}-message-hint${err.message ? ` ${uid}-message-error` : ""}`}
-          className="w-full resize-y bg-transparent py-2 text-[1.0625rem] leading-relaxed outline-none"
+          // Grows with what is typed, from four lines, then scrolls. No drag handle where it grows by
+          // itself: drawing it cost the browser a long stall each time the form came into view. Where
+          // it cannot grow (no field-sizing), the visitor can still drag it taller.
+          className="max-h-[22rem] min-h-[calc(4lh+1rem)] w-full resize-y bg-transparent py-2 t-body outline-none [field-sizing:content] supports-[field-sizing:content]:resize-none"
         />
       </Field>
 
@@ -270,7 +277,7 @@ export function EnquiryForm({
               id={`${uid}-type`}
               name="projectType"
               defaultValue={v.projectType ?? ""}
-              className="w-full appearance-none bg-transparent py-2 text-[1.0625rem] outline-none"
+              className="w-full appearance-none bg-transparent py-2 t-body outline-none"
             >
               <option value="">Choose one</option>
               {category
@@ -299,11 +306,11 @@ export function EnquiryForm({
               maxLength={120}
               placeholder="Area and city"
               defaultValue={v.location}
-              className={`w-full bg-transparent py-2 text-[1.0625rem] outline-none ${placeholder}`}
+              className={`w-full bg-transparent py-2 t-body outline-none ${placeholder}`}
             />
           </Field>
           <Field id={`${uid}-budget`} label="Budget for the whole project" error={err.budget} line={fieldLine} tint={muted}>
-            <select id={`${uid}-budget`} name="budget" defaultValue={v.budget ?? ""} className="w-full appearance-none bg-transparent py-2 text-[1.0625rem] outline-none">
+            <select id={`${uid}-budget`} name="budget" defaultValue={v.budget ?? ""} className="w-full appearance-none bg-transparent py-2 t-body outline-none">
               <option value="">Prefer not to say</option>
               {budgets.map((b) => (
                 <option key={b} value={b}>
@@ -313,7 +320,7 @@ export function EnquiryForm({
             </select>
           </Field>
           <Field id={`${uid}-timeline`} label="When would you like to start?" error={err.timeline} line={fieldLine} tint={muted}>
-            <select id={`${uid}-timeline`} name="timeline" defaultValue={v.timeline ?? ""} className="w-full appearance-none bg-transparent py-2 text-[1.0625rem] outline-none">
+            <select id={`${uid}-timeline`} name="timeline" defaultValue={v.timeline ?? ""} className="w-full appearance-none bg-transparent py-2 t-body outline-none">
               <option value="">Prefer not to say</option>
               {timelines.map((t) => (
                 <option key={t} value={t}>

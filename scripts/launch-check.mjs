@@ -110,9 +110,10 @@ for (const dir of ["projects", "services", "insights"]) {
 // ——— Studio facts and process (read from the config source) ———
 const studioSrc = fs.readFileSync(path.join(root, "src/config/studio.ts"), "utf8");
 for (const m of studioSrc.matchAll(/\{\s*name:\s*"([^"]+)",\s*confirmed:\s*false\s*\}/g)) block("Studio", `service area not confirmed: ${m[1]}`);
-if (/address:\s*null/.test(studioSrc)) warn("Studio", "no studio address (needed for Google Business Profile and LocalBusiness data)");
+if (/address:\s*null/.test(studioSrc)) warn("Studio", "no office address (needed for Google Business Profile and LocalBusiness data)");
+if (/openingHours:\s*null/.test(studioSrc)) warn("Studio", "no opening hours (recommended for Google Business Profile and LocalBusiness data)");
 if (/foundingYear:\s*null/.test(studioSrc)) warn("Studio", "founding year not set");
-// Only steps that render count: one that needs a capability the studio has not confirmed is hidden.
+// Only steps that render count: one that needs a capability the company does not offer is hidden.
 const capability = (name) => new RegExp(`\\b${name}:\\s*true\\b`).test(studioSrc);
 const steps = JSON.parse(fs.readFileSync(path.join(root, "src/config/process-steps.json"), "utf8"));
 const unconfirmedSteps = steps.filter((s) => (!s.requires || capability(s.requires)) && !s.confirmed).map((s) => s.title);
@@ -122,14 +123,17 @@ if (unconfirmedSteps.length) block("Process", `steps not confirmed by the studio
 const need = (key, area, why) => !process.env[key] && block(area, `${key} is not set (${why})`);
 const want = (key, area, why) => !process.env[key] && warn(area, `${key} is not set (${why})`);
 need("NEXT_PUBLIC_SITE_URL", "Environment", "canonical URLs, sitemap and social cards");
-need("STUDIO_LEGAL_NAME", "Environment", "footer and privacy notice need the registered company name");
-need("NEXT_PUBLIC_CONTACT_EMAIL", "Environment", "privacy notice requires a contact for data requests");
+// Company facts come from the environment or from a default in studio.ts, written env("KEY") ?? "value".
+const hasDefault = (key) => new RegExp(`env\\("${key}"\\)\\s*\\?\\?\\s*"[^"]+"`).test(studioSrc);
+const fact = (key, why) => !process.env[key] && !hasDefault(key) && block("Studio", `${key} is not set and src/config/studio.ts has no default (${why})`);
+fact("STUDIO_LEGAL_NAME", "footer and privacy notice need the registered business name");
+fact("NEXT_PUBLIC_CONTACT_EMAIL", "privacy notice requires a contact for data requests");
 const hasDb = process.env.SUPABASE_URL && (process.env.SUPABASE_SECRET_KEY || process.env.SUPABASE_SERVICE_ROLE_KEY);
 const hasMail = process.env.RESEND_API_KEY && process.env.ENQUIRY_NOTIFY_TO && process.env.ENQUIRY_NOTIFY_FROM;
 if (!hasDb && !hasMail) block("Enquiries", "neither Supabase nor email delivery is configured, so the form cannot accept enquiries");
 if (hasDb) need("ENQUIRY_IP_SALT", "Enquiries", "rate limiting needs a private salt");
 if (hasDb && !hasMail) warn("Enquiries", "no email notification: enquiries will only appear in Supabase");
-want("NEXT_PUBLIC_WHATSAPP_NUMBER", "Contact", "WhatsApp buttons are hidden without it");
+want("NEXT_PUBLIC_WHATSAPP_NUMBER", "Contact", "WhatsApp buttons are hidden without it; the profile gives a phone number but does not say it takes WhatsApp");
 want("NEXT_PUBLIC_GA_MEASUREMENT_ID", "Analytics", "no conversion tracking");
 want("GOOGLE_SITE_VERIFICATION", "Search Console", "verify the domain in Search Console (or use DNS verification)");
 const turnstile = { secret: !!process.env.TURNSTILE_SECRET_KEY, site: !!process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY };
@@ -144,14 +148,15 @@ if (turnstile.secret !== turnstile.site) {
 
 // ——— Manual checks that code cannot verify ———
 const manual = [
-  "Privacy notice (English and Bahasa Malaysia) reviewed by the studio's legal adviser",
-  "LAM registration confirmed before any page describes the studio or its people as \"Interior Designers\"",
-  "Legal advice on the descriptor \"Interior design studio\" (src/config/studio.ts descriptor) given the studio's LAM status",
-  "Studio approves the voice copy: About principles, service introductions, the hero and home page lines",
-  "If the studio carries out renovation or fit-out itself: CIDB registration and grade confirmed",
+  "Privacy notice (English and Bahasa Malaysia) reviewed by the company's legal adviser",
+  "LAM registration confirmed before any page describes the company or its people as \"Interior Designers\"",
+  `CIDB registration ${process.env.STUDIO_CIDB_NO || studioSrc.match(/env\("STUDIO_CIDB_NO"\)\s*\?\?\s*"([^"]+)"/)?.[1] || "(not supplied)"} checked on the CIDB public register; the site states no grade`,
+  "Company approves the copy condensed from its profile: About, founders' biographies, service pages, process step lines, home page",
+  "Team members named on the About page are happy to be named",
   "Rembayung: owners' consent to publish the project; scope wording (interior design only) confirmed",
+  "Home page as reviewed needs Rembayung published: until it is, the hero shows a still photograph instead of the film, the flagship is the first published built project with no run of photographs after it, and Inside a project is left out (the section numbers close up)",
   "Google Business Profile created and verified with the same name, address and phone as the site",
-  "Every project film is real footage of that project. No AI-generated interior is shown as a completed space",
+  "Every project film is real footage of that project. The one exception, the home hero's generated film of Rembayung's hall, is captioned \"Interior design · Visualisation\" wherever it shows and is never presented as footage",
 ];
 
 const print = (title, list) => {

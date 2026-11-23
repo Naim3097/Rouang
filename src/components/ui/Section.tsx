@@ -55,7 +55,7 @@ export function Pending({ title, children, tone = "light" }: { title: string; ch
       className={`rounded-[2px] border border-dashed p-5 ${tone === "dark" ? "border-kapur/25 text-mouse" : "border-ink/25 text-ink-muted"}`}
     >
       <p className="t-label mb-2">Awaiting studio · {title}</p>
-      <div className="t-caption text-[0.875rem]">{children}</div>
+      <div className="t-meta">{children}</div>
     </div>
   );
 }

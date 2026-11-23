@@ -29,7 +29,7 @@ export default async function InsightsPage() {
           <div className="page-grid mt-16 gap-y-10 sm:mt-24">
             <Label className="col-span-12 text-ink-muted lg:col-span-3">Insights</Label>
             <div className="col-span-12 lg:col-span-9">
-              <TitlePair as="h1" size="hero" eyebrow="Interior design insights" lead="Notes for people planning a space" italic="written from the drawing board" />
+              <TitlePair as="h1" size="hero" eyebrow="Interior design insights" lead="Notes for people planning a space" follow="written from the drawing board" />
               <p className="mt-8 max-w-[38rem] text-ink-soft">
                 Questions people commonly ask, answered properly: before you hire anyone, before you sign off a layout,
                 and before any work starts on site.
@@ -44,14 +44,14 @@ export default async function InsightsPage() {
             <ol className="border-t border-ink/15">
               {insights.map((a) => (
                 <li key={a.slug} className="border-b border-ink/15">
-                  <Link href={`/insights/${a.slug}`} className="page-grid group gap-y-3 py-10">
+                  <Link href={`/insights/${a.slug}`} className="page-grid gap-y-3 py-10">
                     <p className="t-label col-span-12 text-ink-muted lg:col-span-3">
                       {a.category}
                       {a.isDraft ? " · Draft" : ""}
                     </p>
                     <div className="col-span-12 lg:col-span-6">
-                      <h2 className="t-headline text-[clamp(1.625rem,1.25rem+1.4vw,2.5rem)]">
-                        <span className="link-reveal">{a.title}</span>
+                      <h2 className="t-title">
+                        <span className="link-name">{a.title}</span>
                       </h2>
                       <p className="mt-4 max-w-[36rem] text-ink-soft">{a.description}</p>
                     </div>

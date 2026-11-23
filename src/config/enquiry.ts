@@ -1,6 +1,6 @@
 /**
  * Enquiry form options. Plain data so the client form and the server validation share one list.
- * Budget brackets are provisional until the studio confirms how it wants to qualify enquiries.
+ * Budget brackets are provisional until the company confirms how it wants to qualify enquiries.
  */
 
 export const categories = [
@@ -9,8 +9,10 @@ export const categories = [
 ] as const;
 
 export const projectTypes = {
-  residential: ["Condominium or apartment", "Landed house", "One room or area", "Not sure yet"],
-  // Neutral until the studio confirms office and retail work (the commercial service page is a draft).
+  // New houses are part of the New Build & Construction capability (company profile, p.4).
+  residential: ["Condominium or apartment", "Landed house", "New house", "One room or area", "Not sure yet"],
+  // Restaurants are the commercial work shown so far. The profile names no particular kinds of
+  // commercial space, so the rest stays neutral.
   commercial: ["Restaurant, café or bar", "Another food business", "Another kind of space", "Not sure yet"],
 } as const;
 

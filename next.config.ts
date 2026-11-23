@@ -26,8 +26,7 @@ const nextConfig: NextConfig = {
     // Share cards read their fonts and the project photograph from disk when they are requested,
     // so those files have to travel with the function (public/ is not part of a server bundle).
     "/**/opengraph-image*": [
-      "./node_modules/@fontsource/outfit/files/outfit-latin-{400,500}-normal.woff",
-      "./node_modules/@fontsource/eb-garamond/files/eb-garamond-latin-400-italic.woff",
+      "./node_modules/@fontsource/outfit/files/outfit-latin-{300,400,500}-normal.woff",
       "./public/images/projects/**/*.jpg",
     ],
   },
@@ -47,6 +46,15 @@ const nextConfig: NextConfig = {
         as: "*.css",
       },
     },
+  },
+  // The services were reorganised around the three capabilities in the company profile
+  // (November 2026). The old interior design pages now live under Renovation & Interior.
+  async redirects() {
+    return ["residential-interior-design", "restaurant-interior-design", "commercial-interior-design"].map((slug) => ({
+      source: `/services/${slug}`,
+      destination: "/services/renovation-and-interior",
+      permanent: true,
+    }));
   },
   async headers() {
     const headers = [{ source: "/:path*", headers: securityHeaders }];

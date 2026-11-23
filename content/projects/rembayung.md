@@ -66,8 +66,6 @@ gallery:
     height: 2400
     span: half
     role: material
-    walk: "Batik, carried overhead on timber frames."
-    walkOrder: 2
     caption: "Batik carried on timber frames overhead."
   - src: /images/projects/rembayung/rembayung-long-hall.jpg
     alt: "A long dining hall under the A-frame roof, divided down its length by a planted banquette"
@@ -82,8 +80,6 @@ gallery:
     height: 2400
     span: narrow
     role: material
-    walk: "A timber counter, detailed with a routed edge."
-    walkOrder: 4
     caption: "Edge detail on a timber counter."
   - src: /images/projects/rembayung/rembayung-rattan-pendant.jpg
     alt: "A large rattan pendant lamp hanging under the steel and timber roof, with tables below"
@@ -91,24 +87,18 @@ gallery:
     height: 2400
     span: half
     role: space
-    walk: "Rattan pendants hang low over the tables."
-    walkOrder: 5
   - src: /images/projects/rembayung/rembayung-gable-dining.jpg
     alt: "Dining tables with rattan-backed chairs beneath the glazed gable, behind a slatted timber screen"
     width: 1350
     height: 2400
     span: half
     role: space
-    walk: "Dining tables beneath the building's glazed gable, behind a slatted timber screen."
-    walkOrder: 1
   - src: /images/projects/rembayung/rembayung-stained-glass-screen.jpg
     alt: "A partition of corrugated and stained glass in green, blue and amber, hung with woven trays and the Rembayung name"
     width: 1350
     height: 2400
     span: half
     role: material
-    walk: "Stained glass in green, blue and amber, hung with woven trays."
-    walkOrder: 6
     caption: "Stained glass, woven trays and the restaurant's name."
   - src: /images/projects/rembayung/rembayung-batik-shelves.jpg
     alt: "Timber shelving stacked with folded batik cloth above a slatted base"
@@ -122,8 +112,6 @@ gallery:
     height: 2400
     span: half
     role: whole
-    walk: "The ground-floor dining room: bentwood chairs, timber blinds, terracotta underfoot."
-    walkOrder: 3
   - src: /images/projects/rembayung/rembayung-upper-dining.jpg
     alt: "Upstairs dining under the pitched timber roof, with rows of tables and planters along the edge"
     width: 1350
@@ -189,7 +177,7 @@ lighting: >-
 challenges: []
 quote: null
 services:
-  - restaurant-interior-design
+  - renovation-and-interior
 facts:
   - label: ROUANG's role
     value: Interior design only. Construction was not part of ROUANG's scope.

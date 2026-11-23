@@ -1,0 +1,452 @@
+/* Home, 01 Work: the section's title and the flagship scene (SelectedWork.tsx, FlagshipScene.tsx). Imported by globals.css. */
+
+/* ——— 01 Work: the flagship scene, then the showcase. ———
+   With scroll-driven animation and motion allowed (any screen size), one stage stays pinned for the
+   whole scene. Its run, as offsets into the pinned scroll, where --lead is the moment the title is
+   fully in:
+     the title      fades in, centred on the dark ground. After the film, at 40-75svh: the scene
+                    pins over the hero's last screen with its own ground clear while the film fades
+                    out beneath it (styles/home/hero.css), and the title waits until the film and its
+                    caption have gone. Otherwise it fades in as the scene comes up the screen.
+     +25 to +95     the flagship comes in from the right over the title, its photograph travelling at
+                    about half the speed of its frame, so the picture is drawn open rather than slid
+                    in; the title drifts left and fades beneath it
+     +60 to +125    the shade, the name and the facts gather at the photograph's foot
+     +125 to +155   it holds (keyboard focus on its links lands here: FlagshipRun)
+     +155 on        the strip moves right to left, steadily, faster than the page would,
+                    and four tall photographs of the project come in after the flagship, each the full
+                    height of the screen, each picture drifting slowly inside its frame, until the last
+                    meets the right edge
+     then 20svh     it holds, and the page moves on to the other projects, flush against the strip
+   Only transforms and opacity animate.
+   Without it, or with reduced motion: the title, the photograph with its facts, then the four
+   photographs as a contact sheet, one after another, with their captions beneath. */
+
+.work-intro {
+  padding-block: var(--section-space) clamp(3rem, 6vw, 5rem);
+}
+
+@media (min-width: 64rem) {
+  .work-lead {
+    position: relative;
+    height: 100svh;
+    min-height: 40rem;
+  }
+
+  .work-photo {
+    position: absolute;
+    inset: 0;
+  }
+
+  .work-facts {
+    position: absolute;
+    inset-inline: 0;
+    bottom: 0;
+  }
+
+  /* Over the photograph the small labels (the eyebrow, the title block's terms) are Milky White, not
+     Mouse Grey, which falls under 4.5:1 where the shade thins out over the window. */
+  .work-facts .t-label {
+    color: rgb(243 243 243 / 0.75);
+  }
+}
+
+.work-drift {
+  position: absolute;
+  inset: 0;
+}
+
+/* Shade drawn from the floor of the photograph up, deepest under the words. */
+.work-shade {
+  background:
+    linear-gradient(to top, rgb(20 20 20 / 0.92) 0%, rgb(20 20 20 / 0.7) 32%, rgb(20 20 20 / 0.22) 56%, rgb(20 20 20 / 0) 70%),
+    linear-gradient(to right, rgb(20 20 20 / 0.32) 0%, rgb(20 20 20 / 0) 50%);
+}
+
+/* The contact sheet: two across, four on large screens. */
+.work-views {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 2.25rem var(--grid-gap);
+  padding-inline: var(--page-gutter);
+  padding-bottom: var(--section-space);
+}
+
+@media (min-width: 64rem) {
+  .work-views {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    padding-top: clamp(3rem, 6vw, 5rem);
+  }
+}
+
+.work-view-frame {
+  position: relative;
+  aspect-ratio: 3 / 4;
+  overflow: hidden;
+  background: var(--color-ink-raised);
+}
+
+.work-view-caption {
+  display: flex;
+  flex-direction: column;
+  gap: 0.375rem;
+  margin-top: 0.875rem;
+}
+
+.work-view-caption .t-label {
+  color: var(--color-mouse);
+}
+
+.work-view-caption .t-meta {
+  color: rgb(243 243 243 / 0.85);
+}
+
+.work-hold {
+  position: absolute;
+  left: 0;
+  width: 1px;
+  visibility: hidden;
+  pointer-events: none;
+}
+
+@supports (animation-timeline: view()) {
+  @media (prefers-reduced-motion: no-preference) {
+    /* The timeline ignores the header's scroll padding (view-timeline-inset), so contain 0% is
+       exactly the moment the scene's top reaches the top of the screen and the stage pins. The
+       strip travels the width of its photographs and the gaps between them (--travel), over
+       seven-tenths of that in scroll (--pan).
+       The photographs are sized so the run ends on a composed frame, --k of them across the screen
+       edge to edge: two on a 16:10 or 4:3 screen, three on a 16:9 one or wider, which keeps each a
+       tall picture (between about 3:5 and 4:5). On an upright screen one photograph is most of the
+       width, with a glimpse of its neighbour. --view-w is the same width in the page's units, for
+       the scroll it takes; inside the stage it is measured in the stage's own (.work-view). */
+    .work-scene {
+      --lead: 0svh;
+      --gap: clamp(0.5rem, 0.9vw, 0.875rem);
+      --k: 1.2;
+      --view-w: calc((100vw - (var(--k) - 1) * var(--gap)) / var(--k));
+      --travel: calc(var(--views) * (var(--view-w) + var(--gap)));
+      --pan: calc(var(--travel) * 0.7);
+      --ease-pan: cubic-bezier(0.3, 0.1, 0.7, 0.9);
+      height: calc(100lvh + var(--lead) + 175svh + var(--pan));
+      view-timeline: --work block;
+      view-timeline-inset: 0px;
+    }
+
+    @media (min-aspect-ratio: 1/1) {
+      .work-scene {
+        --k: 2;
+      }
+    }
+
+    @media (min-aspect-ratio: 17/10) {
+      .work-scene {
+        --k: 3;
+      }
+    }
+
+    /* After the film: the scene starts 40svh before the hero lets go, so its stage pins over the
+       hero's last screen while the film fades to dark beneath it. Its ground is clear for as long
+       as it lies over the hero, and dark below, where the hero ends: when the hero then scrolls
+       away, dark ground meets dark ground and nothing is seen to move. */
+    .home-hero[data-film="on"] + .work-section > .work-scene {
+      --lead: 75svh;
+      margin-top: calc(-100lvh - 40svh);
+      background: linear-gradient(to bottom, transparent calc(100lvh + 40svh), var(--color-ink) 0);
+    }
+
+    .work-stage {
+      position: sticky;
+      top: 0;
+      height: 100lvh;
+      overflow: clip;
+      container-type: size;
+    }
+
+    /* The title is centred in the small viewport, the part of the screen above a phone's toolbar. */
+    .work-intro {
+      position: absolute;
+      inset: 0 0 auto;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      height: 100svh;
+      padding-block: calc(var(--header-h) * 0.5) 0;
+      animation: work-intro-in var(--ease-scrub) both;
+      animation-timeline: --work;
+      animation-range: entry 30% entry 90%;
+    }
+
+    .home-hero[data-film="on"] + .work-section .work-intro {
+      animation-range: contain 40svh contain 75svh;
+    }
+
+    /* Leaving is on the inner block, so each element runs one animation. */
+    .work-intro-inner {
+      animation: work-intro-out var(--ease-scrub) both;
+      animation-timeline: --work;
+      animation-range: contain calc(var(--lead) + 25svh) contain calc(var(--lead) + 85svh);
+    }
+
+    .work-feature,
+    .work-track {
+      position: absolute;
+      inset: 0;
+    }
+
+    .work-track {
+      animation: work-enter var(--ease-scrub) both;
+      animation-timeline: --work;
+      animation-range: contain calc(var(--lead) + 25svh) contain calc(var(--lead) + 95svh);
+    }
+
+    /* The flagship's panel, a screen wide, then the four photographs, in one row the full height of
+       the stage. It moves until its right edge meets the stage's. */
+    .work-strip {
+      display: flex;
+      gap: var(--gap);
+      width: max-content;
+      height: 100%;
+      animation: work-pan var(--ease-pan) both;
+      animation-timeline: --work;
+      animation-range: contain calc(var(--lead) + 155svh) contain calc(var(--lead) + 155svh + var(--pan));
+    }
+
+    .work-lead {
+      position: relative;
+      flex: none;
+      width: 100cqw;
+      height: 100%;
+      min-height: 0;
+      overflow: clip;
+    }
+
+    .work-photo {
+      position: absolute;
+      inset: 0;
+      aspect-ratio: auto;
+    }
+
+    .work-photo-inner {
+      animation: work-reveal var(--ease-scrub) both;
+      animation-timeline: --work;
+      animation-range: contain calc(var(--lead) + 25svh) contain calc(var(--lead) + 95svh);
+    }
+
+    /* Each picture is a little wider than its frame and drifts across it, slower than the strip. */
+    .work-drift {
+      inset: 0 -6%;
+      animation: work-drift linear both;
+      animation-timeline: --work;
+      animation-range: contain calc(var(--lead) + 155svh) contain calc(var(--lead) + 155svh + var(--pan));
+    }
+
+    .work-shade {
+      display: block;
+      animation: work-fade var(--ease-scrub) both;
+      animation-timeline: --work;
+      animation-range: contain calc(var(--lead) + 60svh) contain calc(var(--lead) + 100svh);
+    }
+
+    .work-facts {
+      position: absolute;
+      inset-inline: 0;
+      bottom: 0;
+      padding-top: 0;
+      padding-bottom: max(2rem, 5svh);
+    }
+
+    .work-fact {
+      animation: work-fact var(--ease-scrub) both;
+      animation-timeline: --work;
+      animation-range: contain calc(var(--lead) + 80svh) contain calc(var(--lead) + 112svh);
+    }
+
+    .work-facts-side .work-fact {
+      animation-range: contain calc(var(--lead) + 90svh) contain calc(var(--lead) + 125svh);
+    }
+
+    /* The name rises from behind its own baseline. */
+    .work-title-line {
+      animation: work-line var(--ease-scrub) both;
+      animation-timeline: --work;
+      animation-range: contain calc(var(--lead) + 75svh) contain calc(var(--lead) + 108svh);
+    }
+
+    .work-views {
+      display: flex;
+      gap: var(--gap);
+      height: 100%;
+      padding: 0;
+    }
+
+    .work-view {
+      flex: none;
+      width: calc((100cqw - (var(--k) - 1) * var(--gap)) / var(--k));
+      height: 100%;
+    }
+
+    .work-view-figure {
+      position: relative;
+      height: 100%;
+    }
+
+    .work-view-frame {
+      position: absolute;
+      inset: 0;
+      aspect-ratio: auto;
+    }
+
+    /* The header crosses the photographs: a scrim along their top keeps its small white text clear
+       of a pale ceiling or the white of the batik. */
+    .work-photo::after,
+    .work-view-frame::after {
+      content: "";
+      position: absolute;
+      inset: 0 0 auto;
+      height: calc(var(--header-h) + 5rem);
+      background: linear-gradient(to bottom, rgb(14 14 14 / 0.45), rgb(14 14 14 / 0));
+      pointer-events: none;
+    }
+
+    /* Number and caption at the foot of each photograph, level with the flagship's facts, on a shade
+       that keeps them AA over the palest floor. */
+    .work-view-caption {
+      position: absolute;
+      inset-inline: 0;
+      bottom: 0;
+      margin: 0;
+      padding: 5rem clamp(1.25rem, 2vw, 1.75rem) max(2rem, 5svh);
+      background: linear-gradient(to top, rgb(14 14 14 / 0.84) 0%, rgb(14 14 14 / 0.75) 58%, rgb(14 14 14 / 0) 100%);
+    }
+
+    /* The number is as clear as the caption line under it. */
+    .work-view-caption .t-label {
+      color: rgb(243 243 243 / 0.92);
+    }
+
+    .work-view-caption .t-meta {
+      max-width: 28rem;
+      color: rgb(243 243 243 / 0.92);
+    }
+
+    .work-hold {
+      top: calc(var(--lead) + 125svh);
+      height: 30svh;
+    }
+  }
+
+  /* Short landscape screens: keep the label, the name (a link to the case study) and the summary
+     line; the facts table and its link would not fit above the fold. */
+  @media (max-height: 30rem) and (prefers-reduced-motion: no-preference) {
+    .work-facts-side {
+      display: none;
+    }
+  }
+
+  /* Phones and tablets in the pinned scene: the facts sit closer together so the photograph keeps
+     the upper half. The type keeps its levels from the scale. */
+  @media (max-width: 63.999rem) and (prefers-reduced-motion: no-preference) {
+    .work-facts .page-grid {
+      row-gap: 1.25rem;
+    }
+
+    .work-facts .t-sub {
+      margin-top: 0.75rem;
+    }
+
+    /* Clear of the floating action bar (12px from the bottom of the visible screen, 48px tall),
+       also while the browser's toolbar shows and the stage (100lvh) runs below the screen. */
+    .work-facts,
+    .work-view-caption {
+      padding-bottom: calc(max(2rem, 5svh) + 3.75rem + 100lvh - 100svh + env(safe-area-inset-bottom, 0px));
+    }
+
+    .work-facts .t-label {
+      color: var(--color-kapur);
+      text-shadow: 0 0 12px rgb(0 0 0 / 0.6);
+    }
+
+    .work-facts .t-sub {
+      color: var(--color-kapur);
+    }
+
+    /* The shade reaches higher and stays deeper, so the eyebrow and the summary read over the lit
+       timber ceiling where they hold. */
+    .work-shade {
+      background: linear-gradient(
+        to top,
+        rgb(20 20 20 / 0.92) 0%,
+        rgb(20 20 20 / 0.8) 45%,
+        rgb(20 20 20 / 0.72) 62%,
+        rgb(20 20 20 / 0.4) 74%,
+        rgb(20 20 20 / 0) 86%
+      );
+    }
+  }
+}
+
+/* Fully shown well before the title settles. */
+@keyframes work-intro-in {
+  from {
+    opacity: 0;
+    translate: 0 0.75rem;
+  }
+}
+
+@keyframes work-intro-out {
+  to {
+    opacity: 0;
+    translate: -10cqw 0;
+  }
+}
+
+/* The track starts a screen's width to the right. */
+@keyframes work-enter {
+  from {
+    translate: 100cqw 0;
+  }
+}
+
+/* The picture starts held back inside its frame, a little closer, and settles as the frame arrives. */
+@keyframes work-reveal {
+  from {
+    translate: -55% 0;
+    scale: 1.08;
+  }
+}
+
+/* Until the strip's right edge meets the stage's. */
+@keyframes work-pan {
+  to {
+    translate: calc(100cqw - 100%) 0;
+  }
+}
+
+@keyframes work-drift {
+  from {
+    translate: -4% 0;
+  }
+  to {
+    translate: 4% 0;
+  }
+}
+
+@keyframes work-fade {
+  from {
+    opacity: 0;
+  }
+}
+
+@keyframes work-fact {
+  from {
+    opacity: 0;
+    translate: 0 1.25rem;
+  }
+}
+
+@keyframes work-line {
+  from {
+    translate: 0 105%;
+  }
+}

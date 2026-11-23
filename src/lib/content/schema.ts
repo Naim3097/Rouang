@@ -47,10 +47,6 @@ export const galleryItem = z.union([
     span: z.enum(["full", "wide", "half", "narrow"]).default("half"),
     /** The brand kit's three kinds of picture. */
     role: z.enum(["space", "material", "whole"]).optional(),
-    /** Include in the scroll walkthrough, with this line as its caption. */
-    walk: z.string().optional(),
-    /** Position in the walkthrough, which tells the story in its own order (rooms first, then details). */
-    walkOrder: z.number().optional(),
   }),
   pendingImage.extend({ span: z.enum(["full", "wide", "half", "narrow"]).default("half") }),
 ]);
@@ -138,12 +134,14 @@ export const projectSchema = z.strictObject({
 export const serviceSchema = z.strictObject({
   title: z.string(),
   status,
-  sector: z.enum(["residential", "commercial"]),
+  /** Who the service is for. A service for one sector preselects it on the enquiry form. */
+  sectors: z.array(z.enum(["residential", "commercial"])).min(1),
   navLabel: z.string(),
   order: z.number().default(100),
   kicker: z.string(),
   headline: z.string(),
-  headlineItalic: z.string(),
+  /** The second, lighter line of the page's title pair. */
+  headlineFollow: z.string(),
   summary: z.string(),
   audience: z.array(z.string()).min(1),
   offers: z.array(z.strictObject({ title: z.string(), body: z.string(), confirmed: z.boolean() })).min(1),
@@ -171,7 +169,7 @@ export const insightSchema = z.strictObject({
   ]),
   publishedAt: isoDate,
   updatedAt: isoDate.optional(),
-  author: z.string().default("ROUANG Studio"),
+  author: z.string().default("ROUANG"),
   /** Editorial intent, kept with the article so its job is never forgotten. */
   purpose: z.string(),
   audience: z.string(),

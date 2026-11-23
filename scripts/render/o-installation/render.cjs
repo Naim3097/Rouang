@@ -10,8 +10,9 @@
  *      path-traces the render passes (light groups) and rasterises the
  *      see-through matte
  *   4. "develops" the raw float images in Node: adds up the passes, then
- *      exposure, tone mapping (AgX), a very gentle vignette and film grain,
- *      alpha from the matte
+ *      white balance, exposure, tone mapping (AgX), a little colour back in
+ *      the brightest tones, a very gentle vignette and film grain, alpha
+ *      from the matte
  *   5. writes the site assets (WebP with alpha, the scenery JPEG, the layout
  *      JSON) and preview images for judging
  *
@@ -47,11 +48,13 @@ const opt = (name, def) => {
  * afterwards. The single-group passes are there for look development.
  */
 const PASSES = {
-  main: { sun: 1, sky: 1, scenery: 1 },
+  main: { sun: 1, sky: 1, fill: 1, scenery: 1, vsun: 1 },
   led: { led: 1 },
   sun: { sun: 1 },
   sky: { sky: 1 },
+  fill: { fill: 1 },
   scenery: { scenery: 1 },
+  vsun: { vsun: 1 },
 };
 
 const OPTS = {
@@ -93,10 +96,6 @@ const OUT_JSON = path.join(OUT_HERO, 'o-installation.json');
 const OUT_SCENERY = path.join(OUT_HERO, 'o-scenery.jpg');
 const SCENERY_SRC = path.join(HERE, 'scenery-source.jpg');
 
-// How the site places the photo behind the opening (see README): scale it to
-// cover the frame, then reduce it to this share of the cover size, centred
-// on the see-through region.
-const SITE_PHOTO_SCALE = { desktop: 0.8, portrait: 0.45 };
 
 // WebP encoding of the site images: lossy colour, lossless alpha (alphaQuality
 // 100), no metadata (sharp writes none unless asked).
@@ -113,18 +112,25 @@ const WEBP = {
 
 // Develop settings (applied in Node to the linear float render).
 const GRADE = {
-  exposureStops: 1.95, // base exposure, plus --exposure
-  whiteBalance: [1.05, 1.0, 0.91], // linear RGB gains before tone mapping (a touch warm)
-  vignette: 0.16, // darkening at the far corners (linear light)
+  exposureStops: 1.45, // base exposure, plus --exposure
+  // linear RGB gains before tone mapping: a touch cooler than neutral (as a
+  // camera balanced for the shade would be), so the shade reads as a neutral
+  // warm grey while the low sun stays golden
+  whiteBalance: [0.96, 1.0, 1.04],
+  vignette: { desktop: 0.1, portrait: 0.07 }, // darkening at the far corners (linear light)
   grain: 1.1, // film grain strength (8-bit levels, standard deviation in mid-tones)
   saturation: 1.0,
-  contrast: 0.15, // gentle extra S-curve after AgX (0 = none)
+  // AgX lets bright colours drift toward white faster than film does; this
+  // gives back some colour in the brightest tones only (0 = plain AgX)
+  highlightSaturation: 0.8,
+  contrast: 0.14, // gentle extra S-curve after AgX (0 = none)
   // strength of each pass in the final image (the single light groups are
-  // for look development; main = sun + sky + scenery)
-  mix: { main: 1, led: 0.6, sun: 1, sky: 1, scenery: 1 },
+  // for look development; main = sun + sky + fill + scenery + vsun)
+  mix: { main: 1, led: 0.44, sun: 1, sky: 1, fill: 1, scenery: 1, vsun: 1 },
   // look development: --grade '{"contrast":0.1}' overrides any of the above
   ...JSON.parse(String(opt('grade', '{}'))),
 };
+const vignetteFor = (view) => (typeof GRADE.vignette === 'number' ? GRADE.vignette : GRADE.vignette[view] || 0);
 
 // ---------------------------------------------------------------------------
 // Static file server for the render page
@@ -236,7 +242,7 @@ async function renderAll() {
       } catch (e) {
         const msg = String(e && e.message);
         const lost = /context lost|Target closed|Session closed|crash/i.test(msg);
-        if (!lost || restarts >= 6) throw e;
+        if (!lost || restarts >= 40) throw e;
         restarts++;
         console.log(`  ${what}: ${msg.split('\n')[0]}; restarting Chrome (${restarts})`);
         await session.browser.close().catch(() => {});
@@ -295,7 +301,8 @@ async function renderAll() {
         const mt = flipRows(new Float32Array((await fetchResult(page, m.bytes)).buffer.slice(0)), m.width, m.height, 1);
         let seen = 0;
         for (let i = 0; i < mt.length; i += 13) seen += mt[i];
-        if (!(seen > 0)) throw new Error('WebGL context lost (empty matte)');
+        // (a crop window may legitimately show no scenery at all)
+        if (!(seen > 0) && !OPTS.crop) throw new Error('WebGL context lost (empty matte)');
         return mt;
       });
       fs.writeFileSync(path.join(OPTS.cache, `${tag}-matte.f32`), Buffer.from(matte.buffer));
@@ -401,7 +408,7 @@ function grainField(width, height, seed) {
  *   matte:  float, 1 where the scenery is seen
  * Returns RGBA 8-bit with straight (not premultiplied) colour.
  */
-function develop(passes, matte, width, height, { exposureStops, whiteBalance, vignette, grain, saturation, contrast }) {
+function develop(passes, matte, width, height, { exposureStops, whiteBalance, vignette, grain, saturation, highlightSaturation, contrast }) {
   const N = width * height;
   const out = Buffer.alloc(N * 4);
   const exp = Math.pow(2, exposureStops);
@@ -437,7 +444,8 @@ function develop(passes, matte, width, height, { exposureStops, whiteBalance, vi
     c = agx(c);
     // optional saturation and contrast tweaks in display space
     const L = 0.2126 * c[0] + 0.7152 * c[1] + 0.0722 * c[2];
-    c = c.map((v) => L + (v - L) * saturation);
+    const hs = highlightSaturation ? highlightSaturation * Math.min(1, Math.max(0, (L - 0.2) / 0.5)) : 0;
+    c = c.map((v) => L + (v - L) * (saturation + hs));
     let s = c.map((v) => toSrgb(Math.min(Math.max(v, 0), 1)));
     if (contrast) s = s.map((v) => v + contrast * (v - 0.5) * (1 - Math.abs(2 * v - 1)) * 1.0);
     if (grainN) {
@@ -521,7 +529,7 @@ async function writeOutputs() {
     about: 'Geometry of the O installation hero renders. All positions are normalised image coordinates (0..1 of width and height, origin top-left). See scripts/render/o-installation/README.md.',
     generatedBy: 'scripts/render/o-installation/render.cjs',
     markViewBox: [0, 0, 266.64, 261.71],
-    sitePhotoPlacement: { rule: 'cover the frame, then scale to this share of the cover size, centred on seeThrough.center', scale: SITE_PHOTO_SCALE },
+    sitePhotoPlacement: null, // filled in from the scene below
     views: {},
   };
 
@@ -536,7 +544,7 @@ async function writeOutputs() {
       weight: (GRADE.mix[pass] === undefined ? 1 : GRADE.mix[pass]) * (OPTS.weights[pass] === undefined ? 1 : OPTS.weights[pass]),
     }));
     const matte = readF32(path.join(OPTS.cache, `${tag}-matte.f32`));
-    const grade = { ...GRADE, exposureStops: GRADE.exposureStops + OPTS.exposure, ...(OPTS.crop ? { vignette: 0 } : {}) };
+    const grade = { ...GRADE, exposureStops: GRADE.exposureStops + OPTS.exposure, vignette: OPTS.crop ? 0 : vignetteFor(view) };
     const t0 = Date.now();
     const rgba = develop(passes, matte, W, H, grade);
     console.log(`develop ${view} (${passes.map((p) => `${p.pass} x${p.weight}`).join(' + ')}): ${((Date.now() - t0) / 1000).toFixed(1)} s`);
@@ -555,7 +563,7 @@ async function writeOutputs() {
     const webpFile = final && !OPTS.tag ? path.join(OUT_HERO, `o-installation-${view}.webp`) : path.join(OPTS.previews, `o-installation-${tag}.webp`);
     const info = await img.clone().webp(WEBP).toFile(webpFile);
     // the same pixels without compression, for judging what the encoder costs
-    await img.clone().png({ compressionLevel: 6 }).toFile(path.join(OPTS.previews, `${view}${OPTS.tag ? '-' + OPTS.tag : ''}-lossless.png`));
+    await img.clone().png({ compressionLevel: 6 }).toFile(path.join(OPTS.previews, OPTS.crop ? `${tag}-lossless.png` : `${view}${OPTS.tag ? '-' + OPTS.tag : ''}-lossless.png`));
     console.log(`  wrote ${webpFile} (${(info.size / 1024).toFixed(0)} KB)`);
 
     // a crop window (look development): just the developed pixels over a dark background
@@ -568,6 +576,14 @@ async function writeOutputs() {
     // layout for the site, refined with the matte image itself
     const L = meta.layout;
     L.seeThrough = { ...matteBox(matte, W, H, 0.5), source: 'matte pass, pixels with alpha below 0.5' };
+    const PH = meta.settings.PHOTO;
+    json.sitePhotoPlacement = {
+      rule: 'scale the photo to cover the frame, then to `scale` of that cover size; centre it horizontally at 0.5 + offsetX of the frame width; place it vertically so its horizon (photoHorizon, a share of its height) lies on views.<view>.horizonY. views.<view>.photo is the resulting rectangle.',
+      scale: Object.fromEntries(Object.entries(PH.placement).map(([k, p]) => [k, p.scale])),
+      offsetX: Object.fromEntries(Object.entries(PH.placement).map(([k, p]) => [k, p.offsetX])),
+      photoHorizon: PH.horizon,
+      photoSun: PH.sun,
+    };
     json.views[view] = r6({
       file: `/images/hero/o-installation-${view}.webp`,
       width: L.width,
@@ -578,6 +594,8 @@ async function writeOutputs() {
       seeThrough: L.seeThrough,
       emblemCenter: L.emblemCenter,
       floorLine: L.floorLine,
+      horizonY: L.horizonY,
+      photo: L.photo,
       innerContourPoints: L.innerContourPoints,
       camera: L.camera,
       render: { samples: meta.samples, renderedWidth: W, renderedHeight: H },
@@ -586,11 +604,8 @@ async function writeOutputs() {
     // ---------- previews ----------
     const pv = (name) => path.join(OPTS.previews, `${view}${OPTS.tag ? '-' + OPTS.tag : ''}-${name}`);
     // 1. the beauty over the ORIGINAL photo, placed the way the site does it
-    const cover = Math.max(W / 1600, H / 900);
-    const k = SITE_PHOTO_SCALE[view];
-    const pw = Math.round(1600 * cover * k), ph = Math.round(900 * cover * k);
-    const c = L.seeThrough.center;
-    const left = Math.round(c[0] * W - pw / 2), top = Math.round(c[1] * H - ph / 2);
+    const pw = Math.round(L.photo.width * W), ph = Math.round(L.photo.height * H);
+    const left = Math.round(L.photo.x * W), top = Math.round(L.photo.y * H);
     const photo = await sharp(SCENERY_SRC).resize(pw, ph, { kernel: 'lanczos3' }).removeAlpha().raw().toBuffer();
     // place the photo on a canvas the size of the frame (it may hang over the edges)
     const bgRaw = Buffer.alloc(W * H * 3);

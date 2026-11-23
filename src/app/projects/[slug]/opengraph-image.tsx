@@ -18,7 +18,7 @@ export default async function Image({ params }: { params: Promise<{ slug: string
       // A render on a share card must say what it is, just as it does on the page.
       kicker: p ? [p.type, p.location, p.visualisation ? "Design proposal" : null].filter(Boolean).join(" · ") : "Project",
       title: p ? p.title : "ROUANG",
-      italic: p ? (p.visualisation ? "Design proposal by ROUANG" : "Interior design by ROUANG") : undefined,
+      follow: p ? (p.visualisation ? "Design proposal by ROUANG" : "Interior design by ROUANG") : undefined,
       image: img && !("pending" in img) ? img.src : null,
     }),
   );

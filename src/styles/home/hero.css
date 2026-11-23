@@ -1,0 +1,374 @@
+/* Home: the hero and the intro (HomeHero.tsx, HeroFilm.tsx, HeroIntroControl.tsx). Imported by globals.css. */
+
+/* ——— Hero: the Rembayung film, run by the scroll, with the statement centred over it. ———
+   With the film on (HomeHero's script, or HeroFilm after a navigation within the site, sets
+   data-film="on" before first paint: motion allowed, no Data Saver), the hero is 240svh of scroll
+   taller than the screen and its stage stays pinned while that scroll passes; HeroFilm turns the
+   scroll into the film's time and writes how far through it is to --film-p (0-1).
+     0-25svh      the statement fades and rises a little; the shade behind it goes with it
+     0-180svh     the film runs, from the empty shell to the finished room
+     180-200svh   the finished room holds
+     200-240svh   the whole stage, film and caption together, fades to the dark ground. 01 Work's
+                  scene is already pinned over it by then, its own ground clear (styles/home/work.css),
+                  and "Selected work" fades in where the film was the moment it has gone. Then the
+                  hero lets go, on the same dark ground as the scene, so nothing is seen to slide.
+   The stage is as tall as the large viewport, so no strip opens beneath it on a phone whose toolbar
+   slides away, and the words keep to the small one, above the toolbar.
+   Otherwise (reduced motion, Data Saver, no script, or the photograph standing in for the film)
+   the hero is one still, the height of the small viewport, taller only if the words need more
+   room, and nothing pins.
+   The write-up stands in the middle of the screen, on the film's axis: the A-frame, the gable and
+   the pavilion are all centred in the frame. The caption is centred at the foot.
+   The scrim darkens the top for the white header (enough for its small text over a white sky); the
+   shade is a band along the foot for the caption; the statement carries a soft pool of its own. */
+
+.home-hero {
+  --film-p: 0;
+  min-height: 100svh;
+}
+
+.home-hero[data-film="on"] {
+  height: calc(100lvh + 240svh);
+}
+
+.home-hero-stage {
+  position: sticky;
+  top: 0;
+  display: flex;
+  flex-direction: column;
+  min-height: 100svh;
+  overflow: hidden;
+}
+
+.home-hero[data-film="on"] .home-hero-stage {
+  height: 100lvh;
+}
+
+/* The words fill the small viewport: the statement in the middle of what the header and the caption
+   leave, set below the true centre (twice the space above it as below), so it sits over the hall's
+   back wall, under the gable's bright glass and the mezzanine rail. On an upright phone the gable
+   takes more of the height, so the words sit lower still, the roof's apex pointing down to them. */
+.home-hero-body {
+  display: grid;
+  grid-template-rows: 2fr auto 1fr auto;
+  min-height: 100svh;
+  padding-top: calc(var(--header-h) + 1.5rem);
+  padding-bottom: max(2.25rem, 6svh);
+  text-align: center;
+}
+
+@media (max-width: 40rem) {
+  .home-hero-body {
+    grid-template-rows: 4fr auto 1fr auto;
+  }
+}
+
+.home-hero[data-film="on"] .home-hero-body {
+  margin-bottom: calc(100lvh - 100svh);
+}
+
+/* The words carry their own shade: a soft pool centred on them at any size, flat across the text and
+   falling away beyond it (::before, behind the words in their own stacking context). It goes with
+   them when they fade as the film starts, so the film runs undimmed. A faint halo keeps each letter
+   off the brightest detail. In the still (reduced motion, Data Saver) the words stay over the
+   finished room, its rail and lamps behind them, so the pool is a fifth deeper there. */
+.home-hero-copy {
+  --pool: 1;
+  grid-row: 2;
+  justify-self: center;
+  position: relative;
+  isolation: isolate;
+  padding-block: 1.5rem;
+  text-shadow: 0 0 1.5rem rgb(14 14 14 / 0.45);
+}
+
+.home-hero:not([data-film="on"]) .home-hero-copy {
+  --pool: 1.2;
+}
+
+/* In the still, the finished room is drawn a fifth larger from its top edge (a third on an upright
+   screen, where the words sit lower), so the pavilion's lit sign falls below the words instead of
+   running between the statement and the line beneath it. The gable still crowns the screen. */
+.home-hero:not([data-film="on"]) .home-hero-stage > [role="img"] {
+  scale: 1.2;
+  transform-origin: 50% 0;
+}
+
+@media (orientation: portrait) {
+  .home-hero:not([data-film="on"]) .home-hero-stage > [role="img"] {
+    scale: 1.32;
+  }
+}
+
+.home-hero-copy::before {
+  content: "";
+  position: absolute;
+  z-index: -1;
+  left: 50%;
+  top: 50%;
+  width: calc(100% + 30rem);
+  height: calc(100% + 16rem);
+  translate: -50% -50%;
+  background: radial-gradient(
+    closest-side,
+    rgb(14 14 14 / calc(0.64 * var(--pool))) 0%,
+    rgb(14 14 14 / calc(0.58 * var(--pool))) 55%,
+    rgb(14 14 14 / calc(0.26 * var(--pool))) 80%,
+    rgb(14 14 14 / 0) 100%
+  );
+  pointer-events: none;
+}
+
+.home-hero-caption {
+  grid-row: 4;
+  margin-top: 2rem;
+}
+
+/* Phones: once the page moves, the floating action bar (48px, 12px from the foot) takes the bottom
+   right; the caption stands clear above it. */
+@media (max-width: 63.999rem) {
+  .home-hero-body {
+    padding-bottom: calc(3.75rem + max(1rem, 2.5svh));
+  }
+}
+
+/* The fade to the dark ground at the end of the run. Where the scroll can drive it, on the hero's
+   own timeline: contain 0% is the top of the page, so these offsets are the same 200-240svh on any
+   screen, the moment 01 Work's scene pins over the hero and the moment its title starts to show.
+   Elsewhere HeroFilm's --film-p drives it (the scene then simply follows). */
+.home-hero[data-film="on"] .home-hero-stage {
+  opacity: clamp(0, (1 - var(--film-p)) * 6, 1);
+}
+
+@supports (animation-timeline: view()) {
+  .home-hero[data-film="on"] {
+    view-timeline: --hero block;
+    view-timeline-inset: 0px;
+  }
+
+  .home-hero[data-film="on"] .home-hero-stage {
+    opacity: 1;
+    animation: hero-out var(--ease-scrub) both;
+    animation-timeline: --hero;
+    animation-range: contain 200svh contain 240svh;
+  }
+}
+
+@keyframes hero-out {
+  to {
+    opacity: 0;
+  }
+}
+
+/* The stills and the film, bottom to top: the last frame, the first frame, the film. The first
+   frame fades into the last as the page scrolls, so until the film is ready (or if it cannot load)
+   the hero still goes from the shell to the finished room; once it is ready the film fades in over
+   the blend that matches its frame, and the stills keep blending beneath it for whenever the film
+   has to stand aside again (a new cut loading). Without the film, the last frame alone: the
+   finished room. */
+.home-hero:not([data-film="on"]) .home-hero-first,
+.home-hero:not([data-film="on"]) .home-hero-film {
+  display: none;
+}
+
+.home-hero[data-film="on"] .home-hero-first {
+  opacity: clamp(0, 1.4 - var(--film-p) * 2.82, 1);
+}
+
+.home-hero-film {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  opacity: 0;
+  transition: opacity 0.5s var(--ease-settle);
+}
+
+.home-hero[data-film-state="ready"] .home-hero-film {
+  opacity: 1;
+}
+
+/* The statement's 25svh, now over 240svh of run. */
+.home-hero[data-film="on"] .home-hero-copy {
+  opacity: clamp(0, 1 - var(--film-p) * 9.6, 1);
+  translate: 0 calc(var(--film-p) * -12rem);
+}
+
+/* A phone on its side: the words are set a step down the scale (the page-title size) and closer
+   under the header, so they keep to the screen. */
+@media (max-height: 30rem) and (orientation: landscape) {
+  .home-hero-body {
+    padding-top: calc(var(--header-h) + 0.5rem);
+    padding-bottom: 1.25rem;
+  }
+
+  .home-hero-copy {
+    padding-block: 0.5rem;
+  }
+
+  .home-hero-caption {
+    margin-top: 0.75rem;
+  }
+
+  .home-hero h1 {
+    font-size: var(--fs-h1);
+  }
+}
+
+.home-hero-scrim {
+  background: linear-gradient(to bottom, rgb(14 14 14 / 0.7) 0, rgb(14 14 14 / 0.6) var(--header-h), rgb(14 14 14 / 0.24) calc(var(--header-h) + 4rem), rgb(14 14 14 / 0) calc(var(--header-h) + 10rem));
+}
+
+/* A band along the foot that never lightens: the caption sits in the bottom seventh at every size
+   and keeps AA contrast over the palest frame. (The statement's own shade is on .home-hero-copy.) */
+.home-hero-shade {
+  background: linear-gradient(to top, rgb(14 14 14 / 0.8) 0%, rgb(14 14 14 / 0.72) 14%, rgb(14 14 14 / 0.3) 26%, rgb(14 14 14 / 0) 38%);
+}
+
+/* ——— Intro: ROUANG, spelled out on white. ———
+   Once per session (HomeHero's script), never with reduced motion:
+     0.6-4.0s   the letters arrive one by one, each rising out of a soft gradient and a blur
+     4.0-4.5s   the word holds
+     4.5-5.5s   the white and the word fade out together onto the hero; the header fades in
+   (HeroIntroControl's INTRO_MS follows the end of this.)
+   Any scroll, touch, key or click before the fade cuts it short (data-intro="skip"). */
+
+.intro {
+  display: none;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  /* The overlay takes the pointer while it is there, so a click meant to skip it cannot reach a
+     link beneath. It is as tall as the large viewport, so the page never shows beneath it on a
+     phone whose toolbar slides away. */
+  [data-intro="play"] .intro,
+  [data-intro="skip"] .intro {
+    display: block;
+    position: fixed;
+    inset: 0 0 auto 0;
+    height: 100lvh;
+    z-index: 70;
+    pointer-events: auto;
+    background: #ffffff;
+    color: var(--color-ink);
+    container-type: size;
+  }
+
+  .intro {
+    --intro-ww: min(62cqw, 26rem);
+  }
+
+  @media (max-aspect-ratio: 4/5) {
+    .intro {
+      --intro-ww: min(70cqw, 20rem);
+    }
+  }
+
+  /* The whole overlay fades as one, and is hidden (out of the pointer's way) once it has. */
+  [data-intro="play"] .intro {
+    animation: intro-out 1s var(--ease-settle) 4.5s forwards;
+  }
+
+  [data-intro="skip"] .intro {
+    animation: intro-skip 0.7s var(--ease-brand) both;
+  }
+
+  .intro-word {
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    width: var(--intro-ww);
+    aspect-ratio: 259.823 / 47.824;
+    translate: -50% -50%;
+  }
+
+  /* Each letter's drawing has 16 units of room around the word box (see PAD in HomeHero):
+     6.158% of the word's width each side, 33.457% of its height above and below. */
+  .intro-letter {
+    position: absolute;
+    left: -6.158%;
+    top: -33.457%;
+    width: 112.316%;
+    height: 166.914%;
+    overflow: visible;
+    -webkit-mask-image: linear-gradient(to bottom, transparent 0 36%, #000 64% 100%);
+    mask-image: linear-gradient(to bottom, transparent 0 36%, #000 64% 100%);
+    -webkit-mask-size: 100% 300%;
+    mask-size: 100% 300%;
+    -webkit-mask-repeat: no-repeat;
+    mask-repeat: no-repeat;
+    -webkit-mask-position: 0 100%;
+    mask-position: 0 100%;
+    /* --n is the letter's place in the word, set on each drawing by HomeHero. */
+    animation: intro-letter-in 1.4s cubic-bezier(0.25, 0.4, 0.2, 1) calc(0.6s + var(--n) * 0.4s) both;
+  }
+
+  /* While the intro plays the header is out of sight and out of the pointer's reach (it stays
+     in the accessibility tree; the first key press skips the intro anyway). It fades in as the
+     intro fades out. */
+  body:has([data-intro="play"]) [data-site-header],
+  body:has([data-intro="play"]) [data-action-bar] {
+    pointer-events: none;
+    animation: intro-header 1s var(--ease-settle) 4.5s both;
+  }
+
+  /* On a skip it is back in reach at once (a Tab that skipped lands on it) and fades in as the
+     overlay clears. A fresh name, so the fade starts again from the skip. */
+  body:has([data-intro="skip"]) [data-site-header],
+  body:has([data-intro="skip"]) [data-action-bar] {
+    animation: intro-header-skip 0.7s var(--ease-brand) 0.3s both;
+  }
+}
+
+@keyframes intro-letter-in {
+  from {
+    opacity: 0;
+    filter: blur(9px);
+    translate: 0 6%;
+    -webkit-mask-position: 0 0;
+    mask-position: 0 0;
+  }
+  to {
+    opacity: 1;
+    filter: blur(0);
+    translate: 0 0;
+    -webkit-mask-position: 0 100%;
+    mask-position: 0 100%;
+  }
+}
+
+@keyframes intro-out {
+  to {
+    opacity: 0;
+    visibility: hidden;
+  }
+}
+
+@keyframes intro-skip {
+  from {
+    opacity: 1;
+  }
+  to {
+    opacity: 0;
+    visibility: hidden;
+  }
+}
+
+@keyframes intro-header {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes intro-header-skip {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}

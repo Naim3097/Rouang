@@ -176,7 +176,7 @@ lighting: >-
 challenges: []
 quote: null
 services:
-  - residential-interior-design
+  - renovation-and-interior
 seo:
   title: "House in Ampang: residential interior design"
   description: A family house in Ampang by ROUANG. Arched black-framed doors, dark joinery and brass against white walls. Professional photographs.

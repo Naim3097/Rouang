@@ -2,9 +2,9 @@ import { studio } from "@/config/studio";
 import { absoluteUrl, SITE_NAME } from "./seo";
 
 /**
- * schema.org builders. They only ever use confirmed studio facts: no ratings, reviews, awards or
- * service areas that the studio has not confirmed. LocalBusiness is emitted only once a real
- * address exists, because Google requires one.
+ * schema.org builders. They only ever use confirmed company facts: no ratings, reviews, awards or
+ * service areas that the company has not confirmed. The local business type (GeneralContractor, a
+ * kind of LocalBusiness) is emitted only once a real address exists, because Google requires one.
  */
 
 export const ORG_ID = absoluteUrl("/#organization");
@@ -14,6 +14,15 @@ function confirmedAreas() {
   return studio.serviceAreas
     .filter((a) => a.confirmed)
     .map((a) => ({ "@type": "AdministrativeArea", name: a.name }));
+}
+
+/** SSM and CIDB registration numbers, as schema.org identifiers. */
+function identifiers() {
+  const ids: [string, string | null][] = [
+    ["SSM registration number", studio.registrationNo],
+    ["CIDB registration number", studio.cidbRegistrationNo],
+  ];
+  return ids.flatMap(([name, value]) => (value ? [{ "@type": "PropertyValue", propertyID: name, value }] : []));
 }
 
 function sameAs() {
@@ -31,7 +40,7 @@ export function organizationSchema() {
   const links = sameAs();
   const base: Record<string, unknown> = {
     "@context": "https://schema.org",
-    "@type": studio.address ? ["Organization", "LocalBusiness"] : "Organization",
+    "@type": studio.address ? ["Organization", "GeneralContractor"] : "Organization",
     "@id": ORG_ID,
     name: SITE_NAME,
     url: absoluteUrl("/"),
@@ -39,18 +48,21 @@ export function organizationSchema() {
     image: absoluteUrl("/brand/rouang-app-icon-512.png"),
     slogan: studio.tagline.ms,
     description: studio.positioning,
-    knowsAbout: ["Interior design", "Residential interior design", "Restaurant interior design"],
+    knowsAbout: ["Design and build", "Renovation", "Interior design", "Construction", "Project management"],
   };
+  const ids = identifiers();
   if (studio.legalName) base.legalName = studio.legalName;
   if (studio.contact.email) base.email = studio.contact.email;
-  if (studio.contact.phone) base.telephone = studio.contact.phone;
+  // International format without spaces or dashes, e.g. +60123477170.
+  if (studio.contact.phone) base.telephone = studio.contact.phone.replace(/[^\d+]/g, "");
   if (studio.foundingYear) base.foundingDate = String(studio.foundingYear);
   if (areas.length) base.areaServed = areas;
   if (links.length) base.sameAs = links;
+  if (ids.length) base.identifier = ids;
   if (studio.address) {
     base.address = {
       "@type": "PostalAddress",
-      streetAddress: studio.address.street,
+      streetAddress: studio.address.street.join(", "),
       addressLocality: studio.address.locality,
       addressRegion: studio.address.region,
       postalCode: studio.address.postalCode,
@@ -73,7 +85,7 @@ export function websiteSchema() {
   };
 }
 
-export function serviceSchema(s: { title: string; summary: string; slug: string; sector: string }) {
+export function serviceSchema(s: { title: string; summary: string; slug: string }) {
   const areas = confirmedAreas();
   return {
     "@context": "https://schema.org",

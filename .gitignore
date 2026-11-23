@@ -45,8 +45,8 @@ next-env.d.ts
 !.env.example
 .next-*/
 
-# Hero render outputs before publishing: scripts/render/o-installation/site-geometry.cjs
-# publishes content-hashed copies of these, which are what the site uses
+# Outputs of scripts/render/o-installation, the earlier O hero, which the site no longer shows.
+# Kept out of the repository in case the script is run again.
 /public/images/hero/o-installation-desktop.webp
 /public/images/hero/o-installation-portrait.webp
 /public/images/hero/o-scenery.jpg

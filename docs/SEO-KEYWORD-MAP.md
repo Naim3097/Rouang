@@ -24,10 +24,10 @@ studio wants paid data, a keyword tool before investing in new pages.
 
 | Intent cluster | Primary page | Title pattern (current) | Notes |
 | --- | --- | --- | --- |
-| Brand + "interior design studio KL" | `/` | ROUANG · Interior design studio in Kuala Lumpur | Home carries Rembayung proof and both audiences |
-| "residential interior design KL / Selangor", "condo interior design KL" | `/services/residential-interior-design` | Residential interior design in Kuala Lumpur and Selangor | Later: split into condo and landed child pages when there are 2+ projects each |
-| "restaurant interior design KL", "cafe interior design Malaysia" | `/services/restaurant-interior-design` | Restaurant interior design in Kuala Lumpur | Strongest page: real flagship project. Add cost guidance and approvals notes when the studio supplies them |
-| "commercial / office / retail interior design" | `/services/commercial-interior-design` | (draft) | Publish only if the studio takes this work and has a project to show |
+| Brand + "design and build KL / Selangor" | `/` | ROUANG · Design-led construction company in Kuala Lumpur and Selangor | Home carries Rembayung proof and both audiences. Positioning from the company profile (November 2026) |
+| "design and build Selangor / KL" | `/services/design-and-build` | Design and build in Kuala Lumpur and Selangor | CIDB registration is confirmed; the grade is not, so it stays out of titles |
+| "renovation KL / Selangor", "residential interior design KL", "restaurant interior design KL" | `/services/renovation-and-interior` | Renovation and interior design in KL and Selangor | Replaces the residential and restaurant interior design pages, which redirect here. Carries the projects, Rembayung as interior design only |
+| "new house construction Selangor", "build a house Selangor" | `/services/new-build-and-construction` | New build and construction in KL and Selangor | Needs a new-build project to show before it can compete |
 | "Rembayung interior", "Rembayung Kampung Baru" | `/projects/rembayung` | Rembayung, Kampung Baru: restaurant interior design | Brand-adjacent searches from Rembayung's own popularity |
 | Residential proof | `/projects/ampang` and the two proposals | Per project | Name projects by area once owners agree (e.g. "House in Ampang") |
 | "interior design cost Malaysia" | `/insights/what-shapes-interior-design-cost` | What shapes the cost of an interior design project | Draft: needs the studio's own fee model before publishing |

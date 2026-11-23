@@ -87,15 +87,15 @@ export function Analytics({ measurementId }: { measurementId: string | null }) {
           className="fixed bottom-4 left-4 right-4 z-[60] max-w-md rounded-[1.25rem] bg-ink p-5 text-kapur shadow-[0_20px_60px_-20px_rgb(0_0_0/0.5)] sm:right-auto"
           data-tone="dark"
         >
-          <p className="t-caption text-[0.875rem] leading-relaxed text-kapur/85">
+          <p className="t-meta text-kapur/85">
             May we use Google Analytics cookies to see which pages people find useful? No advertising, and you can change
             your mind any time. <Link href="/privacy#analytics" className="underline underline-offset-2">Privacy notice</Link>
           </p>
           <div className="mt-4 flex gap-3">
-            <button type="button" onClick={() => decide("granted")} className="min-h-11 rounded-full bg-kapur px-5 text-[0.9375rem] text-ink">
+            <button type="button" onClick={() => decide("granted")} className="t-meta min-h-11 rounded-full bg-kapur px-5 text-ink">
               Allow analytics
             </button>
-            <button type="button" onClick={() => decide("denied")} className="min-h-11 rounded-full border border-kapur/40 px-5 text-[0.9375rem]">
+            <button type="button" onClick={() => decide("denied")} className="t-meta min-h-11 rounded-full border border-kapur/40 px-5">
               No thanks
             </button>
           </div>

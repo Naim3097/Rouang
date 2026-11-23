@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { CurveRule } from "@/components/brand/Brand";
-import { ArrowLink, ButtonLink } from "@/components/ui/Button";
+import { ButtonLink } from "@/components/ui/Button";
 import { Breadcrumbs } from "@/components/ui/Breadcrumbs";
 import { JsonLd } from "@/components/ui/JsonLd";
 import { Label } from "@/components/ui/Typography";
@@ -55,10 +55,10 @@ export default async function InsightPage({ params }: PageProps<"/insights/[slug
           <div className="page-grid mt-16 gap-y-8 sm:mt-24">
             <div className="col-span-12 lg:col-span-3">
               <Label className="text-ink-muted">{article.category}</Label>
-              {article.isDraft ? <p className="t-label mt-3 text-rikyu">Draft · not yet reviewed by the studio</p> : null}
+              {article.isDraft ? <p className="t-label mt-3 text-ink-muted">Draft · not yet reviewed by ROUANG</p> : null}
             </div>
             <div className="col-span-12 lg:col-span-8">
-              <h1 className="t-headline-hero max-w-[20ch] text-[clamp(2.375rem,1.5rem+3.4vw,4.75rem)]">{article.title}</h1>
+              <h1 className="t-headline-hero max-w-[24ch]">{article.title}</h1>
               <p className="t-sub mt-8 max-w-[40rem] text-ink-soft">{article.description}</p>
               <p className="t-caption mt-8 text-ink-muted">
                 {article.author} · <time dateTime={article.publishedAt}>{formatDate(article.publishedAt)}</time>
@@ -83,10 +83,10 @@ export default async function InsightPage({ params }: PageProps<"/insights/[slug
               <nav aria-label="In this article" className="col-span-12 lg:col-span-3">
                 <div className="lg:sticky lg:top-[calc(var(--header-h)+2rem)]">
                   <p className="t-label text-ink-muted">In this article</p>
-                  <ol className="mt-4 space-y-2.5 text-[0.9375rem]">
+                  <ol className="t-meta mt-4 space-y-2.5">
                     {article.headings.map((h) => (
                       <li key={h.id}>
-                        <a href={`#${h.id}`} className="link-reveal text-ink-soft hover:text-ink">
+                        <a href={`#${h.id}`} className="text-ink-soft transition-colors duration-300 hover:text-ink">
                           {h.text}
                         </a>
                       </li>
@@ -120,18 +120,18 @@ export default async function InsightPage({ params }: PageProps<"/insights/[slug
                     Discuss your project
                   </ButtonLink>
                 </div>
+                {/* Related pages as rows of an index: the name, and what kind of page it is. */}
                 {relatedServices.length || relatedProjects.length ? (
-                  <ul className="mt-8 space-y-2">
-                    {relatedServices.map((s) => (
-                      <li key={s.slug}>
-                        <ArrowLink href={`/services/${s.slug}`}>{s.title}</ArrowLink>
-                      </li>
-                    ))}
-                    {relatedProjects.map((p) => (
-                      <li key={p.slug}>
-                        <ArrowLink href={`/projects/${p.slug}`}>
-                          See the project: <span className="font-serif italic">{p.title}</span>
-                        </ArrowLink>
+                  <ul className="mt-10 border-t border-kapur/15" aria-label="Related">
+                    {[
+                      ...relatedServices.map((s) => ({ href: `/services/${s.slug}`, name: s.title, kind: "Service" })),
+                      ...relatedProjects.map((p) => ({ href: `/projects/${p.slug}`, name: p.title, kind: "Project" })),
+                    ].map((r) => (
+                      <li key={r.href} className="border-b border-kapur/15">
+                        <Link href={r.href} className="flex min-h-14 items-baseline justify-between gap-6 py-4">
+                          <span className="link-name font-medium">{r.name}</span>
+                          <span className="t-label text-mouse">{r.kind}</span>
+                        </Link>
                       </li>
                     ))}
                   </ul>
@@ -151,8 +151,8 @@ export default async function InsightPage({ params }: PageProps<"/insights/[slug
                 <li key={a.slug} className="border-b border-ink/15">
                   <Link href={`/insights/${a.slug}`} className="block py-8">
                     <p className="t-label text-ink-muted">{a.category}</p>
-                    <p className="t-sub mt-3">
-                      <span className="link-reveal">{a.title}</span>
+                    <p className="t-title mt-3">
+                      <span className="link-name">{a.title}</span>
                     </p>
                   </Link>
                 </li>

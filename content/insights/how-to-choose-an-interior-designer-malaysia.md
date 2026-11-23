@@ -8,8 +8,8 @@ purpose: Help prospective clients compare studios on the things that matter, and
 audience: Homeowners and business owners comparing interior design firms in the Klang Valley
 searchIntent: Informational, comparison stage ("how to choose an interior designer Malaysia")
 relatedServices:
-  - residential-interior-design
-  - restaurant-interior-design
+  - renovation-and-interior
+  - design-and-build
 sources:
   - title: Architects Act 1967 (Act 117), incorporating amendments to February 2015, Lembaga Arkitek Malaysia
     url: https://www.lam.gov.my/my-assets/docs/actRules/architects_act_1967_incorparating_amendments_up_to_february_2015.pdf_-_final.pdf
@@ -18,7 +18,7 @@ sources:
   - title: Lembaga Arkitek Malaysia
     url: https://classic.lam.gov.my/home-en
 todo:
-  - "Publish only once the studio's own LAM and CIDB position is confirmed: this article tells readers to check both, so ROUANG's site must hold up to the same test"
+  - "Publish only once ROUANG's LAM position is confirmed: this article tells readers to check LAM and CIDB registration, so ROUANG's site must hold up to the same test. CIDB is now confirmed (registration no. 0120250108-SL148929, company profile, November 2026); LAM is not"
   - Studio to review the questions list and add how ROUANG answers each one
   - Re-check the LAM and CIDB pages from a Malaysian connection before publishing
 ---

@@ -3,7 +3,7 @@ import { Breadcrumbs } from "@/components/ui/Breadcrumbs";
 import { Pending } from "@/components/ui/Section";
 import { Label } from "@/components/ui/Typography";
 import { privacyNotice, type NoticeSection } from "@/config/privacy";
-import { studio } from "@/config/studio";
+import { addressLine, studio } from "@/config/studio";
 import { SHOW_DRAFTS } from "@/lib/env";
 import { pageMetadata } from "@/lib/seo";
 
@@ -16,12 +16,14 @@ export const metadata: Metadata = pageMetadata({
   path: "/privacy",
 });
 
-const UPDATED = { iso: "2026-10-29", en: "29 October 2026", ms: "29 Oktober 2026" };
+const UPDATED = { iso: "2026-11-17", en: "17 November 2026", ms: "17 November 2026" };
 
 export default function PrivacyPage() {
   const notice = privacyNotice({
-    controller: studio.legalName ?? "ROUANG",
-    contact: studio.contact.email ?? "the contact details on our contact page",
+    controller: studio.legalName,
+    registrationNo: studio.registrationNo,
+    address: addressLine(),
+    contact: studio.contact.email,
   });
 
   return (
@@ -38,12 +40,12 @@ export default function PrivacyPage() {
               <nav aria-label="Language" className="mt-8">
                 <ul className="flex gap-2">
                   <li>
-                    <a href="#english" className="inline-flex min-h-11 items-center rounded-full border border-ink/25 px-4 text-[0.9375rem]">
+                    <a href="#english" className="link-fade t-meta inline-flex min-h-11 items-center rounded-full border border-ink/25 px-4">
                       English
                     </a>
                   </li>
                   <li>
-                    <a href="#bahasa-malaysia" lang="ms" className="inline-flex min-h-11 items-center rounded-full border border-ink/25 px-4 text-[0.9375rem]">
+                    <a href="#bahasa-malaysia" lang="ms" className="link-fade t-meta inline-flex min-h-11 items-center rounded-full border border-ink/25 px-4">
                       Bahasa Malaysia
                     </a>
                   </li>
@@ -53,18 +55,18 @@ export default function PrivacyPage() {
           </div>
 
           <div className="col-span-12 lg:col-span-7 lg:col-start-5">
-            <h1 className="t-headline-hero text-[clamp(2.375rem,1.5rem+3.4vw,4.5rem)]">
+            <h1 className="t-headline-hero">
               <span className="block">How we handle your details</span>
-              <span lang="ms" className="t-italic-display mt-2 block text-[0.8em] text-rikyu">
+              <span lang="ms" className="t-follow block text-rikyu">
                 Notis privasi
               </span>
             </h1>
             {SHOW_DRAFTS ? (
               <div className="mt-10">
                 <Pending title="Legal review">
-                  Written against s.7 of the Personal Data Protection Act 2010 (as amended in 2024). Needs the registered
-                  company name, a contact email and address for data requests, and review by the studio&rsquo;s legal adviser
-                  before launch, including the Bahasa Malaysia text.
+                  Written against s.7 of the Personal Data Protection Act 2010 (as amended in 2024), naming {studio.legalName},
+                  its SSM number, office address and email from the company profile. Needs review by the company&rsquo;s
+                  legal adviser before launch, including the Bahasa Malaysia text.
                 </Pending>
               </div>
             ) : null}

@@ -1,33 +1,39 @@
 [
   {
     "icon": "listen",
-    "title": "Listen",
-    "body": "A first conversation about the space, how it is used now, what is not working and what you have to spend. Then a visit to measure and photograph it.",
-    "confirmed": false
+    "title": "Initial Discussion",
+    "body": "A first conversation about the project: the space, what you need from it and what you have in mind.",
+    "confirmed": true
   },
   {
     "icon": "plan",
-    "title": "Plan",
-    "body": "Layouts come first. We test where people move, sit, cook, work or wait before any finish is chosen, because a plan that works is what makes the rest affordable.",
-    "confirmed": false
+    "title": "Paid Design Engagement",
+    "body": "You appoint ROUANG to design the project, and the design work begins.",
+    "confirmed": true
   },
   {
     "icon": "design",
-    "title": "Design",
-    "body": "Materials, colour, lighting and built-in joinery are drawn and specified together, with the budget in view, until there is a single design you can sign off.",
-    "confirmed": false
+    "title": "Design Development",
+    "body": "The concept is developed into a full design, guided by the project’s purpose and your needs.",
+    "confirmed": true
+  },
+  {
+    "icon": "budget",
+    "title": "Project Proposal & Quotation",
+    "body": "A proposal and quotation for carrying out the work, based on the developed design.",
+    "confirmed": true
   },
   {
     "icon": "build",
-    "title": "Build",
-    "body": "Construction and renovation delivered by one team, to the drawings, with one timeline and one person to call.",
-    "confirmed": false,
+    "title": "Construction",
+    "body": "The works are carried out to the design, with coordinated planning, project management and quality control.",
+    "confirmed": true,
     "requires": "renovationAndBuild"
   },
   {
     "icon": "liveIn",
-    "title": "Live in",
-    "body": "The point of all of it: a space that is used the way it was imagined, and that still works when life changes around it.",
-    "confirmed": false
+    "title": "Handover",
+    "body": "The completed space is handed over to you.",
+    "confirmed": true
   }
 ]

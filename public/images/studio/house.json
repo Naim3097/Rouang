@@ -1,0 +1,265 @@
+{
+  "about": "Exploded drawing of a generic house for the Studio section, in layers. Not a depiction of any ROUANG project.",
+  "viewBox": [
+    0,
+    0,
+    1810,
+    2866
+  ],
+  "unit": "half a pixel of the traced drawing",
+  "colors": {
+    "lines": "#f3f3f3",
+    "solid": "#404732",
+    "sourceBackground": "#303b2b"
+  },
+  "paintOrder": [
+    "ground.solid",
+    "ground.lines",
+    "guides.lower",
+    "upper.solid",
+    "upper.lines",
+    "guides.upper",
+    "roof.solid",
+    "roof.lines"
+  ],
+  "layers": {
+    "roof": {
+      "lines": "house-roof-lines.svg",
+      "solid": "house-roof-solid.svg",
+      "bbox": [
+        198,
+        8,
+        1428,
+        722
+      ],
+      "shapes": 33,
+      "assembled": {
+        "y": 1094,
+        "skewY": 3.556,
+        "originX": 223,
+        "yWithoutSkew": 1138
+      }
+    },
+    "upper": {
+      "lines": "house-upper-lines.svg",
+      "solid": "house-upper-solid.svg",
+      "bbox": [
+        204,
+        706,
+        1426,
+        806
+      ],
+      "shapes": 26,
+      "assembled": {
+        "y": 587
+      }
+    },
+    "ground": {
+      "lines": "house-ground-lines.svg",
+      "solid": "house-ground-solid.svg",
+      "bbox": [
+        8,
+        1466,
+        1794,
+        1392
+      ],
+      "shapes": 358,
+      "assembled": {
+        "y": 0
+      }
+    }
+  },
+  "guides": {
+    "upper": {
+      "lines": "house-guides-upper.svg",
+      "bbox": [
+        220,
+        360,
+        1380,
+        686
+      ],
+      "shapes": 69,
+      "travelsWith": "upper"
+    },
+    "lower": {
+      "lines": "house-guides-lower.svg",
+      "bbox": [
+        220,
+        1170,
+        1380,
+        944
+      ],
+      "shapes": 75,
+      "travelsWith": "ground"
+    },
+    "runs": [
+      {
+        "x": 223,
+        "y1": 556,
+        "y2": 1046,
+        "set": "upper",
+        "joins": [
+          "roof",
+          "upper"
+        ]
+      },
+      {
+        "x": 223,
+        "y1": 1334,
+        "y2": 1896,
+        "set": "lower",
+        "joins": [
+          "upper",
+          "ground"
+        ]
+      },
+      {
+        "x": 535,
+        "y1": 566,
+        "y2": 886,
+        "set": "upper",
+        "joins": [
+          "roof",
+          "upper"
+        ]
+      },
+      {
+        "x": 535,
+        "y1": 1480,
+        "y2": 1730,
+        "set": "lower",
+        "joins": [
+          "upper",
+          "ground"
+        ]
+      },
+      {
+        "x": 829,
+        "y1": 770,
+        "y2": 896,
+        "set": "upper",
+        "joins": [
+          "roof",
+          "upper"
+        ]
+      },
+      {
+        "x": 829,
+        "y1": 1436,
+        "y2": 1576,
+        "set": "lower",
+        "joins": [
+          "upper",
+          "ground"
+        ]
+      },
+      {
+        "x": 1123,
+        "y1": 1422,
+        "y2": 1460,
+        "set": "lower",
+        "joins": [
+          "upper",
+          "ground"
+        ]
+      },
+      {
+        "x": 1217,
+        "y1": 552,
+        "y2": 740,
+        "set": "upper",
+        "joins": [
+          "roof",
+          "upper"
+        ]
+      },
+      {
+        "x": 1217,
+        "y1": 1374,
+        "y2": 1508,
+        "set": "lower",
+        "joins": [
+          "upper",
+          "ground"
+        ]
+      },
+      {
+        "x": 1601,
+        "y1": 360,
+        "y2": 918,
+        "set": "upper",
+        "joins": [
+          "roof",
+          "upper"
+        ]
+      },
+      {
+        "x": 1601,
+        "y1": 1170,
+        "y2": 1712,
+        "set": "lower",
+        "joins": [
+          "upper",
+          "ground"
+        ]
+      },
+      {
+        "x": 1601,
+        "y1": 2032,
+        "y2": 2114,
+        "set": "lower",
+        "joins": [
+          "ground"
+        ]
+      }
+    ]
+  },
+  "assembled": {
+    "bbox": [
+      8,
+      1100,
+      1794,
+      1758
+    ],
+    "rule": "At progress p (0 = exploded as drawn, 1 = assembled) a layer's point (x, y) moves to y + p * (assembled.y + tan(skewY) * (x - originX)); x never changes. The ground floor stays put."
+  },
+  "measured": {
+    "unit": "drawing pixels",
+    "upperOnGround": {
+      "left": {
+        "x": 104,
+        "drop": 295
+      },
+      "right": {
+        "x": 813,
+        "drop": 292
+      }
+    },
+    "roofOnUpper": {
+      "left": {
+        "x": 111.5,
+        "drop": 253.5
+      },
+      "right": {
+        "x": 811.5,
+        "drop": 297
+      }
+    }
+  },
+  "source": {
+    "page": [
+      0,
+      0,
+      841.8898,
+      1190.551
+    ],
+    "gridStep": 0.754265,
+    "originX": 0.064937,
+    "originY": 0.160447,
+    "gridX0": 107,
+    "gridY1": 1478,
+    "margin": 4,
+    "scale": 2,
+    "tolerance": 0.35
+  }
+}

@@ -2,18 +2,24 @@
 
 import { useEffect } from "react";
 
-/** How long the intro takes to hand over to the page, in ms (keep in step with "Intro" in globals.css). */
-const INTRO_MS = 9600;
+/** When the intro has finished fading onto the page, in ms (keep in step with "Intro" in styles/home/hero.css). */
+const INTRO_MS = 5600;
+/** From here on the intro is already fading out: a skip would only restart the fade. */
+const FADING_MS = 4500;
 /** How long a skipped intro takes to clear. */
 const SKIP_MS = 800;
-/** From here on the intro is only settling (the statement is arriving): a skip would replay it. */
-const SETTLING_MS = 7900;
+/** Keys that would scroll the page beneath the intro. Tab still moves focus. */
+const SCROLL_KEYS = new Set([" ", "ArrowDown", "ArrowUp", "PageDown", "PageUp", "Home", "End"]);
 
 /**
- * Lets the visitor cut the intro short. The first scroll, touch, key or click during the intro
- * fast-forwards it to the finished hero; either way the overlay is then retired, so nothing of it
- * stays on the page. Timed from the intro's own CSS clock, not from hydration, which can come
- * seconds after the first frame. Renders nothing.
+ * Lets the visitor cut the intro short. The first scroll, touch, key or click while the word is
+ * being spelled fades the intro straight out; either way the overlay is then retired, so nothing
+ * of it stays on the page. Timed from the intro's own CSS clock, not from hydration, which can
+ * come seconds after the first frame. Renders nothing.
+ *
+ * The gesture that skips the intro does not also scroll the page beneath it: until the overlay has
+ * cleared, the wheel, a finger and the scrolling keys are held (Lenis leaves the overlay's wheel
+ * alone, see HomeHero), so the visitor arrives at the top of the hero with the statement whole.
  */
 export function HeroIntroControl() {
   useEffect(() => {
@@ -26,19 +32,29 @@ export function HeroIntroControl() {
       return clock && clock.startTime !== null && typeof now === "number" ? now - Number(clock.startTime) : 0;
     };
     const events = ["wheel", "touchstart", "keydown", "pointerdown"] as const;
+    const stopListening = () => events.forEach((e) => window.removeEventListener(e, skip));
     let timer = window.setTimeout(() => finish(), Math.max(0, INTRO_MS - elapsed()));
+
+    const hold = (e: Event) => {
+      if (e.cancelable && (!(e instanceof KeyboardEvent) || SCROLL_KEYS.has(e.key))) e.preventDefault();
+    };
+    const holds = ["wheel", "touchmove", "keydown"] as const;
+    holds.forEach((e) => window.addEventListener(e, hold, { passive: false }));
+    const release = () => holds.forEach((e) => window.removeEventListener(e, hold));
 
     function finish() {
       window.clearTimeout(timer);
-      events.forEach((e) => window.removeEventListener(e, skip));
+      stopListening();
+      release();
       if (hero) hero.dataset.intro = "done";
     }
 
     function skip() {
       if (!hero || hero.dataset.intro !== "play") return;
-      if (elapsed() >= SETTLING_MS) return finish();
+      stopListening();
+      // Already fading: let it finish as it is.
+      if (elapsed() >= FADING_MS) return;
       hero.dataset.intro = "skip";
-      events.forEach((e) => window.removeEventListener(e, skip));
       window.clearTimeout(timer);
       timer = window.setTimeout(() => finish(), SKIP_MS);
     }
@@ -46,29 +62,9 @@ export function HeroIntroControl() {
     events.forEach((e) => window.addEventListener(e, skip, { passive: true, once: true }));
     return () => {
       window.clearTimeout(timer);
-      events.forEach((e) => window.removeEventListener(e, skip));
+      stopListening();
+      release();
     };
-  }, []);
-
-  return null;
-}
-
-/**
- * Once the page is scrolled past the hero's words (the .hero-text-past mark, 100svh down), marks
- * the section so their scroll animations are switched off (globals.css): each word then rests in
- * its final state, and the browser can let go of the many small layers those animations keep.
- * Scrolling back above the mark turns them on again. Renders nothing.
- */
-export function HeroTextRelease() {
-  useEffect(() => {
-    const hero = document.querySelector<HTMLElement>("[data-hero]");
-    const mark = hero?.querySelector(".hero-text-past");
-    if (!hero || !mark) return;
-    const io = new IntersectionObserver(([e]) => {
-      hero.toggleAttribute("data-text-past", !e.isIntersecting && e.boundingClientRect.top < 0);
-    });
-    io.observe(mark);
-    return () => io.disconnect();
   }, []);
 
   return null;

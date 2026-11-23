@@ -36,7 +36,7 @@ export function SectorFilter({ targetId, counts }: { targetId: string; counts: R
           aria-pressed={value === o.value}
           aria-controls={targetId}
           onClick={() => choose(o.value)}
-          className="inline-flex min-h-11 items-center gap-2 rounded-full border border-ink/25 px-4 text-[0.9375rem] transition-colors aria-pressed:border-ink aria-pressed:bg-ink aria-pressed:text-kapur"
+          className="t-meta inline-flex min-h-11 items-center gap-2 rounded-full border border-ink/25 px-4 transition-colors aria-pressed:border-ink aria-pressed:bg-ink aria-pressed:text-kapur"
         >
           {o.label}
           <span className="t-caption tabular-nums">{counts[o.value] ?? 0}</span>

@@ -1,0 +1,568 @@
+/* Home, 02 Studio (StudioName.tsx). Imported by globals.css. */
+
+/* ——— 02 Studio: what the company believes, then who it is, on the brand's green. ———
+   The green is the Rikyū family from the kit: Rikyū Grey #888E7E into its deep end #404732.
+   Milky White on Rikyū Grey itself is only 3:1, so the field is never lighter than an even mix of
+   the two (#636957, Milky White 5.1:1). The light sits behind the sentence, where the text is
+   Milky White or large; the smaller, softer text is read where the field is deeper. Measured
+   against the pixels behind each line, grain included, at every screen size: small text 5:1 and
+   up, the large follow line 3.5:1 and up. The shades below are the section's own. */
+.studio-scene {
+  --studio-light: color-mix(in oklab, var(--color-rikyu) 50%, var(--color-rikyu-deep)); /* #636957 */
+  --studio-mid: color-mix(in oklab, var(--color-rikyu) 20%, var(--color-rikyu-deep)); /* #4e5540 */
+  --studio-deep: var(--color-rikyu-deep); /* #404732 */
+  --studio-deeper: color-mix(in oklab, var(--color-rikyu-deep) 86%, var(--color-ink)); /* #393f2e */
+  /* Behind the house on a large screen, towards the ground of the drawing itself (#303b2b). */
+  --studio-shade: color-mix(in oklab, var(--color-rikyu-deep) 72%, var(--color-ink)); /* #33392a */
+  /* The second voice: the follow line (large, over the light) and the terms (small, on the deeper
+     field, 5.3:1 and up). */
+  --studio-follow: color-mix(in oklab, var(--color-kapur) 70%, var(--color-rikyu)); /* #d2d4cf */
+  /* Running text a step quieter than Milky White (5.4:1 and up where it sits). */
+  --studio-soft: color-mix(in oklab, var(--color-kapur) 80%, var(--color-rikyu)); /* #dddeda */
+  background: var(--studio-deep);
+  color: var(--color-kapur);
+  /* The last word drifts in from the right on phones; nothing it carries may widen the page. */
+  overflow-x: clip;
+}
+
+.studio-stage {
+  isolation: isolate;
+}
+
+/* The field: a soft light at the top left, over the deep green that deepens a little towards the
+   bottom right. Where the two panels follow each other it covers the section, the light behind the
+   sentence. The light falls off along a curve, not a straight ramp, so it has no visible rim. */
+.studio-field {
+  --glow: 120% 34% at 6% 15%;
+  --falloff:
+    color-mix(in srgb, var(--studio-light) 74%, transparent) 26%,
+    color-mix(in srgb, var(--studio-light) 40%, transparent) 54%,
+    color-mix(in srgb, var(--studio-light) 13%, transparent) 78%,
+    transparent;
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  background:
+    radial-gradient(ellipse var(--glow), var(--studio-light), var(--falloff)),
+    linear-gradient(160deg, var(--studio-deep) 35%, var(--studio-deeper));
+}
+
+/* A fine grain over the green, like a plastered wall, which also keeps the long, shallow gradients
+   from showing steps. A small bitmap tile of light and dark specks, each faint enough to move the
+   green by a level or two either way, so it neither lightens nor darkens the field overall.
+   A bitmap in normal blending, not an SVG noise filter in soft light: the browser redrew that
+   filter for every repeat of the tile and held up a frame by over 150ms as the section came near. */
+.studio-field::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background-image: url("/images/textures/grain.png");
+  background-size: 160px;
+}
+
+.studio-follow {
+  color: var(--studio-follow);
+}
+
+.studio-soft {
+  color: var(--studio-soft);
+}
+
+/* The last word of the sentence, drawn as a graphic at its own size: about 100px on a phone, so it
+   still reads as the graphic it is there, and 230px on a 1440px screen. */
+.studio-built {
+  font-size: clamp(5.75rem, 3.5rem + 12vw, 15.5rem);
+  line-height: 0.9;
+  letter-spacing: -0.05em;
+}
+
+/* ——— The house beside "built" (StudioHouse.tsx) ———
+   A generic exploded drawing in Milky White line, decorative only. Every layer is a box the size of
+   the drawing's viewBox (1810 × 2866 units), masked by its line work, so a move in percent of a
+   layer's own height is a move in the drawing. The upper floor comes down 587 units (20.48%),
+   carrying the roof with it; the roof then comes down 507 more at the left guide (17.69%), with a
+   3.56° vertical shear (593 at its far corner), because the drawing turns the roof slightly
+   against the floors: so both eaves sit on the walls and vertical lines stay vertical. The ground
+   floor stays where it is. A layer takes the move of the upper floor as its translate and the move
+   of the roof as its transform, so the scroll can drive both on the compositor (the keyframes at
+   the foot of this file). At rest two numbers give the pose, --studio-up and --studio-roof: 1
+   where the house stands whole (without scroll-driven animation, and once it has come together),
+   0 where the layers hang apart as drawn (reduced motion).
+   Mind the comments inside the rules here: a lone apostrophe in one makes the compiler drop the
+   custom property that follows it. */
+
+/* The sentence, then the house: below it on a narrow screen, beside it where there is room. */
+.studio-pair {
+  --studio-house-h: min(64svh, 46rem);
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  row-gap: clamp(2.5rem, 8vw, 4rem);
+}
+
+.studio-house {
+  justify-self: end;
+  width: min(100%, var(--studio-house-h) * 1810 / 2866);
+  pointer-events: none;
+}
+
+/* Beside it: the sentence's column is a little wider than its longest line (16.7em of the headline
+   size), not the 19em it may wrap at, so the house gets the rest of the width. The lines break
+   where they do at 19em. */
+@media (min-width: 64rem), (orientation: landscape) and (max-height: 32rem) {
+  .studio-pair {
+    --studio-house-h: min(80svh, 46rem);
+    grid-template-columns: calc(17.5 * var(--fs-h2)) minmax(0, 1fr);
+    column-gap: clamp(2rem, 5vw, 5rem);
+    align-items: center;
+  }
+
+  .studio-house {
+    justify-self: center;
+  }
+}
+
+.studio-house-art {
+  position: relative;
+  aspect-ratio: 1810 / 2866;
+}
+
+/* The drawing's full box: every layer below is a box this size. The still copy of the house
+   (StudioHouse.tsx) shows only where the other one moves. */
+.studio-house-stack {
+  --studio-up: 1;
+  --studio-roof: 1;
+  position: absolute;
+  inset: 0;
+}
+
+.studio-house-still {
+  display: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .studio-house-stack {
+    --studio-up: 0;
+    --studio-roof: 0;
+  }
+}
+
+/* Standing whole and still: the box keeps only the house, not the air the layers came down through. */
+@supports not (animation-timeline: view()) {
+  @media (prefers-reduced-motion: no-preference) {
+    .studio-house-art {
+      aspect-ratio: 1810 / 1758;
+    }
+
+    .studio-house-stack {
+      inset: auto 0 0;
+      height: calc(100% * 2866 / 1758);
+    }
+  }
+}
+
+.studio-house-frame,
+.studio-house-ink {
+  position: absolute;
+  inset: 0;
+}
+
+.studio-house-up {
+  translate: 0 calc(var(--studio-up) * 20.4815%);
+}
+
+.studio-house-up-undo {
+  translate: 0 calc(var(--studio-up) * -20.4815%);
+}
+
+/* The roof rides down with the upper floor, then settles onto it, sheared about the left guide. */
+.studio-house-roof,
+.studio-house-roof-undo {
+  transform-origin: 12.3204% 0;
+}
+
+.studio-house-roof {
+  translate: 0 calc(var(--studio-up) * 20.4815%);
+  transform: translateY(calc(var(--studio-roof) * 17.6902%)) skewY(calc(var(--studio-roof) * 3.556deg));
+}
+
+.studio-house-roof-undo {
+  translate: 0 calc(var(--studio-up) * -20.4815%);
+  transform: skewY(calc(var(--studio-roof) * -3.556deg)) translateY(calc(var(--studio-roof) * -17.6902%));
+}
+
+/* What a layer stands in front of is cut away by its silhouette, so the field shows through. */
+.studio-house-under-roof,
+.studio-house-under-up {
+  mask-size: 100% 100%;
+  mask-repeat: no-repeat;
+  mask-composite: exclude;
+}
+
+.studio-house-under-roof {
+  mask-image: url("/images/studio/house-roof-solid.svg"), linear-gradient(#000 0 0);
+}
+
+.studio-house-under-up {
+  mask-image: url("/images/studio/house-upper-solid.svg"), linear-gradient(#000 0 0);
+}
+
+.studio-house-ink {
+  background: var(--color-kapur);
+  mask-size: 100% 100%;
+  mask-repeat: no-repeat;
+}
+
+.studio-house-ground {
+  mask-image: url("/images/studio/house-ground-lines.svg");
+}
+
+.studio-house-upper {
+  mask-image: url("/images/studio/house-upper-lines.svg");
+}
+
+.studio-house-roof-lines {
+  mask-image: url("/images/studio/house-roof-lines.svg");
+}
+
+/* A guide: a strip around one dashed run, clipped in the frame of the layer it hangs from, with
+   the dashes fixed to the layer below. As the gap closes the higher layer comes down the strip,
+   and the guide is gone as the two meet. Inside the strip the dashes are a box the size of the
+   drawing again, set back to its corner, so they move as the layers do. */
+.studio-house-guide {
+  position: absolute;
+  left: calc(var(--gx) / 1810 * 100%);
+  top: calc(var(--gy) / 2866 * 100%);
+  width: calc(16 / 1810 * 100%);
+  height: calc(var(--gh) / 2866 * 100%);
+  overflow: clip;
+}
+
+.studio-house-guide > div {
+  position: absolute;
+  left: calc(var(--gx) / 16 * -100%);
+  top: calc(var(--gy) / var(--gh) * -100%);
+  width: calc(1810 / 16 * 100%);
+  height: calc(2866 / var(--gh) * 100%);
+  background: var(--color-kapur);
+  mask-size: 100% 100%;
+  mask-repeat: no-repeat;
+}
+
+/* Between the roof and the upper floor: the strip moves with the roof, the dashes with the floor. */
+.studio-house-guide-upper > div {
+  mask-image: url("/images/studio/house-guides-upper.svg");
+  transform-origin: 12.3204% 0;
+  transform: skewY(calc(var(--studio-roof) * -3.556deg)) translateY(calc(var(--studio-roof) * -17.6902%));
+}
+
+/* Between the upper floor and the ground floor. */
+.studio-house-guide-lower > div,
+.studio-house-guide-ground > div {
+  mask-image: url("/images/studio/house-guides-lower.svg");
+}
+
+.studio-house-guide-lower > div {
+  translate: 0 calc(var(--studio-up) * -20.4815%);
+}
+
+/* Within the ground floor, down to the carport: it fades as the upper floor sets off. */
+.studio-house-guide-ground {
+  opacity: calc(1 - 2 * var(--studio-up));
+}
+
+/* Large screens with scroll-driven animation: the stage pins. First the house comes together
+   beside the sentence: the upper floor settles onto the ground floor, then the roof onto it. Then
+   the sentence pans left out of the frame, each line at a slightly different rate so it moves like
+   type on a sheet rather than a block, and the house with it, while the studio arrives from the
+   right. The field travels the same way at about half the pace, so the light leaves with the
+   sentence and the studio settles on the deep green. Elsewhere the house comes together as it
+   crosses the screen, whole by the time it reaches the middle, and the last word drifts a little as
+   it passes. Transforms and opacity only, all of them run by the compositor. */
+
+@supports (animation-timeline: view()) {
+  @media (prefers-reduced-motion: no-preference) {
+    .studio-line-3 {
+      animation: studio-drift var(--ease-scrub) both;
+      animation-timeline: view();
+      animation-range: cover 0% cover 100%;
+    }
+
+    /* The house comes together over one stretch of the scroll, named here for everything in it:
+       as the drawing crosses the screen, or (below) early in the pinned run. At the very end of
+       the stretch the still copy, standing whole, takes the place of the moving one. */
+    .studio-house-art {
+      --studio-build: --studio-house;
+      --studio-build-range: cover 12% cover 50%;
+      view-timeline: --studio-house block;
+    }
+
+    .studio-house-moving {
+      animation: studio-house-moving step-end both;
+    }
+
+    .studio-house-still {
+      display: block;
+      animation: studio-house-still step-end both;
+    }
+
+    .studio-house-moving .studio-house-up {
+      animation: studio-house-up linear both;
+    }
+
+    .studio-house-moving .studio-house-up-undo,
+    .studio-house-guide-lower > div {
+      animation: studio-house-up-undo linear both;
+    }
+
+    .studio-house-moving .studio-house-roof {
+      animation:
+        studio-house-up linear both,
+        studio-house-roof linear both;
+    }
+
+    .studio-house-moving .studio-house-roof-undo {
+      animation:
+        studio-house-up-undo linear both,
+        studio-house-roof-undo linear both;
+    }
+
+    .studio-house-guide-upper > div {
+      animation: studio-house-roof-undo linear both;
+    }
+
+    .studio-house-guide-ground {
+      animation: studio-house-guide-fade linear both;
+    }
+
+    .studio-house-stack,
+    .studio-house-moving .studio-house-frame,
+    .studio-house-guide > div,
+    .studio-house-guide-ground {
+      animation-timeline: var(--studio-build);
+      animation-range: var(--studio-build-range);
+    }
+  }
+
+  @media (min-width: 64rem) and (prefers-reduced-motion: no-preference) {
+    .studio-scene {
+      height: 390svh;
+      view-timeline: --studio block;
+    }
+
+    /* Clipped, not a scroll box: focus on a link still on its way in must not scroll the stage
+       sideways (RevealFocus moves the page to where it has arrived instead). */
+    .studio-stage {
+      position: sticky;
+      top: 0;
+      height: 100svh;
+      overflow: clip;
+    }
+
+    /* Two screens wide, so it can travel out to the left: the light behind the sentence in the
+       first, a quieter one in the second, where the studio settles (no lighter than #4e5540, so the
+       small terms there keep 4.9:1). */
+    .studio-field {
+      --glow: 30% 72% at 12% 46%;
+      right: auto;
+      width: 200vw;
+      background:
+        radial-gradient(
+          ellipse 36% 95% at 66% 22%,
+          var(--studio-mid),
+          color-mix(in srgb, var(--studio-mid) 60%, transparent) 40%,
+          color-mix(in srgb, var(--studio-mid) 20%, transparent) 72%,
+          transparent
+        ),
+        radial-gradient(ellipse var(--glow), var(--studio-light), var(--falloff)),
+        radial-gradient(
+          ellipse 18% 66% at 35.5% 55%,
+          var(--studio-shade) 30%,
+          color-mix(in srgb, var(--studio-shade) 55%, transparent) 62%,
+          color-mix(in srgb, var(--studio-shade) 18%, transparent) 84%,
+          transparent
+        ),
+        linear-gradient(100deg, var(--studio-deep) 40%, var(--studio-deeper));
+      animation: studio-field linear both;
+      animation-timeline: --studio;
+      animation-range: contain 30% contain 87%;
+    }
+
+    .studio-word {
+      position: absolute;
+      inset: 0;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      padding-top: var(--header-h);
+    }
+
+    .studio-word > .t-label,
+    .studio-line {
+      --pan: -96vw;
+      animation: studio-pan var(--ease-scrub) both;
+      animation-timeline: --studio;
+      animation-range: contain 37.4% contain 74.1%;
+    }
+
+    .studio-line-2 {
+      --pan: -90vw;
+    }
+
+    .studio-line-3 {
+      --pan: -82vw;
+    }
+
+    /* The house: in the room to the right of the sentence, as large as that room allows. */
+    .studio-pair {
+      display: block;
+    }
+
+    .studio-house {
+      --pan: -100vw;
+      --pad: clamp(1rem, 3svh, 2rem);
+      position: absolute;
+      justify-self: stretch;
+      /* Centred on 71% of the screen's width, as in the client's mockup, from just under the header
+         to just above the foot (on a 16:9 or 16:10 screen about 86% of its height); nearer the
+         sentence only where the screen is too narrow for that. */
+      inset: calc(var(--header-h) + var(--pad)) var(--page-gutter) var(--pad)
+        max(var(--page-gutter) + 17 * var(--fs-h2) + clamp(2rem, 4vw, 4.5rem), 42vw + var(--page-gutter));
+      width: auto;
+      display: grid;
+      place-items: center;
+      container-type: size;
+      /* The sentence's longest line is 16.7em wide; the house keeps a gap beyond it. It leaves with
+         the sentence, setting off a little after it and travelling further, so it never closes on
+         the words while they are on screen, and it is out of the frame before the studio, arriving
+         a little later than the sentence sets off, reaches where it stood. */
+      animation: studio-pan var(--ease-scrub) both;
+      animation-timeline: --studio;
+      animation-range: contain 41.1% contain 74.1%;
+    }
+
+    .studio-house-art {
+      --studio-build: --studio;
+      --studio-build-range: contain 4% contain 34%;
+      height: min(100cqh, 100cqw * 2866 / 1810);
+    }
+
+    .studio-idea {
+      position: absolute;
+      inset: 0;
+      display: flex;
+      align-items: center;
+      padding-block: var(--header-h) 0;
+      animation: studio-arrive var(--ease-scrub) both;
+      animation-timeline: --studio;
+      animation-range: contain 55.9% contain 90.1%;
+    }
+  }
+}
+
+/* The house comes together: the upper floor settles first, eased in and out over the first two
+   thirds of the stretch; the roof sets off as the floor nears its place and lands last. Each
+   layer of the drawing takes the moves it shares (and the frame under it takes them back). */
+@keyframes studio-house-up {
+  0% {
+    translate: 0 0;
+    animation-timing-function: cubic-bezier(0.42, 0, 0.22, 1);
+  }
+  64%,
+  100% {
+    translate: 0 20.4815%;
+  }
+}
+
+@keyframes studio-house-up-undo {
+  0% {
+    translate: 0 0;
+    animation-timing-function: cubic-bezier(0.42, 0, 0.22, 1);
+  }
+  64%,
+  100% {
+    translate: 0 -20.4815%;
+  }
+}
+
+@keyframes studio-house-roof {
+  0%,
+  36% {
+    transform: translateY(0) skewY(0deg);
+    animation-timing-function: cubic-bezier(0.42, 0, 0.22, 1);
+  }
+  100% {
+    transform: translateY(17.6902%) skewY(3.556deg);
+  }
+}
+
+@keyframes studio-house-roof-undo {
+  0%,
+  36% {
+    transform: skewY(0deg) translateY(0);
+    animation-timing-function: cubic-bezier(0.42, 0, 0.22, 1);
+  }
+  100% {
+    transform: skewY(-3.556deg) translateY(-17.6902%);
+  }
+}
+
+/* The short guide within the ground floor is gone by the time the upper floor is halfway down. */
+@keyframes studio-house-guide-fade {
+  0% {
+    opacity: 1;
+    animation-timing-function: ease-in;
+  }
+  23.4%,
+  100% {
+    opacity: 0;
+  }
+}
+
+/* From the very end of the stretch on, the still copy stands in for the moving one. */
+@keyframes studio-house-moving {
+  to {
+    opacity: 0;
+  }
+}
+
+@keyframes studio-house-still {
+  from {
+    opacity: 0;
+  }
+}
+
+@keyframes studio-pan {
+  to {
+    translate: var(--pan) 0;
+  }
+}
+
+@keyframes studio-arrive {
+  0% {
+    translate: 46vw 0;
+    opacity: 0;
+  }
+  45% {
+    opacity: 1;
+  }
+  100% {
+    translate: 0 0;
+    opacity: 1;
+  }
+}
+
+@keyframes studio-drift {
+  from {
+    translate: 7vw 0;
+  }
+  to {
+    translate: 0 0;
+  }
+}
+
+@keyframes studio-field {
+  to {
+    translate: -100vw 0;
+  }
+}

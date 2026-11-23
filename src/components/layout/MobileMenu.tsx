@@ -30,7 +30,7 @@ export function MobileMenu({ pathname, whatsapp, nav }: { pathname: string; what
       <button
         type="button"
         onClick={open}
-        className="-mr-2 inline-flex min-h-11 items-center gap-3 px-2 text-[0.9375rem] lg:hidden"
+        className="t-meta -mr-2 inline-flex min-h-11 items-center gap-3 px-2 lg:hidden"
         aria-haspopup="dialog"
         aria-expanded={expanded}
         aria-controls={id}
@@ -55,7 +55,7 @@ export function MobileMenu({ pathname, whatsapp, nav }: { pathname: string; what
             <Link href="/" onClick={close} aria-label="ROUANG, home">
               <Wordmark className="h-auto w-[8.75rem]" />
             </Link>
-            <button type="button" onClick={close} className="-mr-2 inline-flex min-h-11 items-center gap-3 px-2 text-[0.9375rem]">
+            <button type="button" onClick={close} className="t-meta -mr-2 inline-flex min-h-11 items-center gap-3 px-2">
               <span>Close</span>
               <span className="relative block h-4 w-4" aria-hidden="true">
                 <span className="absolute left-0 top-1/2 h-px w-full rotate-45 bg-current" />
@@ -72,9 +72,9 @@ export function MobileMenu({ pathname, whatsapp, nav }: { pathname: string; what
                     href={item.href}
                     onClick={close}
                     aria-current={pathname === item.href ? "page" : undefined}
-                    className="flex items-baseline justify-between gap-4 py-4"
+                    className="link-fade flex items-baseline justify-between gap-4 py-4"
                   >
-                    <span className="text-[2.25rem] font-medium leading-none tracking-[-0.03em] xs:text-[2.75rem]">{item.label}</span>
+                    <span className="t-headline">{item.label}</span>
                     <span className="t-label tabular-nums text-mouse" aria-hidden="true">
                       {String(i + 1).padStart(2, "0")}
                     </span>
@@ -90,7 +90,7 @@ export function MobileMenu({ pathname, whatsapp, nav }: { pathname: string; what
                 Anda cerita macam mana nak duduk. Kami terjemah jadi ruang.
               </p>
               {whatsapp ? (
-                <ContactLink href={whatsapp} kind="whatsapp" location="menu" className="link-line inline-block">
+                <ContactLink href={whatsapp} kind="whatsapp" location="menu" className="link-fade inline-flex min-h-11 items-center">
                   Message us on WhatsApp
                 </ContactLink>
               ) : null}

@@ -11,7 +11,7 @@ export default function NotFound() {
         <p className="t-label text-mouse">Error 404</p>
         <h1 className="t-headline-hero mt-8 max-w-[14ch]">
           <span className="block">This room is empty.</span>
-          <span className="t-italic-display block text-[1.08em] text-rikyu">Nothing has been built here yet.</span>
+          <span className="t-follow block text-rikyu">Nothing has been built here yet.</span>
         </h1>
         <p className="mt-8 max-w-[32rem] text-kapur/75">The page you were looking for has moved or never existed.</p>
         <div className="mt-10 flex flex-wrap gap-3">

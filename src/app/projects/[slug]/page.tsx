@@ -3,10 +3,10 @@ import Image from "next/image";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { ViewTransition } from "react";
-import { CurveRule, Mark } from "@/components/brand/Brand";
+import { CurveRule } from "@/components/brand/Brand";
 import { TitleBlock } from "@/components/projects/TitleBlock";
 import { DraftTag } from "@/components/projects/ProjectIndex";
-import { ArrowLink, ButtonLink } from "@/components/ui/Button";
+import { ButtonLink } from "@/components/ui/Button";
 import { Breadcrumbs } from "@/components/ui/Breadcrumbs";
 import { Figure } from "@/components/ui/Figure";
 import { Film, type FilmSource } from "@/components/ui/Film";
@@ -57,7 +57,7 @@ export default async function ProjectPage({ params }: PageProps<"/projects/[slug
 
   const chapters: Chapter[] = [
     { key: "brief", label: "The brief", title: "What the space had to do", body: project.brief, hint: "The client's brief in a few sentences: who uses the space, what was wrong with it, what had to change." },
-    { key: "concept", label: "The idea", title: "The thought that organised it", body: project.concept, hint: "The design concept in the studio's own words." },
+    { key: "concept", label: "The idea", title: "The thought that organised it", body: project.concept, hint: "The design concept in ROUANG's own words." },
     { key: "planning", label: "The plan", title: "How the space was arranged", body: project.planning, hint: "Spatial planning decisions: circulation, zoning, seating or storage, and why." },
     { key: "lighting", label: "Light", title: "Day and evening", body: project.lighting, hint: "How natural and artificial light were handled." },
   ];
@@ -84,7 +84,7 @@ export default async function ProjectPage({ params }: PageProps<"/projects/[slug
             <div className="page-grid mt-16 gap-y-8 sm:mt-24">
               <div className="col-span-12 lg:col-span-8">
                 <h1 className="flex flex-col">
-                  <span className="mt-5 block font-serif text-[clamp(3.25rem,1.5rem+7vw,8.5rem)] italic leading-[0.88] tracking-[-0.02em]">
+                  <span className="t-headline-hero mt-4 block">
                     {project.title}
                     {project.isDraft ? <DraftTag placeholder={project.placeholder} /> : null}
                   </span>
@@ -127,7 +127,7 @@ export default async function ProjectPage({ params }: PageProps<"/projects/[slug
           <div>
             {/* The name comes first in the heading; the facts line is shown above it. */}
             <h1 className="flex flex-col">
-              <span className="mt-5 block font-serif text-[clamp(3.5rem,1.5rem+9vw,11rem)] italic leading-[0.86] tracking-[-0.02em]">
+              <span className="t-headline-hero mt-4 block">
               {project.title}
               {project.isDraft ? <DraftTag placeholder={project.placeholder} /> : null}
               </span>
@@ -144,20 +144,24 @@ export default async function ProjectPage({ params }: PageProps<"/projects/[slug
         <div className="page-x section-y">
           <div className="page-grid gap-y-12">
             <div className="col-span-12 lg:col-span-4">
-              <Label className="text-ink-muted">Project</Label>
+              {/* Every section label in the page's margin is a pill: the story's chapters are
+                  numbered, the sections around them are not. */}
+              <Label pill className="text-ink-muted">
+                Project
+              </Label>
               <TitleBlock project={project} className="mt-6" />
               {project.photography.credit ? (
                 <p className="t-caption mt-4 text-ink-muted">Photography: {project.photography.credit}</p>
               ) : null}
               {project.visualisation ? (
                 <p className="t-caption mt-4 border-l border-rikyu pl-3 text-ink-muted">
-                  The images on this page are design visualisations prepared by the studio, not photographs of the
+                  The images on this page are design visualisations prepared by ROUANG, not photographs of the
                   finished space.
                 </p>
               ) : null}
             </div>
             <div className="col-span-12 lg:col-span-7 lg:col-start-6">
-              <p className="t-sub">{project.summary}</p>
+              <p className="t-sub max-w-[40rem]">{project.summary}</p>
               {project.html ? <div className="prose-rouang mt-8 text-ink-soft" dangerouslySetInnerHTML={{ __html: project.html }} /> : null}
               {showStubs && project.todo.length ? (
                 <div className="mt-10">
@@ -187,13 +191,13 @@ export default async function ProjectPage({ params }: PageProps<"/projects/[slug
                 <div className="page-grid gap-y-6">
                   <div className="col-span-12 lg:col-span-3">
                     <div className="lg:sticky lg:top-[calc(var(--header-h)+2rem)]">
-                      <Label index={String(i + 1).padStart(2, "0")} className="text-ink-muted">
+                      <Label pill index={String(i + 1).padStart(2, "0")} className="text-ink-muted">
                         {c.label}
                       </Label>
                     </div>
                   </div>
                   <div className="col-span-12 lg:col-span-7 lg:col-start-5">
-                    <h2 className="t-headline text-[clamp(1.875rem,1.3rem+2vw,3rem)]">{c.title}</h2>
+                    <h2 className="t-headline">{c.title}</h2>
                     {c.body ? (
                       <div className="mt-6 space-y-5 text-ink-soft">
                         {c.body.split(/\n\s*\n/).map((para, k) => (
@@ -220,7 +224,7 @@ export default async function ProjectPage({ params }: PageProps<"/projects/[slug
           <div className="page-x section-y">
             <div className="page-grid gap-y-10">
               <div className="col-span-12 lg:col-span-3">
-                <Label as="h2" className="text-mouse">
+                <Label as="h2" pill className="text-mouse">
                   <span id="motion-title">In motion</span>
                 </Label>
               </div>
@@ -256,19 +260,22 @@ export default async function ProjectPage({ params }: PageProps<"/projects/[slug
 
       {/* ——— Materials ——— */}
       {project.materials.length || showStubs ? (
-        <section data-tone="light" className="bg-kapur-deep text-ink">
+        <section data-tone="light" className="bg-kapur-deep text-ink" aria-labelledby="materials-title">
           <div className="page-x section-y">
             <div className="page-grid gap-y-10">
               <div className="col-span-12 lg:col-span-3">
-                <Label className="text-ink-muted">Materials and finishes</Label>
+                {/* The section has no title of its own, so its label is its heading (as In motion). */}
+                <Label as="h2" pill className="text-ink-muted">
+                  <span id="materials-title">Materials and finishes</span>
+                </Label>
               </div>
               <div className="col-span-12 lg:col-span-8 lg:col-start-5">
                 {project.materials.length ? (
                   <dl className="grid border-t border-ink/15 sm:grid-cols-2 sm:gap-x-[var(--grid-gap)]">
                     {project.materials.map((m) => (
                       <div key={m.name} className="border-b border-ink/15 py-5">
-                        <dt className="t-sub">{m.name}</dt>
-                        <dd className="mt-2 text-[0.9375rem] text-ink-soft">{m.note}</dd>
+                        <dt className="t-title">{m.name}</dt>
+                        <dd className="t-meta mt-2 text-ink-soft">{m.note}</dd>
                       </div>
                     ))}
                   </dl>
@@ -287,12 +294,14 @@ export default async function ProjectPage({ params }: PageProps<"/projects/[slug
           <div className="page-x section-y">
             <div className="page-grid gap-y-10">
               <div className="col-span-12 lg:col-span-3">
-                <Label className="text-mouse">Problems worth solving</Label>
+                <Label pill className="text-mouse">
+                  Problems worth solving
+                </Label>
               </div>
               <div className="col-span-12 lg:col-span-8 lg:col-start-5">
                 <h2 className="t-headline">
                   <span className="block">Constraint,</span>
-                  <span className="t-italic-display block text-[1.08em] text-rikyu">then response.</span>
+                  <span className="t-follow block text-rikyu">then response.</span>
                 </h2>
                 {project.challenges.length ? (
                   <ol className="mt-12 border-t border-kapur/15">
@@ -316,7 +325,7 @@ export default async function ProjectPage({ params }: PageProps<"/projects/[slug
                 )}
                 {project.quote && (project.quote.approved || SHOW_DRAFTS) ? (
                   <blockquote className="mt-16 max-w-[38rem]">
-                    <p className="font-serif text-[clamp(1.75rem,1.3rem+1.6vw,2.75rem)] italic leading-[1.2]">&ldquo;{project.quote.text}&rdquo;</p>
+                    <p className="t-quote">&ldquo;{project.quote.text}&rdquo;</p>
                     <footer className="t-caption mt-4 text-mouse">{project.quote.attribution}</footer>
                   </blockquote>
                 ) : null}
@@ -345,7 +354,7 @@ export default async function ProjectPage({ params }: PageProps<"/projects/[slug
             <div className="col-span-12 lg:col-span-6">
               <h2 className="t-headline">
                 <span className="block">Planning something similar?</span>
-                <span className="t-italic-display block text-[1.08em] text-rikyu">Start with a conversation.</span>
+                <span className="t-follow block text-rikyu">Start with a conversation.</span>
               </h2>
               <div className="mt-10 flex flex-wrap gap-3">
                 <ButtonLink href={`/contact?project=${project.sector}`} variant="dark">
@@ -355,16 +364,20 @@ export default async function ProjectPage({ params }: PageProps<"/projects/[slug
             </div>
             {related.length ? (
               <div className="col-span-12 lg:col-span-4 lg:col-start-9">
-                <p className="t-label text-ink-muted">Services on this project</p>
+                {/* "Related", not "on this project": ROUANG's part (below) can be narrower than the service. */}
+                <p className="t-label text-ink-muted">Related service</p>
                 <ul className="mt-5 border-t border-ink/15">
                   {related.map((s) => (
                     <li key={s.slug} className="border-b border-ink/15">
-                      <ArrowLink href={`/services/${s.slug}`} className="w-full justify-between py-4">
+                      <Link href={`/services/${s.slug}`} className="link-fade flex min-h-14 items-center py-4 font-medium">
                         {s.navLabel}
-                      </ArrowLink>
+                      </Link>
                     </li>
                   ))}
                 </ul>
+                <p className="t-caption mt-4 text-ink-muted">
+                  ROUANG&rsquo;s role on this project: {project.scope.join(", ").toLowerCase()}.
+                </p>
               </div>
             ) : null}
           </div>
@@ -436,7 +449,7 @@ function NextProject({ project }: { project: Project }) {
   const photo = img && !("pending" in img) ? img : null;
   return (
     <section data-tone="dark" aria-label="Next project">
-      <Link href={`/projects/${project.slug}`} className="group relative block overflow-hidden">
+      <Link href={`/projects/${project.slug}`} className="next-link group relative block overflow-hidden">
         <div className="relative h-[70svh] min-h-[28rem]">
           {photo ? (
             <ViewTransition name={`project-${project.slug}`} share="project-image" default="none">
@@ -445,12 +458,10 @@ function NextProject({ project }: { project: Project }) {
               </div>
             </ViewTransition>
           ) : null}
+          {photo ? <div className="next-shade absolute inset-0" aria-hidden="true" /> : null}
           <div className="page-x absolute inset-0 flex flex-col justify-end pb-12">
             <p className="t-label text-mouse">Next project</p>
-            <p className="mt-4 flex items-end gap-6 font-serif text-[clamp(3rem,1.5rem+6vw,8rem)] italic leading-[0.9]">
-              {project.title}
-              <Mark className="mb-3 h-8 w-8 shrink-0 not-italic transition-transform duration-500 group-hover:translate-x-2" />
-            </p>
+            <p className="t-headline mt-3">{project.title}</p>
             <p className="t-caption mt-4 text-mouse">
               {project.type}
               {project.location ? ` · ${project.location}` : ""}

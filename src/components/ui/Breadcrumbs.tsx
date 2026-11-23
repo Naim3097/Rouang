@@ -9,6 +9,10 @@ export type Crumb = { name: string; href: string };
 export function Breadcrumbs({ items, tone = "light" }: { items: Crumb[]; tone?: "light" | "dark" | "photo" }) {
   const trail: Crumb[] = [{ name: "Home", href: "/" }, ...items];
   const colour = tone === "photo" ? "text-kapur" : tone === "dark" ? "text-mouse" : "text-ink-muted";
+  // The links are set in a muted grey, so on hover they come up to the full text colour. Over a
+  // photograph they are already full strength, and fade a step like any other link.
+  const link =
+    tone === "photo" ? "link-fade" : `transition-colors duration-300 ${tone === "dark" ? "hover:text-kapur" : "hover:text-ink"}`;
   return (
     <>
       <nav aria-label="Breadcrumb" className={`t-caption ${colour}`}>
@@ -23,7 +27,7 @@ export function Breadcrumbs({ items, tone = "light" }: { items: Crumb[]; tone?: 
                   </span>
                 ) : (
                   <>
-                    <Link href={c.href} className="link-reveal">
+                    <Link href={c.href} className={link}>
                       {c.name}
                     </Link>
                     <span aria-hidden="true">/</span>

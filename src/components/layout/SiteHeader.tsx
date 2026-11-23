@@ -7,7 +7,7 @@ import { Mark, Wordmark } from "@/components/brand/Brand";
 import type { NavItem } from "@/lib/nav";
 import { MobileMenu } from "./MobileMenu";
 
-type Tone = "light" | "dark";
+type Tone = "light" | "dark" | "rikyu";
 
 /**
  * Wordmark top left on the margin, like the title block on a drawing (kit p.8).
@@ -45,7 +45,7 @@ export function SiteHeader({ whatsapp, nav }: { whatsapp: string | null; nav: Na
         if (!best || best.contains(el)) best = el;
       }
       const t = best?.dataset.tone;
-      setTone(t === "dark" || t === "rikyu" ? "dark" : "light");
+      setTone(t === "dark" || t === "rikyu" ? t : "light");
     };
 
     const build = () => {
@@ -116,7 +116,10 @@ export function SiteHeader({ whatsapp, nav }: { whatsapp: string | null; nav: Na
     };
   }, []);
 
-  const dark = tone === "dark";
+  // Over the green the header is light text too; once solid, it is a bar of the deep green rather
+  // than a black band across it.
+  const dark = tone === "dark" || tone === "rikyu";
+  const bar = tone === "rikyu" ? "bg-rikyu-deep/95 text-kapur" : dark ? "bg-ink/95 text-kapur" : "bg-kapur/95 text-ink";
 
   return (
     <header
@@ -126,7 +129,7 @@ export function SiteHeader({ whatsapp, nav }: { whatsapp: string | null; nav: Na
       onFocusCapture={() => setHidden(false)}
       className={`site-header fixed inset-x-0 top-0 z-50 transition-[translate,background-color,color] duration-500 ease-[var(--ease-brand)] ${
         hidden ? "-translate-y-full" : "translate-y-0"
-      } ${solid ? (dark ? "bg-ink/95 text-kapur" : "bg-kapur/95 text-ink") : dark ? "text-kapur" : "text-ink"}`}
+      } ${solid ? bar : dark ? "text-kapur" : "text-ink"}`}
     >
       <div className="page-x flex h-[var(--header-h)] items-center justify-between gap-6">
         <Link href="/" className="block shrink-0" aria-label="ROUANG, home">
@@ -139,7 +142,12 @@ export function SiteHeader({ whatsapp, nav }: { whatsapp: string | null; nav: Na
               const current = pathname === item.href || pathname.startsWith(`${item.href}/`);
               return (
                 <li key={item.href}>
-                  <Link href={item.href} className="link-reveal text-[0.9375rem]" aria-current={current ? "page" : undefined}>
+                  {/* The page you are on is set in Medium, the rest in Regular. */}
+                  <Link
+                    href={item.href}
+                    className="link-fade t-meta aria-[current=page]:font-medium"
+                    aria-current={current ? "page" : undefined}
+                  >
                     {item.label}
                   </Link>
                 </li>
@@ -153,21 +161,21 @@ export function SiteHeader({ whatsapp, nav }: { whatsapp: string | null; nav: Na
         <div className="hidden items-center gap-3 lg:flex">
           <Link
             href="/projects"
-            className={`sweep group inline-flex items-center gap-3 rounded-full border py-2 pl-4 pr-2.5 text-[0.9375rem] ${
+            className={`sweep t-meta inline-flex items-center gap-3 rounded-full border py-2 pl-4 pr-2.5 ${
               dark ? "border-kapur/25" : "border-ink/20"
             }`}
           >
             <span className="whitespace-nowrap">See our projects</span>
-            <Mark className="h-5 w-5 transition-transform duration-500 group-hover:translate-x-0.5" />
+            <Mark className="h-5 w-5" />
           </Link>
           <Link
             href="/contact"
-            className={`sweep group inline-flex items-center gap-3 rounded-full border py-2 pl-4 pr-2.5 text-[0.9375rem] ${
+            className={`sweep t-meta inline-flex items-center gap-3 rounded-full border py-2 pl-4 pr-2.5 ${
               dark ? "border-kapur/60" : "border-ink/45"
             }`}
           >
             <span className="whitespace-nowrap">Discuss your project</span>
-            <Mark className="h-5 w-5 transition-transform duration-500 group-hover:translate-x-0.5" />
+            <Mark className="h-5 w-5" />
           </Link>
         </div>
 

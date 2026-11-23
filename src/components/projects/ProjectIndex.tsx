@@ -1,6 +1,5 @@
 import Image from "next/image";
 import Link from "next/link";
-import { Arrow } from "@/components/ui/Button";
 import type { Project } from "@/lib/content";
 import { publicImage } from "@/lib/content";
 
@@ -8,8 +7,10 @@ import { publicImage } from "@/lib/content";
  * Projects as an index of rows rather than a card grid. On pointer devices, hovering a row opens
  * a circular preview of its photograph: the aperture again, at the size of a thumbnail.
  * Pure CSS; below the large breakpoint a small circle sits at the start of each row instead.
+ * With `showRole` each row also states ROUANG's part in the project, for a list where the context
+ * (a service that includes construction) could suggest more than ROUANG did.
  */
-export function ProjectIndex({ projects, startAt = 1 }: { projects: Project[]; startAt?: number }) {
+export function ProjectIndex({ projects, startAt = 1, showRole = false }: { projects: Project[]; startAt?: number; showRole?: boolean }) {
   return (
     <ol className="border-t border-ink/15">
       {projects.map((p, i) => {
@@ -24,28 +25,37 @@ export function ProjectIndex({ projects, startAt = 1 }: { projects: Project[]; s
               <span className="t-label col-span-2 tabular-nums text-ink-muted sm:col-span-1">
                 {String(i + startAt).padStart(2, "0")}
               </span>
-              <span className="col-span-10 flex items-center gap-4 font-serif text-[clamp(1.75rem,1.2rem+2vw,3.25rem)] italic leading-[1.05] tracking-[-0.01em] transition-transform duration-700 ease-[var(--ease-brand)] group-hover:translate-x-2 sm:col-span-6 lg:col-span-5">
+              <span className="t-title col-span-10 flex items-center gap-4 sm:col-span-6 lg:col-span-5">
                 {photo ? (
                   <span className="relative block h-14 w-14 shrink-0 overflow-hidden rounded-full lg:hidden" aria-hidden="true">
                     <Image src={photo.src} alt="" fill sizes="56px" className="object-cover" style={photo.focus ? { objectPosition: photo.focus } : undefined} />
                   </span>
                 ) : null}
-                <span>
-                {p.title}
-                {p.isDraft ? <DraftTag placeholder={p.placeholder} /> : null}
+                <span className="link-name">
+                  {p.title}
+                  {p.isDraft ? <DraftTag placeholder={p.placeholder} /> : null}
                 </span>
               </span>
               <span className="t-caption col-span-10 col-start-3 text-ink-muted sm:col-span-3 sm:col-start-auto lg:col-span-3">
                 {p.type}
                 {p.location ? ` · ${p.location}` : ""}
                 {p.visualisation ? <span className="sm:hidden"> · Design proposal</span> : null}
+                {/* Each part of the role kept whole: a narrow column would otherwise split "interior / design". */}
+                {showRole ? (
+                  <span className="block">
+                    ROUANG&rsquo;s role:{" "}
+                    {p.scope.map((s, n) => (
+                      <span key={s} className="whitespace-nowrap">
+                        {s.toLowerCase()}
+                        {n < p.scope.length - 1 ? ", " : ""}
+                      </span>
+                    ))}
+                  </span>
+                ) : null}
               </span>
-              <span className="t-caption col-span-10 col-start-3 hidden text-ink-muted sm:col-span-1 sm:col-start-auto sm:block lg:col-span-2">
+              <span className="t-caption col-span-10 col-start-3 hidden text-ink-muted sm:col-span-2 sm:col-start-auto sm:block sm:text-right lg:col-span-3">
                 {p.sector === "residential" ? "Residential" : "Commercial"}
                 {p.visualisation ? <span className="block">Design proposal</span> : null}
-              </span>
-              <span className="col-span-1 hidden justify-self-end sm:block">
-                <Arrow className="transition-transform duration-500 ease-[var(--ease-brand)] group-hover:translate-x-1" />
               </span>
             </Link>
             {photo ? (
@@ -65,7 +75,7 @@ export function ProjectIndex({ projects, startAt = 1 }: { projects: Project[]; s
 
 export function DraftTag({ placeholder }: { placeholder?: boolean }) {
   return (
-    <span className="t-label ml-3 inline-block translate-y-[-0.4em] rounded-full border border-current px-2 py-0.5 align-middle font-sans text-[0.625rem] not-italic opacity-60">
+    <span className="t-label ml-3 inline-block rounded-full border border-current px-2 py-0.5 align-middle opacity-60">
       {placeholder ? "Layout placeholder" : "Draft"}
     </span>
   );

@@ -1,6 +1,6 @@
 # ROUANG website
 
-The website for ROUANG, a design-led interior studio for homes and businesses in Malaysia.
+The website for ROUANG, a design-led construction company for homes and businesses in Malaysia.
 Built with Next.js 16 (App Router, Cache Components), TypeScript, Tailwind CSS v4 and Supabase.
 
 > Status: **preview**. Content is in place and drafts are visible on preview builds, but the
@@ -46,6 +46,9 @@ src/lib/
   env.ts                 Production vs preview detection
   seo.ts, schema.ts      Metadata and schema.org builders
 src/components/          Brand, layout, home, projects, contact and UI components
+  home/                  One file per home-page section (SelectedWork, FlagshipScene, Showcase, StudioName, ...)
+src/app/globals.css      Design tokens, type scale, tones, buttons, links and shared motion
+src/styles/home/*.css    One stylesheet per home-page section, imported by globals.css in page order
 scripts/launch-check.mjs Launch gate
 scripts/media/           Image curation list and export pipeline
 supabase/migrations/     Database schema for enquiries
@@ -116,8 +119,8 @@ See [.env.example](.env.example) for the full list with notes. In Vercel, set th
 | Variable | Needed for |
 | --- | --- |
 | `NEXT_PUBLIC_SITE_URL` | Canonical URLs, sitemap, social cards (production) |
-| `STUDIO_LEGAL_NAME`, `STUDIO_REGISTRATION_NO` | Footer and privacy notice |
-| `NEXT_PUBLIC_CONTACT_EMAIL`, `NEXT_PUBLIC_CONTACT_PHONE`, `NEXT_PUBLIC_WHATSAPP_NUMBER` | Contact links and WhatsApp buttons |
+| `STUDIO_LEGAL_NAME`, `STUDIO_REGISTRATION_NO`, `STUDIO_CIDB_NO`, `NEXT_PUBLIC_CONTACT_EMAIL`, `NEXT_PUBLIC_CONTACT_PHONE` | Optional overrides. The company profile's values are the defaults in `src/config/studio.ts` |
+| `NEXT_PUBLIC_WHATSAPP_NUMBER` | WhatsApp buttons, hidden until set (the profile does not say the phone takes WhatsApp) |
 | `SUPABASE_URL`, `SUPABASE_SECRET_KEY`, `ENQUIRY_IP_SALT` | Storing enquiries (server only) |
 | `RESEND_API_KEY`, `ENQUIRY_NOTIFY_TO`, `ENQUIRY_NOTIFY_FROM` | Email notification of new enquiries |
 | `NEXT_PUBLIC_TURNSTILE_SITE_KEY`, `TURNSTILE_SECRET_KEY` | Cloudflare Turnstile spam check. Set both or neither. Required when enquiries go by email only (no Supabase rate limit) |

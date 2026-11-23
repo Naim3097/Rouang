@@ -4,7 +4,7 @@ export default function manifest(): MetadataRoute.Manifest {
   return {
     name: "ROUANG",
     short_name: "ROUANG",
-    description: "Interior design studio for homes and businesses.",
+    description: "Design-led construction company for homes and businesses.",
     start_url: "/",
     display: "browser",
     background_color: "#141414",

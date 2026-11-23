@@ -4,7 +4,8 @@
  * ROUANG design tokens.
  * Source of truth: ROUANG brand kit (colour palette p.10, typography p.11–13, graphic elements p.14–15).
  * Four colours and nothing else. Tints are allowed where a layout needs a step between them.
- * Rikyū Grey is the only colour: a seal, a hairline, one panel. Never a whole page.
+ * Rikyū Grey is the only colour: a seal, a hairline, the ground of a section where the page turns
+ * to the studio itself (on the home page, 02 Studio and the enquiry panel). Never a whole page.
  */
 @theme {
   --color-ink: #141414;          /* Chinese Black: wordmark, text, dark panels */
@@ -19,8 +20,9 @@
   --color-ink-raised: #1d1d1d;   /* a step up from ink for dark panels */
   --color-kapur-deep: #e7e7e6;   /* a step down from kapur for quiet panels */
 
+  /* One typeface, kept light: Regular 400 and Light 300 carry the hierarchy with size; Medium 500
+     is for emphasis only. The scale itself is the --fs-* sizes in :root and the t-* utilities. */
   --font-sans: var(--font-outfit), ui-sans-serif, system-ui, sans-serif;
-  --font-serif: var(--font-garamond), "Iowan Old Style", Georgia, serif;
 
   /* One motion language. Brand: anything entering or answering a hover. Settle: a photograph
      changing state. Scrub: every scroll-driven move, so scrolling never feels mechanical. */
@@ -31,14 +33,14 @@
   /* Tailwind's own transition default (150ms, its own curve) becomes the house one. */
   --default-transition-duration: 500ms;
   --default-transition-timing-function: cubic-bezier(0.2, 0.7, 0.1, 1);
-
-  --breakpoint-xs: 26rem;
 }
 
 :root {
   --page-gutter: clamp(1.25rem, 4.6vw, 5rem);
   --grid-gap: clamp(1rem, 2vw, 2rem);
-  --section-space: clamp(6rem, 12vw, 11.5rem);
+  /* The space above and below a section: 80px on phones and tablets, 130px at 1440, 144px at most.
+     Set to the lighter type scale, so a section title keeps the room around it in proportion. */
+  --section-space: clamp(5rem, 9vw, 9rem);
   --header-h: 4.75rem;
   --hairline-light: rgb(20 20 20 / 0.14);
   --hairline-dark: rgb(243 243 243 / 0.16);
@@ -47,6 +49,20 @@
   --dur-base: 0.55s;
   --dur-reveal: 0.9s;
   --dur-slow: 1.4s;
+
+  /* The type scale, one size per level (the t-* utilities below set the rest). Each grows evenly
+     from a 360px phone to a 1920px screen and holds outside that range. Section stylesheets that
+     need a level without its utility read these. */
+  --fs-display: clamp(2.25rem, 1.8462rem + 1.7949vw, 4rem);      /* 36 → 64px */
+  --fs-h1: clamp(2rem, 1.7115rem + 1.2821vw, 3.25rem);           /* 32 → 52px */
+  --fs-h2: clamp(1.625rem, 1.4519rem + 0.7692vw, 2.375rem);      /* 26 → 38px */
+  --fs-quote: clamp(1.25rem, 1.1346rem + 0.5128vw, 1.75rem);     /* 20 → 28px */
+  --fs-h3: clamp(1.25rem, 1.1923rem + 0.2564vw, 1.5rem);         /* 20 → 24px */
+  --fs-lead: clamp(1.125rem, 1.0962rem + 0.1282vw, 1.25rem);     /* 18 → 20px */
+  --fs-body: clamp(1rem, 0.9856rem + 0.0641vw, 1.0625rem);       /* 16 → 17px */
+  --fs-meta: clamp(0.875rem, 0.8606rem + 0.0641vw, 0.9375rem);   /* 14 → 15px */
+  --fs-caption: 0.8125rem;                                       /* 13px */
+  --fs-label: clamp(0.6875rem, 0.6731rem + 0.0641vw, 0.75rem);   /* 11 → 12px */
   color-scheme: light;
 }
 
@@ -72,8 +88,8 @@
     background: var(--color-kapur);
     color: var(--color-ink);
     font-family: var(--font-sans);
-    font-size: 1.0625rem;      /* 17px, per kit */
-    line-height: 1.7059;       /* 29px */
+    font-size: var(--fs-body);
+    line-height: 1.65;
     font-weight: 400;
     font-feature-settings: "ss01" 0;
     -webkit-font-smoothing: antialiased;
@@ -104,9 +120,11 @@
     max-width: 100%;
   }
 
+  /* Outfit has no italic, and a slanted copy of it would be a fake: emphasis is set in Medium. */
   em,
   i {
-    font-style: italic;
+    font-style: normal;
+    font-weight: 500;
   }
 
   hr {
@@ -115,83 +133,134 @@
   }
 }
 
-/* ——— Type scale. Five levels and no more (kit p.13), plus caps labels. ——— */
+/* ——— Type scale ———
+ * Outfit only, one utility per level, each level with one job (the table is in
+ * docs/VISUAL-DIRECTION.md). Size carries the hierarchy and weight stays light: Regular 400 for
+ * titles and text, Light 300 for leads, quotes and the second line of a title pair. Medium 500 is
+ * for emphasis only; nothing is set heavier. Sizes are the --fs-* values in :root.
+ */
 
-/* Headline: Outfit Medium 62/64, tracking -3%, sentence case. Fluid between phone and wide desktop. */
-@utility t-headline {
-  font-family: var(--font-sans);
-  font-weight: 500;
-  font-size: clamp(2.375rem, 1.55rem + 3.1vw, 3.875rem);
-  line-height: 1.04;
-  letter-spacing: -0.03em;
-  text-wrap: balance;
-}
-
-/* The hero is the same level, set larger because it is the only one on the page. */
-@utility t-headline-hero {
-  font-family: var(--font-sans);
-  font-weight: 500;
-  font-size: clamp(2.625rem, 1.4rem + 4.6vw, 5.75rem);
-  line-height: 1.01;
-  letter-spacing: -0.035em;
-  text-wrap: balance;
-}
-
-/* Sub-headline: Outfit Regular 28/36. */
-@utility t-sub {
+/* Display: the home page's statement, and nothing else. Its second line is set in t-follow. */
+@utility t-display {
   font-family: var(--font-sans);
   font-weight: 400;
-  font-size: clamp(1.3125rem, 1.1rem + 0.75vw, 1.75rem);
-  line-height: 1.29;
-  letter-spacing: -0.012em;
+  font-size: var(--fs-display);
+  line-height: 1.06;
+  letter-spacing: -0.025em;
+  text-wrap: balance;
+}
+
+/* Page title: the h1 that opens every other page, the case-study name included. */
+@utility t-headline-hero {
+  font-family: var(--font-sans);
+  font-weight: 400;
+  font-size: var(--fs-h1);
+  line-height: 1.08;
+  letter-spacing: -0.022em;
+  text-wrap: balance;
+}
+
+/* Section title: every h2, both lines of a title pair included. */
+@utility t-headline {
+  font-family: var(--font-sans);
+  font-weight: 400;
+  font-size: var(--fs-h2);
+  line-height: 1.12;
+  letter-spacing: -0.018em;
+  text-wrap: balance;
+}
+
+/* The second line of a title pair: the same size, in Light. Pages add Rikyū Grey, which on Milky
+   White measures 3:1 and so is kept to 24px and up (every title level starts above that). */
+@utility t-follow {
+  font-weight: 300;
+}
+
+/* Quote and Malay lines: Light, a step above the lead, set apart by weight. */
+@utility t-quote {
+  font-family: var(--font-sans);
+  font-weight: 300;
+  font-size: var(--fs-quote);
+  line-height: 1.4;
+  letter-spacing: -0.01em;
   text-wrap: pretty;
 }
 
-/* Body: Outfit Regular 17/29. */
+/* Card and project title: every h3, and a project's or a service's name in a card or a list. */
+@utility t-title {
+  font-family: var(--font-sans);
+  font-weight: 400;
+  font-size: var(--fs-h3);
+  line-height: 1.25;
+  letter-spacing: -0.01em;
+  text-wrap: balance;
+}
+
+/* Lead and sub-heading: the paragraph under a title, a standfirst, a summary. Light from 18px,
+   where its strokes still hold. */
+@utility t-sub {
+  font-family: var(--font-sans);
+  font-weight: 300;
+  font-size: var(--fs-lead);
+  line-height: 1.5;
+  letter-spacing: -0.005em;
+  text-wrap: pretty;
+}
+
+/* Body: Regular. Light was measured and left out here: at 16px its stems are one pixel wide and
+   read faint on Milky White, most of all in the softer greys body text is set in. */
 @utility t-body {
   font-family: var(--font-sans);
   font-weight: 400;
-  font-size: 1.0625rem;
-  line-height: 1.7059;
+  font-size: var(--fs-body);
+  line-height: 1.65;
   text-wrap: pretty;
 }
 
-/* Quote and Malay: EB Garamond Italic 23/34, one step larger than the Outfit around it. */
-@utility t-quote {
-  font-family: var(--font-serif);
-  font-style: italic;
+/* Supporting information: facts, a line under a name in a list or a card, interface text. */
+@utility t-meta {
+  font-family: var(--font-sans);
   font-weight: 400;
-  font-size: clamp(1.3125rem, 1.15rem + 0.55vw, 1.4375rem);
-  line-height: 1.48;
-  text-wrap: pretty;
+  font-size: var(--fs-meta);
+  line-height: 1.55;
 }
 
-/* The italic half of a title pair, sized to sit beside an Outfit headline. */
-@utility t-italic-display {
-  font-family: var(--font-serif);
-  font-style: italic;
-  font-weight: 400;
-  letter-spacing: -0.01em;
-  line-height: 1;
-}
-
-/* Caption: Outfit Regular 13/20. */
+/* Small and caption: photograph captions, hints, notes, the legal line. */
 @utility t-caption {
   font-family: var(--font-sans);
   font-weight: 400;
-  font-size: 0.8125rem;
-  line-height: 1.54;
+  font-size: var(--fs-caption);
+  line-height: 1.5;
 }
 
-/* Labels: Regular 400, caps, tracking 0.12em. Capitals are reserved for very small labels. */
+/* Label and eyebrow: caps, tracked. Capitals are reserved for very small labels (kit p.11). */
 @utility t-label {
   font-family: var(--font-sans);
   font-weight: 400;
-  font-size: 0.75rem;
+  font-size: var(--fs-label);
   line-height: 1.4;
   letter-spacing: 0.12em;
   text-transform: uppercase;
   text-wrap: balance;
+}
+
+/* A section label in a small pill (Label with `pill`): a hairline ring in the label's own colour,
+   sized to its words. No fill, so the label keeps the contrast it has on Milky White, Chinese
+   Black or the Rikyū green: even a faint tint would take ink-muted on kapur-deep under 4.5:1.
+   A utility, so classes passed to the label (mx-auto to centre it, a colour) still apply. */
+/* Sized to its words both ways, so a grid cell (a label in the margin of an inner page) never
+   stretches it into a column. */
+@utility label-pill {
+  display: flex;
+  width: fit-content;
+  height: fit-content;
+  align-items: center;
+  gap: 0.5rem;
+  min-height: 1.75rem;
+  padding: 0.25rem 0.875rem;
+  border: 1px solid color-mix(in oklab, currentColor 40%, transparent);
+  border-radius: 999px;
+  white-space: nowrap;
 }
 
 /* ——— Layout ——— */
@@ -301,30 +370,6 @@
   height: 1px;
 }
 
-/* Crosshair field used once per layout as the quiet pattern (kit p.15). */
-.pattern-cross {
-  --cross-gap: 88px;
-  background-image:
-    linear-gradient(currentColor, currentColor),
-    linear-gradient(currentColor, currentColor);
-  background-size: 1px 9px, 9px 1px;
-  background-position: 0 0, 0 0;
-  background-repeat: no-repeat;
-  -webkit-mask-image: radial-gradient(ellipse at center, #000 0%, transparent 72%);
-  mask-image: radial-gradient(ellipse at center, #000 0%, transparent 72%);
-}
-
-.pattern-cross-field {
-  background-image:
-    linear-gradient(to right, transparent 4px, currentColor 4px, currentColor 5px, transparent 5px),
-    linear-gradient(to bottom, transparent 4px, currentColor 4px, currentColor 5px, transparent 5px);
-  background-size: 88px 88px, 88px 88px;
-  -webkit-mask-image:
-    linear-gradient(to bottom, transparent 4px, #000 4px, #000 5px, transparent 5px),
-    linear-gradient(to right, transparent 4px, #000 4px, #000 5px, transparent 5px);
-  opacity: 0.18;
-}
-
 /* Halftone dots that fade across a Rikyū panel (kit p.15). */
 .pattern-halftone {
   background-image: radial-gradient(circle at center, rgb(243 243 243 / 0.55) 0 1.6px, transparent 2.1px);
@@ -346,10 +391,11 @@
   padding: 0.5rem 0.5625rem 0.5rem 1.5rem;
   border-radius: 999px;
   border: 1px solid currentColor;
-  font-size: 1rem;
+  /* Interface text: the supporting-information size, like the header's pills. */
+  font-size: var(--fs-meta);
   line-height: 1.2;
   font-weight: 400;
-  letter-spacing: -0.005em;
+  letter-spacing: 0;
   white-space: nowrap;
   transition:
     background-color var(--dur-base) var(--ease-brand),
@@ -423,6 +469,7 @@
   }
 }
 
+/* The ring is the mark, not an arrow: it stays still while the pill floods. */
 .btn-ring {
   display: grid;
   place-items: center;
@@ -430,12 +477,6 @@
   height: 2.25rem;
   margin-left: auto;
   flex: none;
-  transition: translate var(--dur-base) var(--ease-brand);
-}
-
-.btn:hover .btn-ring,
-.btn:focus-visible .btn-ring {
-  translate: 0.25rem 0;
 }
 
 .btn-solid-light {
@@ -459,34 +500,30 @@
   background: var(--color-ink);
 }
 
-/* ——— Text links: a hairline that draws in on hover. ——— */
+/* ——— Text links: no line under them and no arrow after them. ———
+   Hovering a link eases its words a step quieter. In a link that holds more than its name (a card,
+   a row of an index), only the part marked .link-name changes. The faded words keep at least 5:1
+   on Milky White and Chinese Black. The Rikyū panel is a darker ground (5:1 at rest), so there they
+   fade less, to 3.9:1 while the pointer is on them.
+   Keyboard focus is the outline ring, with the words at full strength. Links set in a muted grey
+   (breadcrumbs, an article's contents) come up to the full text colour instead. Links inside running
+   text (articles, case studies, the form's consent line) keep their underline: there it is the only
+   cue that does not rely on colour. */
 
-.link-line {
-  background-image: linear-gradient(currentColor, currentColor);
-  background-size: 100% 1px;
-  background-position: 0 100%;
-  background-repeat: no-repeat;
-  padding-bottom: 2px;
-  transition: background-size var(--dur-base) var(--ease-brand);
+.link-fade,
+.link-name {
+  transition: opacity var(--dur-quick) var(--ease-brand);
 }
 
-.link-line:hover {
-  background-size: 0% 1px;
-  background-position: 100% 100%;
+@media (hover: hover) {
+  .link-fade:hover,
+  a:hover .link-name {
+    opacity: var(--link-fade, 0.65);
+  }
 }
 
-.link-reveal {
-  background-image: linear-gradient(currentColor, currentColor);
-  background-size: 0% 1px;
-  background-position: 0 100%;
-  background-repeat: no-repeat;
-  padding-bottom: 2px;
-  transition: background-size var(--dur-base) var(--ease-brand);
-}
-
-.link-reveal:hover,
-.link-reveal[aria-current="page"] {
-  background-size: 100% 1px;
+[data-tone="rikyu"] {
+  --link-fade: 0.8;
 }
 
 /* ——— Motion. Everything works without it; reduced motion removes it. ———
@@ -510,24 +547,34 @@
       animation-range: entry 0% cover 50%;
     }
 
+    /* The rule draws itself left to right as it rises into view from below, and is finished the
+       moment all of it is on screen. The three parts share the rule's own timeline (24px tall:
+       the left run at its top, the right run at its foot), not the height of the screen, so
+       wherever it comes to rest in view it is whole, even at the foot of the first screen on a
+       short phone. While it is still crossing the foot of the screen, the curve is drawn about as
+       far down as it can be seen. */
+    .curve-rule {
+      view-timeline: --curve-rule block;
+    }
+
     .curve-rule path {
       animation: curve-draw linear both;
-      animation-timeline: view();
-      animation-range: entry 20% cover 45%;
+      animation-timeline: --curve-rule;
+      animation-range: entry 10% entry 80%;
     }
 
     .curve-rule > span:first-child {
       transform-origin: left center;
       animation: rule-grow linear both;
-      animation-timeline: view();
-      animation-range: entry 10% cover 30%;
+      animation-timeline: --curve-rule;
+      animation-range: entry 0% entry 35%;
     }
 
     .curve-rule > span:last-child {
       transform-origin: left center;
       animation: rule-grow linear both;
-      animation-timeline: view();
-      animation-range: cover 30% cover 50%;
+      animation-timeline: --curve-rule;
+      animation-range: entry 70% entry 100%;
     }
   }
 }
@@ -553,1522 +600,37 @@
   }
 }
 
-/* ——— Hero: the ROUANG O built into a concrete wall, looking out to the client's scenery. ———
-   The wall is a path-traced render (scripts/render/o-installation) with the opening left
-   transparent; the scenery photograph sits behind it, unaltered. Everything is placed from the
-   render's own geometry (o-installation.json), in container units of the stage, so the image,
-   the words in the opening and the intro's O line up at any screen shape. The image always
-   covers the stage; --img-w and --img-h are its covered size.
-     --o-*    the emblem's outer edge (front plate), as fractions of the image
-     --lip-*  the emblem's inner edge at the front, where the frame meets the opening
-     --zoom-* the point the camera moves toward, and how far, to pass through the opening
-     --sv-*   how the view is framed: the photograph's sun (--sv-ax/ay, fractions of the photo) is
-              placed at --sv-bx/by of the wall image, at --sv-k0 times its cover size
-   The view is far away, so as the camera moves it barely grows (--sv-k0 to --sv-k1, about the
-   same point the wall grows about) and never shows an edge: its offset is clamped so the photo
-   always covers the screen. Selected Work takes the same view over at --sv-k1, so these are set on
-   both. Landscape screens use the 16:9 render, portrait screens (max-aspect-ratio 4/5) the tall one. */
+/* ——— Home page: one stylesheet per section, in the order of the page (src/styles/home). ———
+   Each file names the components it styles. Plain CSS takes @import only at the top of a file, but
+   these are compiled by Tailwind (@tailwindcss/turbopack), which inlines each one where it stands.
+   So the sections keep their place in the cascade: after the shared tones, buttons, links and
+   motion above (a section rule overrides one of those at the same specificity), and before the
+   other pages and the utilities below. */
+@import "../styles/home/hero.css";
+@import "../styles/home/work.css";
+@import "../styles/home/showcase.css";
+@import "../styles/home/studio.css";
+@import "../styles/home/pathways.css";
+@import "../styles/home/inside.css";
+@import "../styles/home/process.css";
 
-.hero-track,
-.work-scene {
-  --img-ar: 1.77778;
-  /* hero geometry: desktop (scripts/render/o-installation/site-geometry.cjs) */
-  --o-x: 0.5;
-  --o-y: 0.48849;
-  --o-w: 0.43556;
-  --o-h: 0.76;
-  --lip-x: 0.50028;
-  --lip-y: 0.47094;
-  --lip-w: 0.39119;
-  --lip-h: 0.64843;
-  --zoom-x: 0.5002;
-  --zoom-y: 0.40878;
-  --zoom-s: 3.74;
-  /* end hero geometry: desktop */
-  --sv-ax: 0.339;
-  --sv-ay: 0.619;
-  --sv-bx: 0.425;
-  --sv-by: 0.535;
-  --sv-k0: 1.16;
-  --sv-k1: calc(var(--sv-k0) * 1.06);
-  /* Where the wall image is held when the screen crops its top and bottom (a band may hold it
-     high), and the vertical offset that gives from the centred position. */
-  --img-fy: 0.5;
-  --img-t: clamp(calc(100cqh - var(--img-h)), calc(50cqh - var(--img-h) * var(--img-fy)), 0px);
-  --img-dy: calc(var(--img-t) - 50cqh + var(--img-h) / 2);
-  /* The opening's shape, for clipping the mist (set on the section by HeroAperture). */
-  --o-mask: var(--o-mask-desktop);
-  --img-w: max(100cqw, 100cqh * var(--img-ar));
-  --img-h: max(100cqh, 100cqw / var(--img-ar));
-  --sc-w: max(100cqw, 100cqh * 1.77778);
-  --sc-h: max(100cqh, 100cqw / 1.77778);
-}
-
-/* The move through the O is solved for bands of screen shape (site-geometry.cjs, BANDS), so the
-   edge of the opening leaves the screen just as the move ends on every screen: squarer landscape
-   screens, very wide ones, and (below) portrait tablets each get their own zoom. */
-@media (max-aspect-ratio: 7/5) {
-  .hero-track,
-  .work-scene {
-    /* hero zoom: desktop-square (scripts/render/o-installation/site-geometry.cjs) */
-    --zoom-x: 0.51295;
-    --zoom-y: 0.38764;
-    --zoom-s: 3.39;
-    /* end hero zoom: desktop-square */
-  }
-}
-
-@media (min-aspect-ratio: 2/1) {
-  .hero-track,
-  .work-scene {
-    /* hero zoom: desktop-wide (scripts/render/o-installation/site-geometry.cjs) */
-    --zoom-x: 0.5002;
-    --zoom-y: 0.40878;
-    --zoom-s: 3.57;
-    /* end hero zoom: desktop-wide */
-  }
-}
-
-@media (max-aspect-ratio: 4/5) {
-  .hero-track,
-  .work-scene {
-    --img-ar: 0.46137;
-    /* hero geometry: portrait (scripts/render/o-installation/site-geometry.cjs) */
-    --o-x: 0.5;
-    --o-y: 0.63429;
-    --o-w: 0.86;
-    --o-h: 0.38944;
-    --lip-x: 0.50056;
-    --lip-y: 0.62529;
-    --lip-w: 0.77261;
-    --lip-h: 0.33236;
-    --zoom-x: 0.6526;
-    --zoom-y: 0.66933;
-    --zoom-s: 4.38;
-    /* end hero geometry: portrait */
-    --sv-bx: 0.72;
-    --sv-by: 0.7;
-    --sv-k0: 1.2;
-    --o-mask: var(--o-mask-portrait);
-  }
-}
-
-@media (min-aspect-ratio: 3/5) and (max-aspect-ratio: 4/5) {
-  .hero-track,
-  .work-scene {
-    /* hero zoom: portrait-tablet (scripts/render/o-installation/site-geometry.cjs) */
-    --zoom-x: 0.6526;
-    --zoom-y: 0.64752;
-    --zoom-s: 3.68;
-    --img-fy: 0.57;
-    /* end hero zoom: portrait-tablet */
-    /* Framed larger than on phones, so the photograph's branch stays above the opening. */
-    --sv-k0: 1.55;
-  }
-}
-
-.hero-text-past {
-  position: absolute;
-  top: 100svh;
-  left: 0;
-  width: 1px;
-  height: 1px;
-  pointer-events: none;
-}
-
-/* The ground is the stage's, not the section's: the section's last screen lies over Selected Work,
-   which must show through once the stage stops being drawn. */
-.hero-track {
-  background: none;
-}
-
-/* The large viewport: on phones the stage must still fill the screen once the browser's toolbar
-   has slid away. (The scroll lengths stay in svh, so the timeline does not move with it.) */
-.hero-stage {
-  height: 100lvh;
-  overflow: clip;
-  container-type: size;
-  background: #2b2c2c;
-}
-
-.hero-scenery,
-.hero-scene {
-  position: absolute;
-}
-
-/* The view: the photograph at its cover size, centred on the screen, offset so its sun sits low
-   in the opening, clear of the wave and the words, and grown by --sv-k. The offset (--sv-tx/ty) is
-   clamped to what keeps the photo covering the screen at --sv-k0, whatever the screen's shape. As
-   the view grows from --sv-k0 it stays fixed at the point the camera moves toward (P, where the
-   wall grows from too), so it only ever opens out around that point and keeps covering. */
-.hero-scenery,
-.work-view {
-  --sv-px: calc(var(--sc-w) / 2 + (var(--zoom-x) - 0.5) * var(--img-w));
-  --sv-py: calc(var(--sc-h) / 2 + (var(--zoom-y) - 0.5) * var(--img-h) + var(--img-dy));
-  --sv-tx: clamp(
-    calc(50cqw + var(--sc-w) / 2 - var(--sv-px) - var(--sv-k0) * (var(--sc-w) - var(--sv-px))),
-    calc((var(--sv-bx) - var(--zoom-x)) * var(--img-w) - var(--sv-k0) * ((var(--sv-ax) - 0.5) * var(--sc-w) - var(--sv-px) + var(--sc-w) / 2)),
-    calc((var(--sv-k0) - 1) * var(--sv-px) - 50cqw + var(--sc-w) / 2)
-  );
-  --sv-ty: clamp(
-    calc(50cqh + var(--sc-h) / 2 - var(--sv-py) - var(--sv-k0) * (var(--sc-h) - var(--sv-py))),
-    calc((var(--sv-by) - var(--zoom-y)) * var(--img-h) - var(--sv-k0) * ((var(--sv-ay) - 0.5) * var(--sc-h) - var(--sv-py) + var(--sc-h) / 2)),
-    calc((var(--sv-k0) - 1) * var(--sv-py) - 50cqh + var(--sc-h) / 2)
-  );
-  position: absolute;
-  left: calc(50cqw - var(--sc-w) / 2);
-  top: calc(50cqh - var(--sc-h) / 2);
-  width: var(--sc-w);
-  height: var(--sc-h);
-  /* At --sv-k0 this is exactly "scale about P, then move by --sv-t"; P stays put as k grows. */
-  transform-origin: calc(var(--sv-px) - var(--sv-tx) / var(--sv-k0)) calc(var(--sv-py) - var(--sv-ty) / var(--sv-k0));
-  translate: calc(var(--sv-tx) / var(--sv-k0)) calc(var(--sv-ty) / var(--sv-k0));
-  scale: var(--sv-k0);
-  /* The photograph's own sky, in case it arrives after the wall. */
-  background: linear-gradient(to bottom, #c9bfd6 0%, #f1c9b6 38%, #f3a56f 58%, #b7a3a4 74%, #e2b9a6 100%);
-}
-
-.work-view {
-  scale: var(--sv-k1);
-}
-
-.hero-scenery img,
-.work-view img,
-.hero-wall img {
-  display: block;
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-}
-
-.hero-scene {
-  left: calc(50cqw - var(--img-w) / 2);
-  top: var(--img-t);
-  width: var(--img-w);
-  height: var(--img-h);
-  transform-origin: calc(var(--zoom-x) * 100%) calc(var(--zoom-y) * 100%);
-}
-
-.hero-wall {
-  position: absolute;
-  inset: 0;
-}
-
-/* A little shade under the header, so the white navigation reads on the concrete. */
-.hero-shade {
-  position: absolute;
-  inset: 0;
-  pointer-events: none;
-  background: linear-gradient(to bottom, rgb(10 10 10 / 0.42) 0, rgb(10 10 10 / 0.14) calc(var(--header-h) + 1rem), rgb(10 10 10 / 0) calc(var(--header-h) + 5rem));
-}
-
-/* The words sit inside the opening, in the calm sky above the curve of the emblem. Everything in
-   it, mist included, is clipped to the opening's own shape (the render's alpha, as a mask the size
-   of the wall image, placed so it lines up with this box: the lip's bounds). */
-.hero-o {
-  position: absolute;
-  left: calc((var(--lip-x) - var(--lip-w) / 2) * 100%);
-  top: calc((var(--lip-y) - var(--lip-h) / 2) * 100%);
-  width: calc(var(--lip-w) * 100%);
-  height: calc(var(--lip-h) * 100%);
-  container-type: inline-size;
-  color: var(--color-ink);
-  /* A faint warm halo keeps the words clear where the view behind them is busy (leaves, the sun). */
-  text-shadow: 0 0 0.5em rgb(255 244 232 / 0.6);
-  -webkit-mask-image: var(--o-mask);
-  mask-image: var(--o-mask);
-  -webkit-mask-repeat: no-repeat;
-  mask-repeat: no-repeat;
-  -webkit-mask-size: calc(100% / var(--lip-w)) calc(100% / var(--lip-h));
-  mask-size: calc(100% / var(--lip-w)) calc(100% / var(--lip-h));
-  -webkit-mask-position: calc((var(--lip-x) - var(--lip-w) / 2) / (1 - var(--lip-w)) * 100%) calc((var(--lip-y) - var(--lip-h) / 2) / (1 - var(--lip-h)) * 100%);
-  mask-position: calc((var(--lip-x) - var(--lip-w) / 2) / (1 - var(--lip-w)) * 100%) calc((var(--lip-y) - var(--lip-h) / 2) / (1 - var(--lip-h)) * 100%);
-}
-
-.hero-statement,
-.hero-copy {
-  position: absolute;
-  inset: 0 0 18% 0;
+/* ——— Projects page: built work, then design proposals, each a plain grid of equal plates. ———
+   The sector filter sets data-filter on their wrapper. A group left with nothing to show goes,
+   heading and all; the gap between groups belongs to the wrapper, so it goes with it. */
+.project-plates {
   display: flex;
   flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  text-align: center;
+  row-gap: clamp(5rem, 10vw, 8rem);
 }
 
-.hero-statement {
-  padding-inline: 12cqi;
-}
-
-.hero-line-1 {
-  font-weight: 500;
-  font-size: 8.4cqi;
-  line-height: 1.04;
-  letter-spacing: -0.035em;
-  text-wrap: balance;
-}
-
-.hero-line-2 {
-  margin-top: 2.4cqi;
-  font-weight: 300;
-  font-size: max(4.6cqi, 0.875rem);
-  line-height: 1.25;
-  letter-spacing: -0.012em;
-}
-
-.hero-copy {
-  padding-inline: 15cqi;
-  font-size: max(3.5cqi, 0.8125rem);
-  line-height: 1.55;
-  text-wrap: balance;
-}
-
-@media (max-aspect-ratio: 4/5) {
-  /* Held higher in the opening on tall screens, where the sun sits low and to the right. The
-     description is longer, so it sits lower and narrower, where the round of the opening is widest;
-     the view is held so its sun sits below both (--sv-by, --sv-k0 in the portrait block). */
-  .hero-statement {
-    inset: 0 0 24% 0;
-  }
-
-  .hero-copy {
-    inset: 0 0 18% 0;
-  }
-
-  .hero-statement {
-    padding-inline: 9cqi;
-  }
-
-  .hero-line-1 {
-    font-size: 9.8cqi;
-  }
-
-  .hero-line-2 {
-    font-size: 5.6cqi;
-  }
-
-  .hero-copy {
-    padding-inline: 17cqi;
-    font-size: max(4.4cqi, 0.8125rem);
-    line-height: 1.45;
-  }
-}
-
-/* Short landscape screens: the description sits a little higher, clear of the sun and the wave. */
-@media (max-height: 30rem) and (min-aspect-ratio: 4/5) {
-  .hero-copy {
-    inset: 0 0 26% 0;
-    line-height: 1.45;
-  }
-}
-
-/* The haze each word gives off as it disperses or condenses: the word again, as a soft pale glow
-   (a static text-shadow, so only its opacity and position move). */
-.hero-wisp,
-.hero-word {
-  position: relative;
-}
-
-.hero-wisp::after,
-.hero-word::after {
-  content: attr(data-t);
-  position: absolute;
-  inset: 0;
-  color: transparent;
-  text-shadow:
-    0 0 0.2em rgb(255 250 244 / 0.95),
-    0 0 0.55em rgb(255 247 238 / 0.8),
-    0 0 1.4em rgb(255 244 232 / 0.5);
-  opacity: 0;
-  pointer-events: none;
-}
-
-/* Mist (scripts/media/mist.cjs), lifted to white against the sky. */
-.hero-mist {
-  position: absolute;
-  inset: 0;
-  pointer-events: none;
-}
-
-.hero-mist > span,
-.hero-mist::before {
-  position: absolute;
-  opacity: 0;
-  background-position: center;
-  background-repeat: no-repeat;
-  background-size: contain;
-  filter: brightness(1.75);
-}
-
-.hero-mist-1 {
-  left: -18%;
-  top: 12%;
-  width: 136%;
-  aspect-ratio: 2;
-  background-image: url("/images/brand/mist-wisp-1.webp");
-}
-
-.hero-mist-2 {
-  left: -10%;
-  top: 24%;
-  width: 124%;
-  aspect-ratio: 2;
-  background-image: url("/images/brand/mist-wisp-2.webp");
-  transform: scaleX(-1);
-}
-
-.hero-mist-3,
-.hero-mist::before {
-  left: 8%;
-  top: 0;
-  width: 84%;
-  aspect-ratio: 1;
-  background-image: url("/images/brand/mist-bloom.webp");
-}
-
-.hero-mist::before {
-  content: "";
-}
-
-/* Without scroll-driven animation the description cannot replace the statement, so it follows the
-   hero instead. */
-.hero-copy-static {
+.project-plates[data-filter="residential"] [data-sector="commercial"],
+.project-plates[data-filter="commercial"] [data-sector="residential"] {
   display: none;
 }
 
-@supports not (animation-timeline: view()) {
-  .hero-copy {
-    display: none;
-  }
-
-  .hero-copy-static {
-    display: block;
-    position: relative;
-    padding-block: 2.5rem 3.5rem;
-    background: #2b2c2c;
-    color: var(--color-kapur);
-    font-size: 1.125rem;
-    line-height: 1.6;
-    text-align: center;
-    text-wrap: balance;
-  }
-}
-
-@supports (animation-timeline: view()) {
-  /* The hero is the first thing on the page, so scroll position maps straight onto it. The stage
-     holds for 240svh: the statement gives way to the description, the description goes, and the
-     camera moves through the O until the view fills the screen. */
-  .hero-track {
-    position: relative;
-    z-index: 1;
-    height: calc(240svh + 100lvh);
-  }
-
-  .hero-stage {
-    position: sticky;
-    top: 0;
-  }
-
-  @media (prefers-reduced-motion: no-preference) {
-    /* The statement dissolves word by word, the front moving through it: each word fades as a
-       whole and drifts up a little, while its pale haze brightens, rises and opens out, lingering
-       as the description gathers. The words' resting state here is gone (no fill afterwards). */
-    .hero-wisp .hero-ink {
-      opacity: 0;
-      animation: hero-disperse var(--ease-scrub) backwards;
-      animation-timeline: scroll(root block);
-      animation-range: calc(4svh + var(--d) * 30svh) calc(30svh + var(--d) * 30svh);
-    }
-
-    .hero-wisp::after {
-      animation: hero-haze-out var(--ease-scrub) none;
-      animation-timeline: scroll(root block);
-      animation-range: calc(4svh + var(--d) * 30svh) calc(80svh + var(--d) * 30svh);
-    }
-
-    /* The description condenses out of the same haze, word by word, settling from below; later
-       the whole of it thins away as the camera begins to move. */
-    .hero-word .hero-ink {
-      animation: hero-condense var(--ease-scrub) backwards;
-      animation-timeline: scroll(root block);
-      animation-range: calc(38svh + var(--d) * 30svh) calc(64svh + var(--d) * 30svh);
-    }
-
-    .hero-word::after {
-      animation: hero-haze-in var(--ease-scrub) none;
-      animation-timeline: scroll(root block);
-      animation-range: calc(32svh + var(--d) * 30svh) calc(62svh + var(--d) * 30svh);
-    }
-
-    .hero-copy {
-      animation: hero-thin var(--ease-scrub) both;
-      animation-timeline: scroll(root block);
-      animation-range: 128svh 176svh;
-    }
-
-    /* Past the words (HeroTextRelease): every one rests in its final state, so the browser can let
-       go of their layers. Their ranges are all over by 100svh, so nothing visible changes. */
-    [data-text-past] .hero-wisp .hero-ink,
-    [data-text-past] .hero-wisp::after,
-    [data-text-past] .hero-word .hero-ink,
-    [data-text-past] .hero-word::after {
-      animation: none;
-    }
-
-    .hero-mist > span {
-      animation-timing-function: var(--ease-scrub);
-      animation-fill-mode: both;
-      animation-timeline: scroll(root block);
-    }
-
-    .hero-mist-1 {
-      animation-name: mist-drift-a;
-      animation-range: 8svh 64svh;
-    }
-
-    .hero-mist-2 {
-      animation-name: mist-drift-b;
-      animation-range: 18svh 78svh;
-    }
-
-    .hero-mist-3 {
-      animation-name: mist-bloom;
-      animation-range: 26svh 92svh;
-    }
-
-    /* Through the O. The wall and everything on it grow about the point the camera moves toward;
-       the far view behind grows only a little about the same point, so it reads as depth. The
-       wall's scale is eased in proportion (hero-through), so the move feels the same speed at
-       every size, and it ends just as the edge of the opening leaves the screen. */
-    .hero-scene {
-      animation: hero-through linear both;
-      animation-timeline: scroll(root block);
-      animation-range: 136svh 250svh;
-    }
-
-    /* The far view keeps opening out, steadily, right up to the handoff. */
-    .hero-scenery {
-      animation: hero-view linear both;
-      animation-timeline: scroll(root block);
-      animation-range: 136svh 240svh;
-    }
-
-    .hero-shade {
-      animation: hero-fade-out linear both;
-      animation-timeline: scroll(root block);
-      animation-range: 136svh 190svh;
-    }
-
-    /* At 240svh the stage stops being pinned and would scroll away; by then the edge of the opening
-       has left every screen (the wall's move runs on to 250svh, unseen). When Selected Work
-       follows, it is pinned beneath from that moment showing the same view, so the hero simply
-       stops being drawn; without it, the hero scrolls away as ordinary content. */
-    [data-handoff] .hero-stage {
-      animation: hero-fade-out step-end both;
-      animation-timeline: scroll(root block);
-      animation-range: 239svh 240svh;
-    }
-  }
-
-  /* Reduced motion: the statement gives way to the description as a plain cross-fade, and the
-     opening then simply fades into the view. */
-  @media (prefers-reduced-motion: reduce) {
-    .hero-statement,
-    .hero-copy,
-    .hero-scene {
-      animation-timing-function: linear;
-      animation-fill-mode: both;
-      animation-timeline: scroll(root block);
-    }
-
-    .hero-statement {
-      animation-name: hero-fade-out;
-      animation-range: 18svh 40svh;
-    }
-
-    .hero-copy {
-      animation-name: hero-fade-in, hero-fade-out;
-      animation-range: 40svh 62svh, 150svh 180svh;
-      animation-fill-mode: both, forwards;
-    }
-
-    .hero-scene {
-      animation-name: hero-fade-out;
-      animation-range: 180svh 240svh;
-    }
-  }
-}
-
-:root {
-  /* Slow away from rest, long glide, slow into rest. */
-  --ease-through: cubic-bezier(0.55, 0, 0.25, 1);
-}
-
-/* The wall's scale, eased (cubic-bezier(0.45, 0, 0.55, 1)) in proportion rather than in
-   amount: each stop is --zoom-s to the power of the eased progress, so equal scrolling gives equal
-   relative growth, as a steady camera move does. Run with linear timing. */
-@keyframes hero-through {
-  0% { scale: 1; }
-  6.25% { scale: pow(var(--zoom-s), 0.0067); }
-  12.5% { scale: pow(var(--zoom-s), 0.0279); }
-  18.75% { scale: pow(var(--zoom-s), 0.0653); }
-  25% { scale: pow(var(--zoom-s), 0.1202); }
-  31.25% { scale: pow(var(--zoom-s), 0.1932); }
-  37.5% { scale: pow(var(--zoom-s), 0.2835); }
-  43.75% { scale: pow(var(--zoom-s), 0.3878); }
-  50% { scale: pow(var(--zoom-s), 0.5); }
-  56.25% { scale: pow(var(--zoom-s), 0.6122); }
-  62.5% { scale: pow(var(--zoom-s), 0.7165); }
-  68.75% { scale: pow(var(--zoom-s), 0.8068); }
-  75% { scale: pow(var(--zoom-s), 0.8798); }
-  81.25% { scale: pow(var(--zoom-s), 0.9347); }
-  87.5% { scale: pow(var(--zoom-s), 0.9721); }
-  93.75% { scale: pow(var(--zoom-s), 0.9933); }
-  100% { scale: var(--zoom-s); }
-}
-
-@keyframes hero-view {
-  to {
-    scale: var(--sv-k1);
-  }
-}
-
-/* A word loses its ink before it moves far, so it never reads as a dark smudge on the sky. */
-@keyframes hero-disperse {
-  0% {
-    opacity: 1;
-    translate: 0 0;
-    scale: 1;
-  }
-  30% {
-    opacity: 0.3;
-    translate: calc(var(--dx) * 0.12) calc(var(--dy) * 0.12);
-  }
-  100% {
-    opacity: 0;
-    translate: var(--dx) var(--dy);
-    scale: 1.04;
-  }
-}
-
-/* The word's haze brightens as its letters go, then rises and opens out into the air. */
-@keyframes hero-haze-out {
-  0% {
-    opacity: 0;
-    translate: 0 0;
-    scale: 1;
-  }
-  25% {
-    opacity: 0.9;
-  }
-  55% {
-    opacity: 0.7;
-  }
-  100% {
-    opacity: 0;
-    translate: calc(var(--dx) * 1.6) calc(var(--dy) * 1.8);
-    scale: 1.7;
-  }
-}
-
-/* The description: a haze gathers where each word will be, and the word forms in it. */
-@keyframes hero-haze-in {
-  0% {
-    opacity: 0;
-    translate: calc(var(--dx) * 2) calc(var(--dy) * 1.6);
-    scale: 1.35;
-  }
-  55% {
-    opacity: 0.7;
-  }
-  100% {
-    opacity: 0;
-    translate: 0 0;
-    scale: 1;
-  }
-}
-
-@keyframes hero-condense {
-  0% {
-    opacity: 0;
-    translate: var(--dx) var(--dy);
-  }
-  45% {
-    opacity: 0.2;
-  }
-  100% {
-    opacity: 1;
-    translate: 0 0;
-  }
-}
-
-@keyframes hero-thin {
-  to {
-    opacity: 0;
-    translate: 0 -0.6em;
-  }
-}
-
-@keyframes mist-drift-a {
-  0% {
-    opacity: 0;
-    translate: -4% 6%;
-    scale: 0.92;
-  }
-  45% {
-    opacity: 0.85;
-  }
-  100% {
-    opacity: 0;
-    translate: 6% -16%;
-    scale: 1.2;
-  }
-}
-
-@keyframes mist-drift-b {
-  0% {
-    opacity: 0;
-    translate: 5% 8%;
-    scale: 0.95;
-  }
-  50% {
-    opacity: 0.75;
-  }
-  100% {
-    opacity: 0;
-    translate: -7% -14%;
-    scale: 1.24;
-  }
-}
-
-@keyframes mist-bloom {
-  0% {
-    opacity: 0;
-    scale: 0.86;
-    rotate: -6deg;
-  }
-  45% {
-    opacity: 0.6;
-  }
-  100% {
-    opacity: 0;
-    scale: 1.3;
-    rotate: 8deg;
-  }
-}
-
-@keyframes hero-fade-out {
-  to {
-    opacity: 0;
-  }
-}
-
-@keyframes hero-fade-in {
-  from {
-    opacity: 0;
-  }
-}
-
-/* ——— Intro: ROUANG, and the O opening into the hero's emblem. ———
-   Once per session (HeroAperture's script), never with reduced motion. Unhurried:
-     0.6-4.0s    the letters arrive one by one, each rising out of a soft gradient and a blur
-     4.05-5.7s   the other letters soften and fall away to either side
-     4.5-7.4s    the O glides to its place in the wall and opens out to the emblem's size; as it
-                 starts to grow, the solid glyph gives way to a hairline of the same silhouette
-     7.0-8.6s    the white gives way to the wall and the view; the hairline settles into the frame
-     7.9-9.4s    the statement condenses in the opening; the header returns
-   (HeroIntroControl's INTRO_MS follows the end of this.)
-   Any scroll, touch, key or click fast-forwards it (data-intro="skip"). The O's start is its place
-   in the word (letter 1 of WORDMARK); its end is the emblem's outer edge from the render. */
-
-.intro {
+.project-plates[data-filter="residential"] .plate-group:not(:has([data-sector="residential"])),
+.project-plates[data-filter="commercial"] .plate-group:not(:has([data-sector="commercial"])) {
   display: none;
-}
-
-@media (prefers-reduced-motion: no-preference) {
-  /* The overlay takes the pointer while it is there, so a click meant to skip it cannot reach a
-     link beneath. It is as tall as the hero's stage (the large viewport), so they line up. */
-  [data-intro="play"] .intro,
-  [data-intro="skip"] .intro {
-    display: block;
-    position: fixed;
-    inset: 0 0 auto 0;
-    height: 100lvh;
-    z-index: 70;
-    pointer-events: auto;
-    color: var(--color-ink);
-    container-type: size;
-  }
-
-  .intro {
-    --intro-ww: min(62cqw, 26rem);
-  }
-
-  @media (max-aspect-ratio: 4/5) {
-    .intro {
-      --intro-ww: min(70cqw, 20rem);
-    }
-  }
-
-  [data-intro="play"] .intro {
-    animation: intro-retire 0.01s linear 8.7s forwards;
-  }
-
-  [data-intro="skip"] .intro {
-    animation: intro-skip 0.7s var(--ease-brand) both;
-  }
-
-  .intro-white {
-    position: absolute;
-    inset: 0;
-    background: #ffffff;
-    animation: intro-white-out 1.6s var(--ease-settle) 7s both;
-  }
-
-  .intro-word {
-    position: absolute;
-    left: 50%;
-    top: 50%;
-    width: var(--intro-ww);
-    aspect-ratio: 259.823 / 47.824;
-    translate: -50% -50%;
-  }
-
-  /* Each letter's drawing has 16 units of room around the word box (see PAD in HeroAperture):
-     6.158% of the word's width each side, 33.457% of its height above and below. */
-  .intro-letter {
-    position: absolute;
-    left: -6.158%;
-    top: -33.457%;
-    width: 112.316%;
-    height: 166.914%;
-    overflow: visible;
-    -webkit-mask-image: linear-gradient(to bottom, transparent 0 36%, #000 64% 100%);
-    mask-image: linear-gradient(to bottom, transparent 0 36%, #000 64% 100%);
-    -webkit-mask-size: 100% 300%;
-    mask-size: 100% 300%;
-    -webkit-mask-repeat: no-repeat;
-    mask-repeat: no-repeat;
-    -webkit-mask-position: 0 100%;
-    mask-position: 0 100%;
-    animation:
-      intro-letter-in 1.4s cubic-bezier(0.25, 0.4, 0.2, 1) both,
-      intro-letter-out 1.3s var(--ease-settle) forwards;
-    animation-delay: calc(0.6s + var(--n) * 0.4s), calc(4.05s + var(--n) * 0.07s);
-  }
-
-  .intro-letter-0 {
-    --n: 0;
-    --away: -6%;
-  }
-  .intro-letter-1 {
-    --n: 1;
-  }
-  .intro-letter-2 {
-    --n: 2;
-    --away: 6%;
-  }
-  .intro-letter-3 {
-    --n: 3;
-    --away: 7%;
-  }
-  .intro-letter-4 {
-    --n: 4;
-    --away: 8%;
-  }
-  .intro-letter-5 {
-    --n: 5;
-    --away: 9%;
-  }
-
-  /* The O in the word hands over to the moving O, drawn in exactly the same place, as it starts to move. */
-  .intro-letter-1 {
-    animation:
-      intro-letter-in 1.4s cubic-bezier(0.25, 0.4, 0.2, 1) both,
-      intro-hide 0.01s linear forwards;
-    animation-delay: calc(0.6s + var(--n) * 0.4s), 4.5s;
-  }
-
-  .intro-o {
-    position: absolute;
-    overflow: visible;
-    opacity: 0;
-    animation:
-      intro-show 0.01s linear 4.5s both,
-      intro-o-grow 2.9s cubic-bezier(0.6, 0, 0.2, 1) 4.5s both,
-      intro-hide-soft 1.2s var(--ease-settle) 7.4s forwards;
-  }
-
-  /* The solid glyph clears quickly, then the hairline draws in: no grey half-way disc. */
-  .intro-o-fill {
-    animation: intro-hide-soft 0.35s var(--ease-settle) 4.5s both;
-  }
-
-  .intro-o-line {
-    opacity: 0;
-    animation: intro-show-soft 0.6s var(--ease-settle) 4.65s both;
-  }
-
-  /* The statement condenses in the opening as the wall arrives, and the header returns. */
-  [data-intro="play"] .hero-statement {
-    animation: hero-emerge 1.5s var(--ease-settle) 7.9s both;
-  }
-
-  [data-intro="play"] .hero-mist::before {
-    animation: intro-mist 2.2s var(--ease-settle) 7.6s both;
-  }
-
-  /* Skipping starts fresh animations (new names), so the statement and header do come in. */
-  [data-intro="skip"] .hero-statement {
-    animation: hero-emerge-skip 0.8s var(--ease-brand) both;
-  }
-
-  /* While the intro plays the header is out of sight and out of the pointer's reach (it stays
-     in the accessibility tree; the first key press skips the intro anyway). */
-  body:has([data-intro="play"]) [data-site-header],
-  body:has([data-intro="play"]) [data-action-bar] {
-    pointer-events: none;
-    animation: intro-header 1s var(--ease-brand) 8.3s both;
-  }
-
-  /* On a skip it is back in reach at once (a Tab that skipped lands on it) and fades in as the
-     overlay clears. */
-  body:has([data-intro="skip"]) [data-site-header],
-  body:has([data-intro="skip"]) [data-action-bar] {
-    animation: intro-header-skip 0.7s var(--ease-brand) 0.3s both;
-  }
-}
-
-@keyframes intro-letter-in {
-  from {
-    opacity: 0;
-    filter: blur(9px);
-    translate: 0 6%;
-    -webkit-mask-position: 0 0;
-    mask-position: 0 0;
-  }
-  to {
-    opacity: 1;
-    filter: blur(0);
-    translate: 0 0;
-    -webkit-mask-position: 0 100%;
-    mask-position: 0 100%;
-  }
-}
-
-@keyframes intro-letter-out {
-  to {
-    opacity: 0;
-    filter: blur(7px);
-    translate: var(--away, 0) -3%;
-    -webkit-mask-position: 0 0;
-    mask-position: 0 0;
-  }
-}
-
-/* From the O's box in the word to the emblem's outer edge in the wall (both measured from the
-   same drawing, so the silhouette only ever scales). */
-@keyframes intro-o-grow {
-  from {
-    left: calc(50cqw - var(--intro-ww) * 0.36568);
-    top: calc(50cqh - var(--intro-ww) * 0.088068);
-    width: calc(var(--intro-ww) * 0.180546);
-    height: calc(var(--intro-ww) * 0.177197);
-  }
-  to {
-    left: calc(50cqw + (var(--o-x) - var(--o-w) / 2 - 0.5) * var(--img-w));
-    top: calc(50cqh + (var(--o-y) - var(--o-h) / 2 - 0.5) * var(--img-h) + var(--img-dy));
-    width: calc(var(--o-w) * var(--img-w));
-    height: calc(var(--o-h) * var(--img-h));
-  }
-}
-
-@keyframes intro-show {
-  to {
-    opacity: 1;
-  }
-}
-
-@keyframes intro-hide {
-  to {
-    opacity: 0;
-  }
-}
-
-@keyframes intro-show-soft {
-  from {
-    opacity: 0;
-  }
-  to {
-    opacity: 1;
-  }
-}
-
-@keyframes intro-hide-soft {
-  from {
-    opacity: 1;
-  }
-  to {
-    opacity: 0;
-  }
-}
-
-@keyframes intro-white-out {
-  to {
-    opacity: 0;
-  }
-}
-
-@keyframes intro-retire {
-  from,
-  to {
-    visibility: hidden;
-  }
-}
-
-@keyframes intro-skip {
-  from {
-    opacity: 1;
-  }
-  to {
-    opacity: 0;
-    visibility: hidden;
-  }
-}
-
-@keyframes hero-emerge {
-  from {
-    opacity: 0;
-    filter: blur(12px);
-    scale: 1.025;
-  }
-  to {
-    opacity: 1;
-    filter: blur(0);
-    scale: 1;
-  }
-}
-
-@keyframes hero-emerge-skip {
-  from {
-    opacity: 0;
-    filter: blur(12px);
-    scale: 1.025;
-  }
-  to {
-    opacity: 1;
-    filter: blur(0);
-    scale: 1;
-  }
-}
-
-@keyframes intro-mist {
-  0% {
-    opacity: 0;
-    scale: 0.9;
-  }
-  40% {
-    opacity: 0.4;
-  }
-  100% {
-    opacity: 0;
-    scale: 1.25;
-  }
-}
-
-@keyframes intro-header {
-  from {
-    opacity: 0;
-  }
-  to {
-    opacity: 1;
-  }
-}
-
-@keyframes intro-header-skip {
-  from {
-    opacity: 0;
-  }
-  to {
-    opacity: 1;
-  }
-}
-
-/* ——— 01 Work: the flagship scene, then the cascade. ———
-   With scroll-driven animation (any screen size): the scene continues straight out of the hero.
-   It begins underneath the hero's last screen (margin-top: -100lvh, the hero stage's height), its
-   stage pinned and showing the same view the camera has just passed through to, at the same size
-   and place, so when the hero stops being drawn ("Hero") nothing changes. Then dusk falls on the
-   view, "Selected work" rises and holds, the flagship photograph rises over it like a curtain
-   drawn up (its picture held still inside the rising frame) and settles, and its facts gather at
-   its foot. Only transforms and opacity animate.
-   Without it, or with reduced motion: the title, the photograph, its facts, one after another. */
-
-.work-intro {
-  padding-block: var(--section-space) clamp(3rem, 6vw, 5rem);
-}
-
-/* The view carried over from the hero, and the dusk that falls on it. Only in the pinned scene. */
-.work-lead {
-  display: none;
-}
-
-.work-dusk {
-  position: absolute;
-  inset: 0;
-  background:
-    radial-gradient(ellipse 70% 45% at 45% 50%, rgb(22 15 14 / 0.42), rgb(22 15 14 / 0) 72%),
-    linear-gradient(to bottom, rgb(34 24 38 / 0.62) 0%, rgb(58 36 26 / 0.46) 52%, rgb(22 15 12 / 0.74) 100%);
-  opacity: 0;
-}
-
-@media (min-width: 64rem) {
-  .work-feature {
-    position: relative;
-    height: 100svh;
-    min-height: 40rem;
-  }
-
-  .work-photo {
-    position: absolute;
-    inset: 0;
-  }
-
-  .work-facts {
-    position: absolute;
-    inset-inline: 0;
-    bottom: 0;
-  }
-}
-
-/* Shade drawn from the floor of the photograph up, deepest under the words. */
-.work-shade {
-  background:
-    linear-gradient(to top, rgb(20 20 20 / 0.92) 0%, rgb(20 20 20 / 0.7) 32%, rgb(20 20 20 / 0.22) 56%, rgb(20 20 20 / 0) 70%),
-    linear-gradient(to right, rgb(20 20 20 / 0.32) 0%, rgb(20 20 20 / 0) 50%);
-}
-
-@supports (animation-timeline: view()) {
-  @media (prefers-reduced-motion: no-preference) {
-    /* The timeline ignores the header's scroll padding (view-timeline-inset), so contain 0% is
-       exactly the moment this scene's top reaches the top of the screen: the handoff. */
-    .work-scene {
-      position: relative;
-      z-index: 0;
-      margin-top: -100lvh;
-      height: calc(250svh + 100lvh);
-      view-timeline: --work block;
-      view-timeline-inset: 0px;
-    }
-
-    .work-stage {
-      position: sticky;
-      top: 0;
-      height: 100lvh;
-      overflow: hidden;
-      container-type: size;
-    }
-
-    .work-lead {
-      display: block;
-      position: absolute;
-      inset: 0;
-    }
-
-    /* The stage is pinned from the moment the hero stops being drawn (contain 0%, 240svh into the
-       page), and dusk begins to fall on the view at once as the title rises. */
-    .work-dusk {
-      opacity: 1;
-      animation: work-fade var(--ease-scrub) both;
-      animation-timeline: --work;
-      animation-range: contain 0% contain 20%;
-    }
-
-    .work-intro {
-      position: absolute;
-      inset: 0;
-      display: flex;
-      align-items: center;
-      padding-block: 0;
-      animation: work-intro-in var(--ease-scrub) both;
-      animation-timeline: --work;
-      animation-range: contain 5% contain 24%;
-    }
-
-    /* Leaving is on the inner block, so each element runs one animation (both can composite). */
-    .work-intro-inner {
-      animation: work-intro-out var(--ease-scrub) forwards;
-      animation-timeline: --work;
-      animation-range: contain 38% contain 52%;
-    }
-
-    /* Over the dusked view the title's quieter parts need lifting to read. */
-    .work-intro .t-italic-display {
-      color: #c4c8bd;
-    }
-
-    .work-intro .t-label {
-      color: var(--color-kapur);
-    }
-
-    .work-feature {
-      position: absolute;
-      inset: 0;
-      height: auto;
-      min-height: 0;
-    }
-
-    .work-photo {
-      position: absolute;
-      inset: 0;
-      aspect-ratio: auto;
-      overflow: hidden;
-      animation: work-rise var(--ease-scrub) both;
-      animation-timeline: --work;
-      animation-range: contain 36% contain 66%;
-      will-change: transform;
-    }
-
-    .work-photo-inner {
-      animation: work-hold var(--ease-scrub) both;
-      animation-timeline: --work;
-      animation-range: contain 36% contain 83%;
-    }
-
-    .work-shade {
-      display: block;
-      animation: work-fade var(--ease-scrub) both;
-      animation-timeline: --work;
-      animation-range: contain 58% contain 75%;
-    }
-
-    .work-facts {
-      position: absolute;
-      inset-inline: 0;
-      bottom: 0;
-      padding-top: 0;
-      padding-bottom: max(2rem, 5svh);
-    }
-
-    .work-facts .t-label {
-      color: rgb(243 243 243 / 0.75);
-    }
-
-    .work-fact {
-      animation: work-fact var(--ease-scrub) both;
-      animation-timeline: --work;
-      animation-range: contain 64% contain 80%;
-    }
-
-    .work-facts .col-span-12:last-child .work-fact {
-      animation-range: contain 69% contain 86%;
-    }
-
-    /* The name rises from behind its own baseline. */
-    .work-title-line {
-      animation: work-line var(--ease-scrub) both;
-      animation-timeline: --work;
-      animation-range: contain 61% contain 78%;
-    }
-  }
-
-  /* Short landscape screens: keep the label, the name (a link to the case study) and the summary
-     line; the facts table and its link would not fit above the fold. */
-  @media (max-height: 30rem) and (prefers-reduced-motion: no-preference) {
-    .work-facts .t-sub,
-    .work-facts .col-span-12:last-child {
-      display: none;
-    }
-
-    .work-facts h3 {
-      font-size: 2.25rem;
-    }
-  }
-
-  /* Phones in the pinned scene: the facts are set smaller so the photograph keeps the upper half. */
-  @media (max-width: 63.999rem) and (prefers-reduced-motion: no-preference) {
-    .work-facts .page-grid {
-      row-gap: 1.25rem;
-    }
-
-    .work-facts h3 {
-      font-size: clamp(2.5rem, 1.6rem + 5vw, 3.5rem);
-    }
-
-    .work-facts .t-sub {
-      margin-top: 0.75rem;
-      font-size: 1.0625rem;
-    }
-
-    /* Clear of the floating action bar (12px from the bottom of the visible screen, 48px tall),
-       also while the browser's toolbar shows and the stage (100lvh) runs below the screen. */
-    .work-facts {
-      padding-bottom: calc(max(2rem, 5svh) + 3.75rem + 100lvh - 100svh + env(safe-area-inset-bottom, 0px));
-    }
-
-    .work-facts .t-label {
-      color: var(--color-kapur);
-      text-shadow: 0 0 12px rgb(0 0 0 / 0.6);
-    }
-
-    /* The title sits left on phones, over lighter sky: a little more dusk there, a paler italic. */
-    .work-dusk {
-      background:
-        radial-gradient(ellipse 95% 30% at 30% 47%, rgb(22 15 14 / 0.45), rgb(22 15 14 / 0) 70%),
-        radial-gradient(ellipse 70% 45% at 45% 50%, rgb(22 15 14 / 0.42), rgb(22 15 14 / 0) 72%),
-        linear-gradient(to bottom, rgb(34 24 38 / 0.62) 0%, rgb(58 36 26 / 0.46) 52%, rgb(22 15 12 / 0.74) 100%);
-    }
-
-    .work-intro .t-italic-display {
-      color: #d6d9cf;
-    }
-
-    /* The shade reaches higher, so the eyebrow above the name reads over a bright photograph. */
-    .work-shade {
-      background: linear-gradient(to top, rgb(20 20 20 / 0.92) 0%, rgb(20 20 20 / 0.75) 45%, rgb(20 20 20 / 0.55) 62%, rgb(20 20 20 / 0) 80%);
-    }
-  }
-
-  /* Reduced motion keeps the still layout; the photograph only settles as it arrives. */
-  @media (prefers-reduced-motion: reduce) {
-    .work-photo-inner {
-      animation: none;
-    }
-  }
-}
-
-@keyframes work-intro-in {
-  from {
-    opacity: 0;
-    translate: 0 6svh;
-  }
-}
-
-@keyframes work-intro-out {
-  to {
-    opacity: 0;
-    translate: 0 -8svh;
-    scale: 0.985;
-  }
-}
-
-@keyframes work-rise {
-  from {
-    translate: 0 100%;
-  }
-}
-
-/* Counter-moves the rising frame for most of its travel, then lets the picture settle. */
-@keyframes work-hold {
-  0% {
-    translate: 0 -62%;
-    scale: 1.12;
-  }
-  61% {
-    translate: 0 0;
-    scale: 1.05;
-  }
-  100% {
-    translate: 0 0;
-    scale: 1;
-  }
-}
-
-@keyframes work-fade {
-  from {
-    opacity: 0;
-  }
-}
-
-@keyframes work-fact {
-  from {
-    opacity: 0;
-    translate: 0 1.25rem;
-  }
-}
-
-@keyframes work-line {
-  from {
-    translate: 0 105%;
-  }
-}
-
-/* The cascade. Columns arrive at their own pace (--cascade-from, set per column) and settle level by
-   the time the row is centred, as in the reference. Hairlines stay put; only the content moves. */
-.cascade-arrow {
-  transition: translate var(--dur-base) var(--ease-brand);
-}
-
-.cascade-col:hover .cascade-arrow,
-.cascade-col:focus-within .cascade-arrow {
-  translate: 0.25rem 0;
-}
-
-@media (min-width: 64rem) {
-  .cascade-col {
-    overflow: hidden;
-  }
-
-  .cascade-inner {
-    min-height: min(92svh, 56rem);
-  }
-}
-
-/* With a pointer, the photograph appears while its column is hovered or focused, and goes when the
-   pointer leaves. Touch screens have no hover, so there it is always shown. */
-@media (min-width: 64rem) and (hover: hover) and (pointer: fine) {
-  .cascade-media {
-    opacity: 0;
-    background: transparent;
-    transition: opacity var(--dur-reveal) var(--ease-settle);
-  }
-
-  .cascade-media img {
-    scale: 1.05;
-    transition: scale var(--dur-slow) var(--ease-brand);
-  }
-
-  .cascade-col:hover .cascade-media,
-  .cascade-col:focus-within .cascade-media {
-    opacity: 1;
-  }
-
-  .cascade-col:hover .cascade-media img,
-  .cascade-col:focus-within .cascade-media img {
-    scale: 1;
-  }
-}
-
-@supports (animation-timeline: view()) {
-  @media (min-width: 64rem) and (prefers-reduced-motion: no-preference) {
-    .cascade {
-      view-timeline: --cascade block;
-    }
-
-    .cascade-inner {
-      animation: cascade-settle var(--ease-scrub) both;
-      animation-timeline: --cascade;
-      animation-range: entry 0% cover 45%;
-    }
-  }
-
-  /* Two columns on tablets: the second column trails a little. */
-  @media (min-width: 40rem) and (max-width: 63.999rem) and (prefers-reduced-motion: no-preference) {
-    .cascade-col:nth-child(even) .cascade-inner {
-      --cascade-from: 6rem;
-      animation: cascade-settle var(--ease-scrub) both;
-      animation-timeline: view();
-      animation-range: entry 0% cover 40%;
-    }
-  }
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .cascade-media,
-  .cascade-media img {
-    transition-duration: 0.01s;
-  }
-}
-
-@keyframes cascade-settle {
-  from {
-    translate: 0 var(--cascade-from, 0);
-  }
-}
-
-/* ——— 02 Studio: the word, then what the O stands for. ———
-   Large screens with scroll-driven animation: the stage pins and the stacked entry pans left out of
-   the frame, each line at a slightly different rate so it moves like type on a sheet rather than a
-   block, while the three ideas arrive from the right. Phones: the word drifts a little as it passes.
-   Transforms only. */
-
-@supports (animation-timeline: view()) {
-  @media (prefers-reduced-motion: no-preference) {
-    .studio-line-3 {
-      animation: studio-drift var(--ease-scrub) both;
-      animation-timeline: view();
-      animation-range: cover 0% cover 100%;
-    }
-  }
-
-  @media (min-width: 64rem) and (prefers-reduced-motion: no-preference) {
-    .studio-scene {
-      height: 280svh;
-      view-timeline: --studio block;
-    }
-
-    .studio-stage {
-      position: sticky;
-      top: 0;
-      height: 100svh;
-      overflow: hidden;
-    }
-
-    .studio-word {
-      position: absolute;
-      inset: 0;
-      display: flex;
-      flex-direction: column;
-      justify-content: center;
-      padding-top: var(--header-h);
-    }
-
-    .studio-word > .t-label,
-    .studio-line {
-      --pan: -96vw;
-      animation: studio-pan var(--ease-scrub) both;
-      animation-timeline: --studio;
-      animation-range: contain 12% contain 70%;
-    }
-
-    .studio-line-2 {
-      --pan: -90vw;
-    }
-
-    .studio-line-3 {
-      --pan: -82vw;
-    }
-
-    .studio-idea {
-      position: absolute;
-      inset: 0;
-      display: flex;
-      align-items: center;
-      padding-block: var(--header-h) 0;
-      animation: studio-arrive var(--ease-scrub) both;
-      animation-timeline: --studio;
-      animation-range: contain 30% contain 84%;
-    }
-  }
-}
-
-@keyframes studio-pan {
-  to {
-    translate: var(--pan) 0;
-  }
-}
-
-@keyframes studio-arrive {
-  0% {
-    translate: 46vw 0;
-    opacity: 0;
-  }
-  45% {
-    opacity: 1;
-  }
-  100% {
-    translate: 0 0;
-    opacity: 1;
-  }
-}
-
-@keyframes studio-drift {
-  from {
-    translate: 7vw 0;
-  }
-  to {
-    translate: 0 0;
-  }
 }
 
 /* ——— View transitions: a project image morphs between the index and its case study; the page around it crossfades for that moment. ——— */
@@ -2092,242 +654,76 @@
   }
 }
 
-/* Walkthrough: pinned and scroll-driven, or the photographs in sequence for reduced motion.
-   Chosen by CSS, so the server markup is already the right layout and hydration moves nothing. */
-/* ——— Walkthrough: photographs in a semi-oval arch, dissolving one into the next. ———
-   The arch is a half ellipse a little taller than a semicircle, the doorway shape that runs through
-   the work. Each photograph holds for most of its stretch of scroll; the next one rises through it
-   (opacity with the settle curve) and keeps settling while it holds, and the one beneath eases back
-   a touch, so the change reads as depth rather than a cut. Caption, count and index change on the
-   same stretch: the old line goes in the first half, the new one comes in the second, so two lines
-   never sit on top of each other. Ranges come from custom properties set per frame. */
-
-.walk-arch {
-  overflow: hidden;
-  isolation: isolate;
-  border-radius: 50% 50% 0 0 / 46% 46% 0 0;
+/* ——— Next project, at the foot of a case study ———
+   Hovering or focusing it opens the photograph out of its circle to the full width. A shade comes up
+   with it under the words, deepest at the foot and on the left, so the name and the grey lines
+   around it stay legible over a pale wall (the grey label keeps 4.5:1 over white). The shade is in
+   place before the opening photograph reaches the words. */
+.next-shade {
+  background:
+    linear-gradient(to top, rgb(20 20 20 / 0.92) 0%, rgb(20 20 20 / 0.8) 40%, rgb(20 20 20 / 0) 80%),
+    linear-gradient(to right, rgb(20 20 20 / 0.5) 0%, rgb(20 20 20 / 0) 55%);
+  opacity: 0;
+  transition: opacity var(--dur-base) var(--ease-brand);
 }
 
-.walk-pinned {
-  display: none;
+.next-link:focus-visible .next-shade {
+  opacity: 1;
 }
 
-.walk-static {
-  display: block;
-}
-
-@supports (animation-timeline: view()) {
-  @media (prefers-reduced-motion: no-preference) {
-    .walk-pinned {
-      display: block;
-      view-timeline: --walk block;
-    }
-
-    .walk-static {
-      display: none;
-    }
-
-    .walk-layer {
-      animation: walk-dissolve var(--ease-settle) both;
-      animation-timeline: --walk;
-      animation-range: contain var(--walk-in-start) contain var(--walk-in-end);
-    }
-
-    .walk-layer:first-child {
-      animation: none;
-    }
-
-    .walk-layer > img {
-      animation:
-        walk-settle var(--ease-scrub) both,
-        walk-recede var(--ease-scrub) forwards;
-      animation-timeline: --walk, --walk;
-      animation-range:
-        contain var(--walk-in-start) contain var(--walk-out-start),
-        contain var(--walk-out-start) contain var(--walk-out-end);
-    }
-
-    .walk-layer:first-child > img {
-      animation-name: none, walk-recede;
-    }
-
-    .walk-layer:last-child > img {
-      animation-name: walk-settle, none;
-    }
-
-    .walk-cap,
-    .walk-rail,
-    .walk-rail-line {
-      animation-timeline: --walk, --walk;
-      animation-range:
-        contain var(--walk-in-start) contain var(--walk-in-end),
-        contain var(--walk-out-start) contain var(--walk-out-end);
-      animation-timing-function: var(--ease-scrub);
-      animation-fill-mode: both, forwards;
-    }
-
-    .walk-cap {
-      animation-name: walk-cap-in, walk-cap-out;
-    }
-
-    .walk-rail {
-      animation-name: walk-rail-in, walk-rail-out;
-    }
-
-    .walk-rail-line {
-      animation-name: walk-line-in, walk-line-out;
-    }
-
-    .walk-cap:first-child {
-      animation-name: none, walk-cap-out;
-    }
-
-    .walk-rail:first-child {
-      animation-name: none, walk-rail-out;
-    }
-
-    .walk-rail:first-child .walk-rail-line {
-      animation-name: none, walk-line-out;
-    }
-
-    .walk-cap:last-child {
-      animation-name: walk-cap-in, none;
-    }
-
-    .walk-rail:last-child {
-      animation-name: walk-rail-in, none;
-    }
-
-    .walk-rail:last-child .walk-rail-line {
-      animation-name: walk-line-in, none;
-    }
-
-    .walk-progress {
-      transform-origin: left center;
-      animation: walk-progress linear both;
-      animation-timeline: --walk;
-      animation-range: contain 0% contain 100%;
-    }
-  }
-}
-
-@keyframes walk-dissolve {
-  from {
-    opacity: 0;
-  }
-}
-
-@keyframes walk-settle {
-  from {
-    scale: 1.07;
-    translate: 0 2%;
-  }
-  to {
-    scale: 1;
-    translate: 0 0;
-  }
-}
-
-@keyframes walk-recede {
-  to {
-    scale: 0.97;
-  }
-}
-
-@keyframes walk-cap-in {
-  0%,
-  50% {
-    opacity: 0;
-    translate: 0 0.5rem;
-  }
-  100% {
-    opacity: 1;
-    translate: 0 0;
-  }
-}
-
-@keyframes walk-cap-out {
-  0% {
-    opacity: 1;
-    translate: 0 0;
-  }
-  50%,
-  100% {
-    opacity: 0;
-    translate: 0 -0.5rem;
-  }
-}
-
-@keyframes walk-rail-in {
-  from {
-    opacity: 0.55;
-  }
-  to {
+@media (hover: hover) {
+  .next-link:hover .next-shade {
     opacity: 1;
   }
 }
 
-@keyframes walk-rail-out {
-  from {
-    opacity: 1;
-  }
-  to {
-    opacity: 0.55;
-  }
+/* The link runs edge to edge and the photograph opens over it, so an outline would sit off screen
+   or under the picture. Its focus ring is drawn inside the edge, above the photograph: a light ring
+   with a dark one inside it, as on the home page's project cards. */
+.next-link:focus-visible {
+  outline: none;
 }
 
-@keyframes walk-line-in {
-  from {
-    scale: 0.5 1;
-  }
-  to {
-    scale: 1 1;
-  }
-}
-
-@keyframes walk-line-out {
-  from {
-    scale: 1 1;
-  }
-  to {
-    scale: 0.5 1;
-  }
-}
-
-@keyframes walk-progress {
-  from {
-    scale: calc(1 / var(--walk-n)) 1;
-  }
-  to {
-    scale: 1 1;
-  }
+.next-link:focus-visible::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  box-shadow:
+    inset 0 0 0 2px var(--color-kapur),
+    inset 0 0 0 4px rgb(20 20 20 / 0.6);
+  pointer-events: none;
 }
 
 /* ——— Long-form content (articles and project narratives) ——— */
 
+/* A web address written out in the text breaks where it must, so it never runs past a phone's column. */
 .prose-rouang {
   max-width: 40rem;
+  overflow-wrap: break-word;
 }
 
 .prose-rouang > * + * {
   margin-top: 1.25em;
 }
 
+/* Inside running text the headings sit a step down the scale, so they divide an article without
+   competing with the page's own title: h2 at the quote size in Regular, h3 at the lead size in
+   Medium, the one place a small heading needs the extra weight to stand off the body. */
 .prose-rouang h2 {
-  margin-top: 2.6em;
-  font-weight: 500;
-  font-size: clamp(1.5rem, 1.2rem + 1vw, 2rem);
-  line-height: 1.18;
-  letter-spacing: -0.02em;
+  margin-top: 2.4em;
+  font-weight: 400;
+  font-size: var(--fs-quote);
+  line-height: 1.25;
+  letter-spacing: -0.012em;
   text-wrap: balance;
 }
 
 .prose-rouang h3 {
   margin-top: 2em;
   font-weight: 500;
-  font-size: 1.25rem;
-  line-height: 1.3;
-  letter-spacing: -0.01em;
+  font-size: var(--fs-lead);
+  line-height: 1.35;
+  letter-spacing: -0.005em;
 }
 
 .prose-rouang h2 + *,
@@ -2376,10 +772,10 @@
   margin-block: 2em;
   padding-left: 1.25rem;
   border-left: 1px solid var(--color-rikyu);
-  font-family: var(--font-serif);
-  font-style: italic;
-  font-size: 1.4375rem;
-  line-height: 1.48;
+  font-weight: 300;
+  font-size: var(--fs-quote);
+  line-height: 1.4;
+  letter-spacing: -0.01em;
 }
 
 .prose-rouang strong {
@@ -2389,7 +785,7 @@
 .prose-rouang table {
   width: 100%;
   border-collapse: collapse;
-  font-size: 0.9375rem;
+  font-size: var(--fs-meta);
 }
 
 .prose-rouang th,
@@ -2431,12 +827,4 @@
 
 .skip-link:focus {
   top: 1rem;
-}
-
-.no-scrollbar {
-  scrollbar-width: none;
-}
-
-.no-scrollbar::-webkit-scrollbar {
-  display: none;
 }

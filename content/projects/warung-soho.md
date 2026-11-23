@@ -90,7 +90,7 @@ gallery:
     height: 607
     span: half
 services:
-  - restaurant-interior-design
+  - renovation-and-interior
 seo:
   title: "Warung Soho: restaurant design proposal"
   description: Design visualisations by ROUANG for Warung Soho, a dining room of rattan, timber and green steel around a red service counter.

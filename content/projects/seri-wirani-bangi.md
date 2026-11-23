@@ -97,10 +97,10 @@ challenges:
     response: Deep overhangs, slatted screens and planted edges, a tropical layer that shades the walls and softens the mass of the building.
 quote:
   text: A modern tropical home shaped by light, shade and everyday living.
-  attribution: From the studio's design presentation, September 2026
+  attribution: From ROUANG's design presentation, September 2026
   approved: false
 services:
-  - residential-interior-design
+  - renovation-and-interior
 seo:
   title: "Seri Wirani, Bangi: house design proposal"
   description: A modern tropical design proposal by ROUANG to refurbish and extend a house in Bangi. Textured white, timber and glass block. Design visualisations.

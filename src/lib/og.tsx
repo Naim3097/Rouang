@@ -28,13 +28,14 @@ function svgDataUri(def: typeof WORDMARK | typeof MARK, fill: string) {
 
 /**
  * Social card in the brand's own terms: Chinese Black field, wordmark top left on the margin,
- * the mark in the opposite corner (kit p.8), headline in Outfit, the italic line in EB Garamond.
+ * the mark in the opposite corner (kit p.8). One typeface, as on the site: the headline in Outfit
+ * Medium, its follow line and the Malay line in Outfit Light.
  */
-export async function brandCard({ kicker, title, italic, image }: { kicker: string; title: string; italic?: string; image?: string | null }) {
-  const [outfit400, outfit500, garamond] = await Promise.all([
+export async function brandCard({ kicker, title, follow, image }: { kicker: string; title: string; follow?: string; image?: string | null }) {
+  const [outfit300, outfit400, outfit500] = await Promise.all([
+    font("outfit/files/outfit-latin-300-normal.woff"),
     font("outfit/files/outfit-latin-400-normal.woff"),
     font("outfit/files/outfit-latin-500-normal.woff"),
-    font("eb-garamond/files/eb-garamond-latin-400-italic.woff"),
   ]);
 
   // The photograph is cropped and compressed to the card's own size before embedding, so the
@@ -61,14 +62,16 @@ export async function brandCard({ kicker, title, italic, image }: { kicker: stri
           <div style={{ display: "flex", flexDirection: "column" }}>
             <div style={{ fontSize: 18, letterSpacing: "0.12em", textTransform: "uppercase", color: "#949495" }}>{kicker}</div>
             <div style={{ fontSize: photo ? 58 : 68, fontWeight: 500, lineHeight: 1.04, letterSpacing: "-0.03em", marginTop: 22 }}>{title}</div>
-            {italic ? (
-              <div style={{ fontFamily: "Garamond", fontStyle: "italic", fontSize: photo ? 60 : 70, lineHeight: 1.05, color: "#888E7E", marginTop: 6 }}>
-                {italic}
+            {follow ? (
+              <div style={{ fontSize: photo ? 58 : 68, fontWeight: 300, lineHeight: 1.04, letterSpacing: "-0.03em", color: "#888E7E" }}>
+                {follow}
               </div>
             ) : null}
           </div>
           <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-end" }}>
-            <div style={{ fontFamily: "Garamond", fontStyle: "italic", fontSize: 26, color: "#949495" }}>Ruang tanpa batas.</div>
+            <div lang="ms" style={{ fontSize: 24, fontWeight: 300, letterSpacing: "-0.01em", color: "#949495" }}>
+              Ruang tanpa batas.
+            </div>
             {/* eslint-disable-next-line @next/next/no-img-element */}
             {photo ? null : <img src={svgDataUri(MARK, "#F3F3F3")} width={30} height={30} alt="" />}
           </div>
@@ -84,9 +87,9 @@ export async function brandCard({ kicker, title, italic, image }: { kicker: stri
     {
       ...OG_SIZE,
       fonts: [
+        { name: "Outfit", data: outfit300, weight: 300, style: "normal" },
         { name: "Outfit", data: outfit400, weight: 400, style: "normal" },
         { name: "Outfit", data: outfit500, weight: 500, style: "normal" },
-        { name: "Garamond", data: garamond, weight: 400, style: "italic" },
       ],
     },
   );

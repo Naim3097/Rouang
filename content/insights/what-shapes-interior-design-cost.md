@@ -10,10 +10,10 @@ purpose: Answer the most common first question honestly, set expectations before
 audience: Homeowners and business owners in the Klang Valley planning their first interior project
 searchIntent: Informational with commercial follow-up ("interior design cost Malaysia", "renovation cost")
 relatedServices:
-  - residential-interior-design
-  - restaurant-interior-design
+  - renovation-and-interior
+  - design-and-build
 todo:
-  - Studio to add how ROUANG itself charges for design (percentage, per square foot or fixed fee) before publishing
+  - "Studio to add how ROUANG itself charges for design (percentage, per square foot or fixed fee) before publishing. The company profile confirms design is a paid engagement, but not how it is charged"
   - Studio to confirm whether it is happy to publish typical ranges; no figures appear until it does
 ---
 

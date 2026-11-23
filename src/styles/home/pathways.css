@@ -1,0 +1,362 @@
+/* Home, What we do (Pathways.tsx): two doors, for homes and for businesses, and the three
+   capabilities they share on the centre line. Imported by globals.css.
+   The doors stand clear of the screen's edges: on phones the photographs and words keep to the
+   page margin like every other section, and from a tablet up the doors keep a second page margin
+   inside the first, so the composition gathers towards the centre line.
+   Phones and tablets: each door sets its photograph beside its name, the business door mirroring
+   the homes door (phones put the words under both, tablets beside the photograph); the
+   capabilities follow, down the centre line.
+   Wide screens (80rem): one composition, seen whole. The homes door stands high on the left
+   (photograph over words), the business door low on the right (words over photograph), the
+   capabilities on the centre line between them. As it rises into view the doors draw apart to
+   their places. */
+
+.pw {
+  overflow-x: clip;
+  padding-block: var(--section-space);
+  /* How far the doors start in towards the centre line: always less than the gap they cross. */
+  --pw-part: clamp(1.5rem, 3vw, 3.5rem);
+}
+
+.pw-intro {
+  text-align: center;
+}
+
+.pw-spread {
+  display: grid;
+  row-gap: 3.5rem;
+  margin-top: clamp(3rem, 6vw, 5rem);
+}
+
+/* ——— A door ——— */
+
+.pw-door {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  grid-template-areas:
+    "photo head"
+    "body body";
+  column-gap: 1.25rem;
+  row-gap: 1.5rem;
+  align-items: end;
+}
+
+.pw-door-business {
+  grid-template-areas:
+    "head photo"
+    "body body";
+}
+
+.pw-head {
+  grid-area: head;
+}
+
+.pw-body {
+  grid-area: body;
+  max-width: 34rem;
+  text-wrap: pretty;
+}
+
+.pw-photo {
+  grid-area: photo;
+}
+
+/* ——— The capabilities, down the centre line ——— */
+
+.pw-services {
+  text-align: center;
+}
+
+/* A hairline in the brand green leads from the doors into the capabilities and joins each to the
+   next. On tablets each hangs from its own; on wide screens they are lengths of one centre line. */
+.pw-service::before {
+  content: "";
+  display: block;
+  width: 1px;
+  height: clamp(2rem, 3.5vw, 3rem);
+  margin: 0 auto clamp(1.25rem, 2vw, 1.75rem);
+  background: var(--color-rikyu);
+  transform-origin: top;
+  transition:
+    scale var(--dur-base) var(--ease-brand),
+    background-color var(--dur-base) var(--ease-brand);
+}
+
+.pw-service + .pw-service::before {
+  margin-top: clamp(1.25rem, 2vw, 1.75rem);
+}
+
+/* Pointing at a capability, or tabbing to it, deepens its hairline and draws it on down towards it
+   (the length only without reduced motion), while its name fades a step as every link's does. */
+.pw-service:has(> .pw-service-link:focus-visible)::before {
+  --pw-reach: 1.3;
+  background-color: var(--color-rikyu-deep);
+}
+
+@media (hover: hover) {
+  .pw-service:has(> .pw-service-link:hover)::before {
+    --pw-reach: 1.3;
+    background-color: var(--color-rikyu-deep);
+  }
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .pw-service::before {
+    scale: 1 var(--pw-reach, 1);
+  }
+}
+
+.pw-service-link {
+  display: block;
+  margin-inline: auto;
+  max-width: 24rem;
+}
+
+@media (min-width: 48rem) {
+  .pw-spread {
+    row-gap: clamp(4.5rem, 7vw, 6rem);
+  }
+
+  .pw-door {
+    grid-template-columns: repeat(12, minmax(0, 1fr));
+    grid-template-areas: none;
+    grid-template-rows: 1fr auto;
+    column-gap: var(--grid-gap);
+    row-gap: 1.25rem;
+  }
+
+  .pw-door-homes .pw-photo {
+    grid-column: 1 / 6;
+    grid-row: 1 / 3;
+  }
+
+  .pw-door-homes .pw-head,
+  .pw-door-homes .pw-body {
+    grid-column: 7 / 13;
+  }
+
+  .pw-door-business .pw-head,
+  .pw-door-business .pw-body {
+    grid-column: 1 / 7;
+  }
+
+  .pw-door-business .pw-photo {
+    grid-column: 8 / 13;
+    grid-row: 1 / 3;
+  }
+
+  .pw-head {
+    grid-row: 1;
+  }
+
+  .pw-body {
+    grid-row: 2;
+  }
+}
+
+/* A phone held sideways: the photograph takes four columns, not five, so it fits the screen's
+   height. */
+@media (min-width: 48rem) and (max-width: 79.99rem) and (max-height: 32rem) {
+  .pw-door-homes .pw-photo {
+    grid-column: 1 / 5;
+  }
+
+  .pw-door-homes .pw-head,
+  .pw-door-homes .pw-body {
+    grid-column: 6 / 13;
+  }
+
+  .pw-door-business .pw-head,
+  .pw-door-business .pw-body {
+    grid-column: 1 / 8;
+  }
+
+  .pw-door-business .pw-photo {
+    grid-column: 9 / 13;
+  }
+}
+
+/* Tablets and small laptops: each door keeps a second page margin inside the first; the three
+   capabilities run the full width, side by side, each hanging from its hairline. */
+@media (min-width: 48rem) and (max-width: 79.99rem) {
+  .pw-door {
+    margin-inline: var(--page-gutter);
+  }
+
+  .pw-services {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    column-gap: var(--grid-gap);
+  }
+
+  .pw-service + .pw-service::before {
+    margin-top: 0;
+  }
+}
+
+@media (min-width: 80rem) {
+  /* The doors stand a second page margin in from the first (132px from the screen's edge at 1440),
+     and the centre column is only as wide as the capabilities need, so the composition gathers
+     around the centre line. */
+  .pw-spread {
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1.25fr) minmax(0, 1fr);
+    column-gap: clamp(2rem, 4vw, 4.5rem);
+    padding-inline: var(--page-gutter);
+  }
+
+  /* Both doors are as tall as the taller one. The photograph takes up the difference, so the homes
+     photograph lines up with the top of the business words, and the homes words with the foot of
+     the business photograph. */
+  .pw-door {
+    grid-template-columns: minmax(0, 1fr);
+    grid-template-areas: none;
+    row-gap: 0;
+    align-items: stretch;
+    grid-row: 1;
+  }
+
+  .pw-door-homes {
+    grid-column: 1;
+    grid-template-rows: 1fr auto auto;
+  }
+
+  .pw-door-business {
+    grid-column: 3;
+    grid-template-rows: auto auto 1fr;
+  }
+
+  .pw-door .pw-photo,
+  .pw-door .pw-head,
+  .pw-door .pw-body {
+    grid-column: 1;
+  }
+
+  .pw-door-homes .pw-photo {
+    grid-row: 1;
+    margin-bottom: 2rem;
+  }
+
+  .pw-door-homes .pw-head {
+    grid-row: 2;
+  }
+
+  .pw-door-homes .pw-body {
+    grid-row: 3;
+  }
+
+  .pw-door-business .pw-head {
+    grid-row: 1;
+  }
+
+  .pw-door-business .pw-body {
+    grid-row: 2;
+  }
+
+  .pw-door-business .pw-photo {
+    grid-row: 3;
+    margin-top: 2rem;
+  }
+
+  .pw-body {
+    margin-top: 1rem;
+  }
+
+  /* The centre line runs the whole height of the composition, out of nothing above the first
+     capability and back into nothing below the last, so the three read as one process. */
+  .pw-services {
+    grid-column: 2;
+    grid-row: 1;
+    display: flex;
+    flex-direction: column;
+  }
+
+  .pw-services::before,
+  .pw-services::after {
+    content: "";
+    flex: 1 1 0;
+    width: 1px;
+    margin-inline: auto;
+  }
+
+  .pw-services::before {
+    background: linear-gradient(to bottom, transparent, var(--color-rikyu));
+  }
+
+  /* As long as the length that leads into the first capability, so the three sit on the middle. */
+  .pw-services::after {
+    flex-basis: clamp(2rem, 3.5vw, 3rem);
+    margin-top: clamp(1.25rem, 2vw, 1.75rem);
+    background: linear-gradient(to top, transparent, var(--color-rikyu));
+  }
+
+  /* Each capability sets its line in two, as the first and last already do, which keeps the words
+     on the centre line well clear of the doors either side. */
+  .pw-service-link {
+    max-width: 20rem;
+  }
+}
+
+/* A door whose photograph may not be shown here (its project still in draft) keeps its words, set
+   as plain text: under one another on phones and tablets, at the top of its column on wide screens. */
+.pw-door:not(:has(> .pw-photo)) {
+  grid-template-columns: minmax(0, 1fr);
+  grid-template-areas:
+    "head"
+    "body";
+}
+
+@media (min-width: 48rem) {
+  .pw-door:not(:has(> .pw-photo)) {
+    grid-template-columns: repeat(12, minmax(0, 1fr));
+    grid-template-areas: none;
+    grid-template-rows: auto auto;
+  }
+
+  .pw-door:not(:has(> .pw-photo)) > .pw-head,
+  .pw-door:not(:has(> .pw-photo)) > .pw-body {
+    grid-column: 1 / 9;
+  }
+}
+
+@media (min-width: 80rem) {
+  .pw-door:not(:has(> .pw-photo)) {
+    grid-template-columns: minmax(0, 1fr);
+    grid-template-rows: auto auto 1fr;
+  }
+
+  .pw-door:not(:has(> .pw-photo)) > .pw-head,
+  .pw-door:not(:has(> .pw-photo)) > .pw-body {
+    grid-column: 1;
+  }
+}
+
+/* The doors draw apart as the composition rises into view, from just inside the gap either side of
+   the centre line out to their places, and are still before it is fully on screen. Only on wide
+   screens, where the doors stand side by side; reduced motion and other browsers see them in place. */
+@supports (animation-timeline: view()) {
+  @media (prefers-reduced-motion: no-preference) and (min-width: 80rem) {
+    .pw-spread {
+      view-timeline: --pw-spread block;
+    }
+
+    .pw-door {
+      animation: pw-part var(--ease-scrub) both;
+      animation-timeline: --pw-spread;
+      animation-range: entry 0% cover 35%;
+    }
+
+    .pw-door-homes {
+      --pw-from: var(--pw-part);
+    }
+
+    .pw-door-business {
+      --pw-from: calc(var(--pw-part) * -1);
+    }
+  }
+}
+
+@keyframes pw-part {
+  from {
+    translate: var(--pw-from) 0;
+  }
+}

@@ -1,0 +1,612 @@
+/* Home, 01 Work: the other projects, after the flagship (Showcase.tsx). Imported by globals.css. */
+
+/* ——— The cards ———
+   Each project is its photograph the full height of the section, on the ink ground, parted from the
+   next by a hairline. Large landscape screens, with a pointer or by touch: the cards in a row as tall
+   as the screen, after the client's reference, the open one wider than the others (below). Elsewhere
+   they stack: two across and 58svh tall from 640px (upright tablets, a narrow desktop window, a phone
+   on its side), one across and 76svh tall on phones. --card-h is a card's height. */
+.showcase-list {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+}
+
+/* Hover belongs to the card: the tile matches :hover only through it, so a card rising into place
+   with the pointer switched off (showcase-rise, below) is not hovered through its tile. */
+.showcase-tile {
+  --card-h: max(26rem, 76svh);
+  pointer-events: none;
+}
+
+.showcase-card {
+  position: relative;
+  display: block;
+  height: var(--card-h);
+  overflow: hidden;
+  background: var(--color-ink);
+  color: var(--color-kapur);
+  pointer-events: auto;
+}
+
+.showcase-tile + .showcase-tile .showcase-card {
+  border-top: 1px solid var(--hairline-dark);
+}
+
+@media (min-width: 40rem) {
+  .showcase-list {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  /* A last card on its own takes the whole row. */
+  .showcase-tile:last-child:nth-child(odd) {
+    grid-column: 1 / -1;
+  }
+
+  .showcase-tile {
+    --card-h: max(24rem, 58svh);
+  }
+
+  .showcase-tile + .showcase-tile .showcase-card {
+    border-top: 0;
+  }
+
+  .showcase-tile:nth-child(n + 3) .showcase-card {
+    border-top: 1px solid var(--hairline-dark);
+  }
+
+  .showcase-tile:nth-child(even) .showcase-card {
+    border-left: 1px solid var(--hairline-dark);
+  }
+}
+
+@media (min-width: 64rem) and (orientation: landscape) {
+  .showcase-list {
+    grid-template-columns: none;
+    grid-auto-columns: minmax(0, 1fr);
+    grid-auto-flow: column;
+  }
+
+  .showcase-tile {
+    --card-h: 100svh;
+  }
+
+  .showcase-tile:nth-child(n) .showcase-card {
+    border-top: 0;
+  }
+
+  .showcase-tile + .showcase-tile .showcase-card {
+    border-left: 1px solid var(--hairline-dark);
+  }
+}
+
+/* ——— Rest and open ———
+   One switch, --o, opens a card: 0 at rest, 1 open. Hover, keyboard focus and, on touch, the scroll
+   (below) each set it on the tile, and every layer reads its look and its timing from it, so opening
+   and closing each have their own pace.
+   At rest the photograph is grey under a dark veil and only the name stands, sideways, in the middle
+   of the card. Open, the card widens (in the row), its photograph comes up to full colour, the
+   sideways words fade and the write-up rises into the same middle. Every card has its words in the
+   same place, at rest and open. No shade or panel sits behind them: each photograph is framed, per
+   card size, so that its middle is a part of the picture where they read by themselves (Showcase.tsx,
+   SPOTS): --sx and --sy the point of the picture kept in view, --sw 1 for Milky White words, 0 for
+   ink. */
+.showcase-card {
+  --sx: var(--x-phone, var(--x-pair, var(--x, 0.5)));
+  --sy: var(--y-phone, var(--y-pair, var(--y, 0.5)));
+  --sw: var(--w-phone, var(--w-pair, var(--w, 0)));
+}
+
+@media (min-width: 40rem) {
+  .showcase-card {
+    --sx: var(--x-pair, var(--x, 0.5));
+    --sy: var(--y-pair, var(--y, 0.5));
+    --sw: var(--w-pair, var(--w, 0));
+  }
+}
+
+/* A phone on its side: its cards are wider than tall (384px) and the pictures drawn small, too small
+   for the middle of every picture to carry the write-up (measured at the best crops: Seri Wirani's
+   facts 3.5:1 in ink, Warung Soho's facts 1.8:1 in white). There the cards stay at rest, grey under
+   the veil with their names sideways, which read on every picture; a tap opens the project. */
+@media (orientation: landscape) and (max-height: 30rem) and (max-width: 63.999rem) {
+  .showcase-card {
+    --o: 0 !important;
+  }
+}
+
+@media (min-width: 64rem) and (orientation: landscape) {
+  .showcase-card {
+    --sx: var(--x, 0.5);
+    --sy: var(--y, 0.5);
+    --sw: var(--w, 0);
+  }
+}
+
+/* The photograph is drawn --draw wide: as wide as the card or as the picture at the card's full
+   height, whichever is wider (cover), its point --sx brought as near the middle as its edges allow,
+   as object-position would place it. */
+.showcase-card {
+  --draw: max(100%, calc(var(--card-h) * var(--ar, 1)));
+}
+
+.showcase-photo {
+  position: absolute;
+  inset: 0;
+}
+
+/* The veil is the photograph's own: grey and at four tenths of its light at rest, full colour when
+   open. */
+.showcase-photo img {
+  position: absolute;
+  inset: 0 auto 0 calc((100% - var(--draw)) * var(--sx));
+  width: var(--draw);
+  max-width: none;
+  height: 100%;
+  object-fit: cover;
+  object-position: 50% calc(var(--sy) * 100%);
+  filter: grayscale(calc(1 - var(--o, 0))) brightness(calc(0.4 + 0.6 * var(--o, 0)));
+  transition: filter var(--dur-reveal) var(--ease-brand);
+}
+
+/* Both write-ups stand in the middle of the card, across and down (translate centres them on it;
+   in the row, on the part of the card in view, below). */
+.showcase-side,
+.showcase-words {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  translate: -50% -50%;
+}
+
+/* The resting words: the name in Light, set sideways and reading from the bottom, and on a proposal
+   its label beside it, the two centred on one another. They fade as the card opens and come back
+   after it closes. */
+.showcase-side {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.625rem;
+  writing-mode: vertical-rl;
+  white-space: nowrap;
+  rotate: 180deg;
+  opacity: calc(1 - var(--o, 0));
+  transition: opacity calc(0.45s + 0.25s * (1 - var(--o, 0))) var(--ease-brand) calc(0.2s * (1 - var(--o, 0)));
+}
+
+.showcase-side-name {
+  font-size: var(--fs-h2);
+  font-weight: 300;
+  line-height: 1.1;
+  letter-spacing: 0.04em;
+}
+
+/* The open card's write-up: the name, the facts and, on a proposal, its label, each line centred on
+   the others. It rises 35px into place as it fades in, after the card has begun to open, and leaves
+   quickly. */
+.showcase-words {
+  --tone: calc(20 + 223 * var(--sw));
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: min(28rem, 100% - 2 * var(--page-gutter));
+  text-align: center;
+  color: rgb(var(--tone) var(--tone) var(--tone));
+  text-shadow: 0 1px 14px rgb(20 20 20 / calc(0.3 * var(--sw)));
+  opacity: var(--o, 0);
+  transform: translateY(calc(2.1875rem * (1 - var(--o, 0))));
+  transition-property: opacity, transform;
+  transition-duration: calc(0.3s + 0.6s * var(--o, 0));
+  transition-timing-function: var(--ease-brand);
+  transition-delay: calc(0.3s * var(--o, 0));
+}
+
+.showcase-facts {
+  margin-top: 0.5rem;
+}
+
+.showcase-label {
+  margin-top: 0.875rem;
+}
+
+/* ——— The row widens without moving the layout ———
+   Every card keeps its quarter of the row and is laid out as wide as an open card, --open-w (the
+   row shared as --grow parts to the open card and one to each of the others; --grow and --n are set
+   on the list by Showcase.tsx). What the eye sees is shaped by transforms alone: each card is seen
+   through a window as wide as itself whose right edge is moved to where the card ends, --vw from its
+   start (a quarter of the row at rest; when one is open, --open-w for it and --shut-w for the
+   others), and the card inside is moved back to where it starts, --dx from its own quarter (from its
+   index, --nth from 0, and whether any card is open, --any, or one before it, --after). The window
+   is see-through to its left, so the card before shows there, and it lets no pointer through. The
+   photograph is moved inside the card to where object-position would put it in a card that wide.
+   The row is never laid out or painted again while it changes, so nothing reflows, nothing is
+   counted as a layout shift, and the picture keeps its size. Both write-ups are moved with the
+   window, to the middle of the part of the card in view (half of --vw), so they stay centred while
+   it widens or narrows. The write-up is set to the open card's width, so it never rewraps. */
+@media (min-width: 64rem) and (orientation: landscape) {
+  .showcase-list {
+    --open-w: calc(100cqw * var(--grow) / (var(--grow) + var(--n) - 1));
+    --shut-w: calc(100cqw / (var(--grow) + var(--n) - 1));
+    --rest-w: calc(100cqw / var(--n));
+    overflow: clip;
+    container-type: inline-size;
+  }
+
+  .showcase-tile {
+    --vw: calc(
+      var(--rest-w) + var(--any, 0) * (var(--shut-w) - var(--rest-w)) + var(--o, 0) * (var(--open-w) - var(--shut-w))
+    );
+    --dx: calc(var(--nth, 0) * var(--any, 0) * (var(--shut-w) - var(--rest-w)) + var(--after, 0) * (var(--open-w) - var(--shut-w)));
+    position: relative;
+    height: var(--card-h);
+  }
+
+  .showcase-window {
+    position: absolute;
+    inset: 0 auto 0 0;
+    width: var(--open-w);
+    overflow: hidden;
+    translate: calc(var(--dx) + var(--vw) - var(--open-w)) 0;
+    transition: translate var(--dur-reveal) var(--ease-brand);
+  }
+
+  .showcase-card {
+    --draw: max(var(--open-w), calc(var(--card-h) * var(--ar, 1)));
+    translate: calc(var(--open-w) - var(--vw)) 0;
+    transition: translate var(--dur-reveal) var(--ease-brand);
+  }
+
+  .showcase-photo img {
+    translate: calc((var(--vw) - var(--open-w)) * var(--sx)) 0;
+    transition:
+      translate var(--dur-reveal) var(--ease-brand),
+      filter var(--dur-reveal) var(--ease-brand);
+    will-change: transform;
+  }
+
+  .showcase-side,
+  .showcase-words {
+    left: 0;
+    translate: calc(var(--vw) / 2 - 50%) -50%;
+  }
+
+  .showcase-side {
+    transition:
+      opacity calc(0.45s + 0.25s * (1 - var(--o, 0))) var(--ease-brand) calc(0.2s * (1 - var(--o, 0))),
+      translate var(--dur-reveal) var(--ease-brand);
+  }
+
+  .showcase-words {
+    width: min(28rem, var(--open-w) - 2 * var(--page-gutter));
+    transition:
+      opacity calc(0.3s + 0.6s * var(--o, 0)) var(--ease-brand) calc(0.3s * var(--o, 0)),
+      transform calc(0.3s + 0.6s * var(--o, 0)) var(--ease-brand) calc(0.3s * var(--o, 0)),
+      translate var(--dur-reveal) var(--ease-brand);
+  }
+}
+
+/* ——— What opens a card ———
+   Hover counts only while the pointer is not resting as the cards move under it
+   ([data-pointer-rest], ShowcasePointer.tsx); without that script it is plain hover. Keyboard focus
+   opens its card as hover does, unless the pointer is holding another open, so one card is open at a
+   time. */
+@media (hover: hover) {
+  .showcase-scene:not([data-pointer-rest]) .showcase-tile:hover {
+    --o: 1;
+  }
+
+  .showcase-scene:not([data-pointer-rest]) .showcase-tile:hover ~ .showcase-tile {
+    --after: 1;
+  }
+
+  .showcase-scene:not([data-pointer-rest]) .showcase-list:has(> .showcase-tile:hover) {
+    --any: 1;
+  }
+
+  .showcase-scene:is([data-pointer-rest], :not(:has(.showcase-tile:hover))) .showcase-tile:has(.showcase-card:focus-visible) {
+    --o: 1;
+  }
+
+  .showcase-scene:is([data-pointer-rest], :not(:has(.showcase-tile:hover)))
+    .showcase-tile:has(.showcase-card:focus-visible)
+    ~ .showcase-tile {
+    --after: 1;
+  }
+
+  .showcase-scene:is([data-pointer-rest], :not(:has(.showcase-tile:hover)))
+    .showcase-list:has(.showcase-card:focus-visible) {
+    --any: 1;
+  }
+}
+
+@media (hover: none) {
+  .showcase-tile:has(.showcase-card:focus-visible) {
+    --o: 1;
+  }
+
+  .showcase-tile:has(.showcase-card:focus-visible) ~ .showcase-tile {
+    --after: 1;
+  }
+
+  .showcase-list:has(.showcase-card:focus-visible) {
+    --any: 1;
+  }
+}
+
+/* Reduced motion: the same states, without travel. The width changes at once and the words with it;
+   the colour and the words cross-fade in a moment, and the write-up does not rise. */
+@media (prefers-reduced-motion: reduce) {
+  .showcase-window,
+  .showcase-card {
+    transition: none;
+  }
+
+  .showcase-photo img {
+    transition: filter 0.2s linear;
+  }
+
+  .showcase-side {
+    transition: opacity 0.2s linear;
+  }
+
+  .showcase-words {
+    transform: none;
+    transition: opacity 0.2s linear;
+  }
+}
+
+/* Focus is drawn inside the card, above the photograph: a light ring with a dark one inside it, so
+   it shows over a pale picture as well as a dark one. In the row it follows the card's visible width. */
+.showcase-card:focus-visible {
+  outline: none;
+}
+
+.showcase-card:focus-visible::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  box-shadow:
+    inset 0 0 0 2px var(--color-kapur),
+    inset 0 0 0 4px rgb(20 20 20 / 0.6);
+  pointer-events: none;
+}
+
+@media (min-width: 64rem) and (orientation: landscape) {
+  .showcase-card:focus-visible::after {
+    right: calc(var(--open-w) - var(--vw));
+  }
+}
+
+/* ——— Touch ———
+   Touch screens have no hover. Stacked, the card at the middle of the screen opens as it passes; in
+   the row the row holds and the cards open one after another (below). Without scroll-driven
+   animation the stacked cards are simply open (each one's open state is the one measured for it),
+   and the row rests. */
+@supports not (animation-timeline: view()) {
+  @media (hover: none) and (max-width: 63.999rem), (hover: none) and (orientation: portrait) {
+    .showcase-tile {
+      --o: 1;
+    }
+  }
+}
+
+/* Set by the scroll on touch screens: --open, 1 while a stacked card is the one to open; --step, the
+   number of the card open in the held row (0 for none). */
+@property --open {
+  syntax: "<integer>";
+  inherits: true;
+  initial-value: 0;
+}
+
+@property --step {
+  syntax: "<integer>";
+  inherits: true;
+  initial-value: 0;
+}
+
+@supports (animation-timeline: view()) {
+  /* ——— Touch, stacked: the card in the middle of the screen opens ———
+     The scroll only sets the opening off; it then plays in time, exactly as on hover, so wherever
+     the scroll stops a card is either closed or open, never on its way. Each tile holds --open at 1
+     while its middle is within 22svh of the middle of the screen, and the card reads it through a
+     style query: one card open at a time, in order down the page. In a pair, the left card opens as
+     the row comes up to the middle and hands over to the right one as it passes it. With reduced
+     motion too: the change itself is a short cross-fade. */
+  @media (hover: none) and (max-width: 63.999rem), (hover: none) and (orientation: portrait) {
+    .showcase-tile {
+      animation: showcase-open linear;
+      animation-timeline: view();
+      animation-range: cover calc(50% - 22svh) cover calc(50% + 22svh);
+    }
+
+    @container style(--open: 1) {
+      .showcase-card {
+        --o: 1;
+      }
+    }
+  }
+
+  @media (min-width: 40rem) and (hover: none) and (orientation: portrait),
+    (min-width: 40rem) and (max-width: 63.999rem) and (hover: none) {
+    .showcase-tile:nth-child(odd) {
+      animation-range: cover calc(50% - 24svh) cover 50%;
+    }
+
+    .showcase-tile:nth-child(even) {
+      animation-range: cover 50% cover calc(50% + 24svh);
+    }
+  }
+
+  /* ——— Large landscape screens: the row holds ———
+     The row holds on screen while it assembles (and, by touch, while its cards open in turn). The
+     scene is 60svh taller than the screen: its entry runs while it comes up the screen, and contain
+     0% is the moment the stage pins (the timeline ignores the header's scroll padding). The ground
+     behind the cards is ink, continuing the flagship's. With reduced motion and a pointer the row is
+     simply there. */
+  @media (min-width: 64rem) and (orientation: landscape) and (prefers-reduced-motion: no-preference),
+    (min-width: 64rem) and (orientation: landscape) and (hover: none) {
+    .showcase-scene {
+      height: calc(100svh + 60svh);
+      view-timeline: --showcase block;
+      view-timeline-inset: 0px;
+    }
+
+    .showcase-stage {
+      position: sticky;
+      top: 0;
+      height: 100svh;
+      overflow: clip;
+      background: var(--color-ink);
+    }
+  }
+
+  /* The cards come up out of the dark one by one from left to right, as a staircase that levels
+     out, after the client's reference. The first is in its place from the start, its top travelling
+     with the foot of the flagship's last photographs, so no band opens between the two; the next is
+     a quarter of its height below its place as the scene comes up the screen, then half, then three
+     quarters, and the last lands a third of the way into the hold. */
+  @media (min-width: 64rem) and (orientation: landscape) and (prefers-reduced-motion: no-preference) {
+    .showcase-card {
+      animation: showcase-rise var(--ease-scrub) both;
+      animation-timeline: --showcase;
+    }
+
+    .showcase-tile:nth-child(1) .showcase-card {
+      animation: none;
+    }
+
+    .showcase-tile:nth-child(2) .showcase-card {
+      --rise: 25%;
+      animation-range: entry 0% entry 60%;
+    }
+
+    .showcase-tile:nth-child(3) .showcase-card {
+      --rise: 50%;
+      animation-range: entry 10% entry 80%;
+    }
+
+    .showcase-tile:nth-child(4) .showcase-card {
+      --rise: 75%;
+      animation-range: entry 25% contain 33%;
+    }
+  }
+
+  /* ——— Large landscape touch screens: the row opens card by card ———
+     A tablet on its side has the row but no hover. Once the row has landed the stage holds longer
+     (180svh), and the cards open one after another from left to right as the page scrolls, each
+     closing as the next opens, the last closing just before the row lets go; a tap opens the
+     project. The list counts the card to open, --step, and the tiles read it through style queries,
+     so the opening plays in time, as on hover. A card focused from a keyboard opens instead, so one
+     card is open at a time. */
+  @media (min-width: 64rem) and (orientation: landscape) and (hover: none) {
+    .showcase-scene {
+      height: calc(100svh + 180svh);
+    }
+
+    .showcase-tile:nth-child(4) .showcase-card {
+      animation-range: entry 25% contain 8%;
+    }
+
+    .showcase-list {
+      animation: showcase-step linear;
+      animation-timeline: --showcase;
+      animation-range: contain 8% contain 96%;
+    }
+
+    .showcase-list:has(.showcase-card:focus-visible) {
+      animation: none;
+    }
+
+    @container style(--step: 1) {
+      .showcase-tile {
+        --any: 1;
+      }
+
+      .showcase-tile:nth-child(1) {
+        --o: 1;
+      }
+
+      .showcase-tile:nth-child(n + 2) {
+        --after: 1;
+      }
+    }
+
+    @container style(--step: 2) {
+      .showcase-tile {
+        --any: 1;
+      }
+
+      .showcase-tile:nth-child(2) {
+        --o: 1;
+      }
+
+      .showcase-tile:nth-child(n + 3) {
+        --after: 1;
+      }
+    }
+
+    @container style(--step: 3) {
+      .showcase-tile {
+        --any: 1;
+      }
+
+      .showcase-tile:nth-child(3) {
+        --o: 1;
+      }
+
+      .showcase-tile:nth-child(n + 4) {
+        --after: 1;
+      }
+    }
+
+    @container style(--step: 4) {
+      .showcase-tile {
+        --any: 1;
+      }
+
+      .showcase-tile:nth-child(4) {
+        --o: 1;
+      }
+    }
+  }
+}
+
+/* A card in motion ignores the pointer, so a still pointer does not open the cards rising under it;
+   it answers once it has landed. (The rise is a transform; the row's widening moves cards by
+   translate, so the two never meet.) */
+@keyframes showcase-rise {
+  from {
+    transform: translateY(var(--rise, 100%));
+    pointer-events: none;
+  }
+  96% {
+    pointer-events: none;
+  }
+}
+
+/* Held at 1 across the tile's range only (no fill), so 0 before and after it. */
+@keyframes showcase-open {
+  from,
+  to {
+    --open: 1;
+  }
+}
+
+/* Each card's turn, a quarter of the range each (no fill, so 0 before and after it). */
+@keyframes showcase-step {
+  0%,
+  24.99% {
+    --step: 1;
+  }
+  25%,
+  49.99% {
+    --step: 2;
+  }
+  50%,
+  74.99% {
+    --step: 3;
+  }
+  75%,
+  100% {
+    --step: 4;
+  }
+}

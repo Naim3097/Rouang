@@ -1,4 +1,3 @@
-import { Fragment } from "react";
 import type { Metadata } from "next";
 import Link from "next/link";
 import { DraftTag } from "@/components/projects/ProjectIndex";
@@ -6,7 +5,8 @@ import { SectorFilter } from "@/components/projects/SectorFilter";
 import { Breadcrumbs } from "@/components/ui/Breadcrumbs";
 import { Figure } from "@/components/ui/Figure";
 import { Label, TitlePair } from "@/components/ui/Typography";
-import { getProjects, publicImage } from "@/lib/content";
+import { getProjects, publicImage, type Project } from "@/lib/content";
+import type { Image as ImageData, PendingImage } from "@/lib/content/schema";
 import { pageMetadata } from "@/lib/seo";
 
 export const ensureStatic = "navigation";
@@ -24,17 +24,20 @@ export async function generateMetadata(): Promise<Metadata> {
 }
 
 /*
- * Plates are laid out to a rhythm rather than a uniform grid: a wide landscape, then a tall
- * plate set lower, then the reverse. Each entry is [column classes, aspect ratio, vertical offset,
- * the plate's share of the screen width on large screens (for `sizes`)].
+ * Plates sit in a plain grid: two columns from tablets up (each one half of the page grid), one on
+ * phones. Every plate is the same size and the same shape, 4:3, with its caption beneath it at the
+ * same distance, so the columns, the pictures and the captions all line up. Two across rather than
+ * three: the photographs stay large enough to read a room, and the smaller source files (some
+ * visualisations are only about 1,100 px wide) still hold at that size.
  */
-const rhythm: [string, string, string, string][] = [
-  ["lg:col-span-7", "4/3", "", "56vw"],
-  ["lg:col-span-4 lg:col-start-9", "4/5", "lg:mt-40", "32vw"],
-  ["lg:col-span-5 lg:col-start-2", "4/5", "", "40vw"],
-  ["lg:col-span-6 lg:col-start-7", "3/2", "lg:mt-24", "48vw"],
-  ["lg:col-span-8 lg:col-start-3", "16/9", "", "64vw"],
-];
+const PLATE_ASPECT = "4/3";
+
+/** A plate is landscape, so a photograph with its own landscape crop shows that crop instead. */
+function plateImage(img: ImageData | PendingImage): ImageData | PendingImage {
+  if ("pending" in img || !img.wide) return img;
+  // The wide crop is already centred on the focus line, so it sits centred.
+  return { ...img, src: img.wide.src, width: img.wide.width, height: img.wide.height, focus: undefined, wide: undefined };
+}
 
 export default async function ProjectsPage() {
   const projects = await getProjects();
@@ -44,7 +47,8 @@ export default async function ProjectsPage() {
     commercial: projects.filter((p) => p.sector === "commercial").length,
   };
   // Finished work first; design proposals follow under their own heading.
-  const ordered = [...projects].sort((a, b) => Number(a.visualisation) - Number(b.visualisation) || a.order - b.order);
+  const built = projects.filter((p) => !p.visualisation);
+  const proposals = projects.filter((p) => p.visualisation);
 
   return (
     <>
@@ -54,7 +58,7 @@ export default async function ProjectsPage() {
           <div className="page-grid mt-16 gap-y-10 sm:mt-24">
             <Label className="col-span-12 text-ink-muted lg:col-span-3">Projects</Label>
             <div className="col-span-12 lg:col-span-9">
-              <TitlePair as="h1" size="hero" eyebrow="Interior design projects" lead="Rooms we have designed" italic="for homes and for business" />
+              <TitlePair as="h1" size="hero" eyebrow="Interior design projects" lead="Rooms we have designed" follow="for homes and for business" />
               <p className="mt-8 max-w-[38rem] text-ink-soft">
                 Every project starts from a different place, a different budget and a different way of using a room.
                 These are the ones we can show you: finished rooms first, then designs still on the drawing board.
@@ -66,60 +70,77 @@ export default async function ProjectsPage() {
 
       <section data-tone="light" className="bg-kapur text-ink" aria-label="Projects">
         <div className="page-x pb-[var(--section-space)]">
-          <div className="mb-14 flex flex-wrap items-center justify-between gap-6 border-t border-ink/15 pt-6">
+          <div className="mb-12 flex flex-wrap items-center justify-between gap-6 border-t border-ink/15 pt-6 sm:mb-16">
             <SectorFilter targetId="project-plates" counts={counts} />
           </div>
 
-          <ul id="project-plates" data-filter="all" className="page-grid gap-y-20 sm:gap-y-28 [&[data-filter=commercial]_[data-sector=residential]]:hidden [&[data-filter=residential]_[data-sector=commercial]]:hidden">
-            {ordered.map((p, i) => {
-              const img = publicImage(p.card ?? p.hero);
-              // Small source files are shown at a size they can hold.
-              const lowRes = !!img && !("pending" in img) && img.width < 1400;
-              const [cols, aspect, offset, share] = lowRes ? (["lg:col-span-5 lg:col-start-2", "16/9", "", "40vw"] as const) : rhythm[i % rhythm.length];
-              const firstProposal = p.visualisation && !ordered[i - 1]?.visualisation;
-              return (
-                <Fragment key={p.slug}>
-                {firstProposal ? (
-                  <li className="col-span-12 border-t border-ink/15 pt-6">
-                    <h2 className="t-sub">Design proposals</h2>
-                    <p className="t-caption mt-2 max-w-[40rem] text-ink-muted">
-                      Shown in the studio&rsquo;s own design visualisations rather than photographs of finished rooms.
-                    </p>
-                  </li>
-                ) : null}
-                <li data-sector={p.sector} className={`col-span-12 ${cols} ${offset}`}>
-                  <Link href={`/projects/${p.slug}`} className="group block">
-                    {img ? (
-                      <Figure
-                        image={img}
-                        aspect={aspect}
-                        sizes={`(min-width: 1024px) ${share}, 100vw`}
-                        // The first plate is the largest paint on this page.
-                        priority={i === 0}
-                        transitionName={`project-${p.slug}`}
-                        imgClassName="transition-transform duration-[1.6s] ease-[var(--ease-brand)] group-hover:scale-[1.03]"
-                      />
-                    ) : null}
-                    <div className="mt-5 flex items-start justify-between gap-6">
-                      <div>
-                        <h2 className="font-serif text-[clamp(1.875rem,1.4rem+1.6vw,2.875rem)] italic leading-none">
-                          <span className="link-reveal">{p.title}</span>
-                          {p.isDraft ? <DraftTag placeholder={p.placeholder} /> : null}
-                        </h2>
-                        <p className="t-caption mt-3 text-ink-muted">
-                          {[p.type, p.location, p.visualisation ? "Design visualisation" : null].filter(Boolean).join(" · ")}
-                        </p>
-                      </div>
-                      <span className="t-label tabular-nums text-ink-muted">{String(i + 1).padStart(2, "0")}</span>
-                    </div>
-                  </Link>
-                </li>
-                </Fragment>
-              );
-            })}
-          </ul>
+          {/* The filter sets data-filter here; globals.css ("Projects page") does the hiding. */}
+          <div id="project-plates" data-filter="all" className="project-plates">
+            {built.length > 0 ? (
+              <div className="plate-group">
+                <Plates projects={built} startAt={1} heading="h2" />
+              </div>
+            ) : null}
+            {proposals.length > 0 ? (
+              <div className="plate-group">
+                <div className="mb-10 border-t border-ink/15 pt-6 sm:mb-12">
+                  <h2 className="t-headline">Design proposals</h2>
+                  <p className="t-caption mt-2 max-w-[40rem] text-ink-muted">
+                    Shown in ROUANG&rsquo;s own design visualisations rather than photographs of finished rooms.
+                  </p>
+                </div>
+                <Plates projects={proposals} startAt={built.length + 1} heading="h3" />
+              </div>
+            ) : null}
+          </div>
         </div>
       </section>
     </>
+  );
+}
+
+/** One group of plates. Built work is numbered first and the proposals carry on from it. */
+function Plates({ projects, startAt, heading: Heading }: { projects: Project[]; startAt: number; heading: "h2" | "h3" }) {
+  return (
+    <ul className="grid gap-x-[var(--grid-gap)] gap-y-[clamp(3rem,6vw,5rem)] sm:grid-cols-2">
+      {projects.map((p, i) => {
+        const img = publicImage(p.card ?? p.hero);
+        const n = startAt + i;
+        return (
+          <li key={p.slug} data-sector={p.sector}>
+            <Link href={`/projects/${p.slug}`} className="group block">
+              {img ? (
+                <Figure
+                  image={plateImage(img)}
+                  aspect={PLATE_ASPECT}
+                  sizes="(min-width: 640px) 50vw, 100vw"
+                  // The first plate is the largest paint on this page.
+                  priority={n === 1}
+                  transitionName={`project-${p.slug}`}
+                  imgClassName="transition-transform duration-[1.6s] ease-[var(--ease-brand)] group-hover:scale-[1.03]"
+                />
+              ) : null}
+              <div className="mt-5 flex items-baseline justify-between gap-6">
+                <Heading className="link-name t-title">
+                  {p.title}
+                  {p.isDraft ? <DraftTag placeholder={p.placeholder} /> : null}
+                </Heading>
+                <span className="t-label tabular-nums text-ink-muted">{String(n).padStart(2, "0")}</span>
+              </div>
+              <p className="t-caption mt-2 text-ink-muted">
+                {[p.type, p.location].filter(Boolean).join(" · ")}
+                {/* The proposal label is never split across two lines. */}
+                {p.visualisation ? (
+                  <>
+                    {" · "}
+                    <span className="whitespace-nowrap">Design visualisation</span>
+                  </>
+                ) : null}
+              </p>
+            </Link>
+          </li>
+        );
+      })}
+    </ul>
   );
 }

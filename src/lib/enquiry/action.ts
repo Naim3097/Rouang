@@ -69,7 +69,7 @@ export async function submitEnquiry(_prev: EnquiryState, formData: FormData): Pr
   const configured = deliveryConfigured();
   if (!configured.database && !configured.email) {
     console.error("[enquiry] No delivery configured: set SUPABASE_URL and SUPABASE_SECRET_KEY, or RESEND_API_KEY.");
-    return fail("Online enquiries aren't switched on yet. Please contact the studio directly for now.");
+    return fail("Online enquiries aren't switched on yet. Please email or call us directly for now.");
   }
 
   const enquiry = parsed.data;
