@@ -4,7 +4,7 @@ import { Pending } from "@/components/ui/Section";
 import { Label } from "@/components/ui/Typography";
 import { privacyNotice, type NoticeSection } from "@/config/privacy";
 import { addressLine, studio } from "@/config/studio";
-import { SHOW_DRAFTS } from "@/lib/env";
+import { SHOW_NOTES } from "@/lib/env";
 import { pageMetadata } from "@/lib/seo";
 
 export const ensureStatic = "navigation";
@@ -61,7 +61,7 @@ export default function PrivacyPage() {
                 Notis privasi
               </span>
             </h1>
-            {SHOW_DRAFTS ? (
+            {SHOW_NOTES ? (
               <div className="mt-10">
                 <Pending title="Legal review">
                   Written against s.7 of the Personal Data Protection Act 2010 (as amended in 2024), naming {studio.legalName},

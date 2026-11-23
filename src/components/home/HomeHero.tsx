@@ -30,12 +30,14 @@ import { HeroIntroControl } from "./HeroIntroControl";
  */
 
 /**
- * The film, a generated sequence of Rembayung's hall being fitted out (10 s, 1920×1080, silent),
- * in three cuts (HeroFilm picks one per screen) and its first and last frames as stills.
+ * The film, a generated sequence of Rembayung's hall being fitted out (10 s at 30 fps, 1920×1080,
+ * silent), in three cuts (HeroFilm picks one per screen; scripts/media/hero-film.cjs makes them)
+ * and its first and last frames as stills.
  */
 export const HERO_FILM = {
   project: "rembayung",
   duration: 10,
+  fps: 30,
   sources: {
     wide: "/films/hero/rembayung-film-1080.mp4",
     mid: "/films/hero/rembayung-film-720.mp4",
@@ -128,7 +130,7 @@ export function HomeHero({
               <source media="(prefers-reduced-motion: reduce)" srcSet={BLANK} />
               <img {...first} alt="" className="home-hero-first object-cover" />
             </picture>
-            <HeroFilm sources={HERO_FILM.sources} duration={HERO_FILM.duration} />
+            <HeroFilm sources={HERO_FILM.sources} duration={HERO_FILM.duration} fps={HERO_FILM.fps} />
           </div>
         ) : photo ? (
           <div

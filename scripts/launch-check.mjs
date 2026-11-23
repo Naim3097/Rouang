@@ -122,6 +122,9 @@ for (const dir of ["projects", "services", "insights"]) {
     if (/\binsightImagery\b/.test(text)) used.add("insightImagery (one per article)");
   }
   if (used.size) block("Images", `${used.size} temporary Unsplash photograph(s) still in use: ${[...used].join(", ")}. Replace them with the studio's own`);
+  // The image optimiser's leave to fetch them (images.remotePatterns) goes with the last of them.
+  else if (fs.readFileSync(path.join(root, "next.config.ts"), "utf8").includes("images.unsplash.com"))
+    warn("Images", "no temporary Unsplash photograph is in use, but next.config.ts still lets the image optimiser fetch from images.unsplash.com: delete that remotePatterns entry");
 }
 
 // ——— Studio facts and process (read from the config source) ———

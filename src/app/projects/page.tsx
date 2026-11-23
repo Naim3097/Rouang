@@ -1,11 +1,14 @@
 import type { Metadata } from "next";
 import Link from "next/link";
+import { shownImage } from "@/components/projects/images";
 import { DraftTag } from "@/components/projects/ProjectIndex";
 import { SectorFilter } from "@/components/projects/SectorFilter";
 import { Breadcrumbs } from "@/components/ui/Breadcrumbs";
+import { ButtonLink } from "@/components/ui/Button";
 import { Figure } from "@/components/ui/Figure";
-import { Label, TitlePair } from "@/components/ui/Typography";
-import { getProjects, publicImage, type Project } from "@/lib/content";
+import { RikyuField } from "@/components/ui/RikyuField";
+import { TitlePair } from "@/components/ui/Typography";
+import { getProjects, type Project } from "@/lib/content";
 import type { Image as ImageData, PendingImage } from "@/lib/content/schema";
 import { pageMetadata } from "@/lib/seo";
 
@@ -54,47 +57,78 @@ export default async function ProjectsPage() {
 
   return (
     <>
-      <section data-tone="light" className="bg-kapur text-ink">
-        <div className="page-x pb-16 pt-[calc(var(--header-h)+3rem)] sm:pb-24">
-          <Breadcrumbs items={[{ name: "Projects", href: "/projects" }]} />
-          <div className="page-grid mt-16 gap-y-10 sm:mt-24">
-            <Label className="col-span-12 text-ink-muted lg:col-span-3">Projects</Label>
-            <div className="col-span-12 lg:col-span-9">
-              <TitlePair as="h1" size="hero" eyebrow="Interior design projects" lead="Rooms we have designed" follow="for homes and for business" />
-              <p className="mt-8 max-w-[38rem] text-ink-soft">
-                Every project starts from a different place, a different budget and a different way of using a room.
-                These are the ones we can show you: finished rooms first, then designs still on the drawing board.
-              </p>
-            </div>
+      {/* The opening: the Rikyū green field of the home page's "Start a conversation" (RikyuField, full
+          bleed), with the words in Milky White and centred, as the Services and About openings set
+          theirs, in the same measure and spacing as Services. The header turns light over it
+          (data-tone="rikyu"). Every line is solid Milky White, the small capitals too, as the home
+          panel's labels are: at 80% the eyebrow fell just below 4.5:1 where the green is lightest. */}
+      <RikyuField>
+        <div className="page-x pb-[var(--section-space)] pt-[calc(var(--header-h)+3rem)]">
+          <Breadcrumbs tone="photo" items={[{ name: "Projects", href: "/projects" }]} />
+          <div className="mx-auto mt-10 flex max-w-[62rem] flex-col items-center text-center sm:mt-12">
+            <TitlePair
+              as="h1"
+              size="hero"
+              eyebrow="Interior design projects"
+              eyebrowClassName="text-kapur"
+              lead="Rooms we have designed"
+              follow="for homes and for business"
+              followClassName="text-kapur"
+            />
+            <p className="t-sub mt-8 max-w-[38rem] text-kapur">
+              Every project starts from a different place, a different budget and a different way of using a room.
+              {/* Only promised when there is work below to show. */}
+              {projects.length ? " These are the ones we can show you: finished rooms first, then designs still on the drawing board." : null}
+            </p>
           </div>
         </div>
-      </section>
+      </RikyuField>
 
+      {/* The plates start on the page's own grey after the green, with a section's full space above the
+          filter: the change of ground is the divide, so the filter row needs no rule of its own. */}
       <section data-tone="light" className="bg-kapur text-ink" aria-label="Projects">
-        <div className="page-x pb-[var(--section-space)]">
-          <div className="mb-12 flex flex-wrap items-center justify-between gap-6 border-t border-ink/15 pt-6 sm:mb-16">
-            <SectorFilter targetId="project-plates" counts={counts} />
-          </div>
-
-          {/* The filter sets data-filter here; globals.css ("Projects page") does the hiding. */}
-          <div id="project-plates" data-filter="all" className="project-plates">
-            {built.length > 0 ? (
-              <div className="plate-group">
-                <Plates projects={built} startAt={1} heading="h2" />
-              </div>
-            ) : null}
-            {proposals.length > 0 ? (
-              <div className="plate-group">
-                <div className="mb-10 border-t border-ink/15 pt-6 sm:mb-12">
-                  <h2 className="t-headline">Design proposals</h2>
-                  <p className="t-caption mt-2 max-w-[40rem] text-ink-muted">
-                    Shown in ROUANG&rsquo;s own design visualisations rather than photographs of finished rooms.
-                  </p>
+        <div className="page-x section-y">
+          {projects.length ? (
+            <>
+              {/* A filter only where there is a choice: with every project in one sector it would offer a 0. */}
+              {counts.residential && counts.commercial ? (
+                <div className="mb-12 flex flex-wrap items-center justify-between gap-6 sm:mb-16">
+                  <SectorFilter targetId="project-plates" counts={counts} />
                 </div>
-                <Plates projects={proposals} startAt={built.length + 1} heading="h3" />
+              ) : null}
+
+              {/* The filter sets data-filter here; globals.css ("Projects page") does the hiding. */}
+              <div id="project-plates" data-filter="all" className="project-plates">
+                {built.length > 0 ? (
+                  <div className="plate-group">
+                    <Plates projects={built} startAt={1} heading="h2" />
+                  </div>
+                ) : null}
+                {proposals.length > 0 ? (
+                  <div className="plate-group">
+                    <div className="mb-10 border-t border-ink/15 pt-6 sm:mb-12">
+                      <h2 className="t-headline">Design proposals</h2>
+                      <p className="t-caption mt-2 max-w-[40rem] text-ink-muted">
+                        Shown in ROUANG&rsquo;s own design visualisations rather than photographs of finished rooms.
+                      </p>
+                    </div>
+                    <Plates projects={proposals} startAt={built.length + 1} heading="h3" />
+                  </div>
+                ) : null}
               </div>
-            ) : null}
-          </div>
+            </>
+          ) : (
+            // Nothing published yet (the live site before launch): one line and a way forward, centred
+            // under the centred opening, instead of a filter of zeros over an empty grid. The focus
+            // ring is ink, as on the filter pills: in the button's own Milky White it would vanish
+            // into the page around it.
+            <div className="mx-auto flex max-w-[38rem] flex-col items-center text-center">
+              <p className="t-sub text-ink-soft">The first projects are being prepared for this page.</p>
+              <ButtonLink href="/contact" variant="dark" className="mt-10 focus-visible:outline-ink">
+                Discuss your project
+              </ButtonLink>
+            </div>
+          )}
         </div>
       </section>
     </>
@@ -111,7 +145,7 @@ function Plates({ projects, startAt, heading: Heading }: { projects: Project[]; 
   return (
     <ul className={`grid gap-x-[var(--grid-gap)] gap-y-[clamp(3rem,6vw,5rem)] sm:grid-cols-2 ${threes ? "lg:grid-cols-3" : ""}`}>
       {projects.map((p, i) => {
-        const img = publicImage(p.card ?? p.hero);
+        const img = shownImage(p.card ?? p.hero);
         const n = startAt + i;
         return (
           <li key={p.slug} data-sector={p.sector}>
@@ -140,7 +174,7 @@ function Plates({ projects, startAt, heading: Heading }: { projects: Project[]; 
                 {p.visualisation ? (
                   <>
                     {" · "}
-                    <span className="whitespace-nowrap">Design visualisation</span>
+                    <span className="whitespace-nowrap">Design proposal</span>
                   </>
                 ) : null}
               </p>

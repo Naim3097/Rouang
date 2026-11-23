@@ -2,6 +2,7 @@ import Image from "next/image";
 import Link from "next/link";
 import type { Project } from "@/lib/content";
 import { publicImage } from "@/lib/content";
+import { SHOW_NOTES } from "@/lib/env";
 
 /**
  * Projects as an index of rows rather than a card grid. On pointer devices, hovering a row opens
@@ -25,9 +26,17 @@ export function ProjectIndex({ projects, startAt = 1, showRole = false }: { proj
               <span className="t-label col-span-2 tabular-nums text-ink-muted sm:col-span-1">
                 {String(i + startAt).padStart(2, "0")}
               </span>
-              <span className="t-title col-span-10 flex items-center gap-4 sm:col-span-6 lg:col-span-5">
+              {/* The row lines up on the baseline of the name. Below lg the small circle sits beside the
+                  name out of flow (absolute, in the padding it leaves), so the name stays the only thing
+                  this cell can take its baseline from: the number and the captions align with the words,
+                  not with the foot of the circle, and the name stays centred on the circle. */}
+              <span
+                className={`t-title col-span-10 sm:col-span-6 lg:col-span-5 ${
+                  photo ? "relative flex min-h-14 items-center pl-18 lg:static lg:block lg:min-h-0 lg:pl-0" : ""
+                }`}
+              >
                 {photo ? (
-                  <span className="relative block h-14 w-14 shrink-0 overflow-hidden rounded-full lg:hidden" aria-hidden="true">
+                  <span className="absolute left-0 top-1/2 block h-14 w-14 -translate-y-1/2 overflow-hidden rounded-full lg:hidden" aria-hidden="true">
                     <Image src={photo.src} alt="" fill sizes="56px" className="object-cover" style={photo.focus ? { objectPosition: photo.focus } : undefined} />
                   </span>
                 ) : null}
@@ -73,7 +82,9 @@ export function ProjectIndex({ projects, startAt = 1, showRole = false }: { proj
   );
 }
 
+/** The agency's "Draft" tag beside a project's name: local development only (SHOW_NOTES). */
 export function DraftTag({ placeholder }: { placeholder?: boolean }) {
+  if (!SHOW_NOTES) return null;
   return (
     <span className="t-label ml-3 inline-block rounded-full border border-current px-2 py-0.5 align-middle opacity-60">
       {placeholder ? "Layout placeholder" : "Draft"}

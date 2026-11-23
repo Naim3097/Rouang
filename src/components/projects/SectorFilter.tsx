@@ -36,7 +36,10 @@ export function SectorFilter({ targetId, counts }: { targetId: string; counts: R
           aria-pressed={value === o.value}
           aria-controls={targetId}
           onClick={() => choose(o.value)}
-          className="t-meta inline-flex min-h-11 items-center gap-2 rounded-full border border-ink/25 px-4 transition-colors aria-pressed:border-ink aria-pressed:bg-ink aria-pressed:text-kapur"
+          // The focus ring is always ink, and shows at once (it is left out of the colour transition):
+          // the pressed pill's own text is Milky White, and a ring in its colour would vanish into the
+          // page around it.
+          className="t-meta inline-flex min-h-11 items-center gap-2 rounded-full border border-ink/25 px-4 transition-[color,background-color,border-color] focus-visible:outline-ink aria-pressed:border-ink aria-pressed:bg-ink aria-pressed:text-kapur"
         >
           {o.label}
           <span className="t-caption tabular-nums">{counts[o.value] ?? 0}</span>

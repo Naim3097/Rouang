@@ -15,9 +15,9 @@ import type { Image as ImageData } from "@/lib/content/schema";
  *   a step, Page Up and Page Down a larger one, Home and End to either edge.
  * - A mouse or pen pressed on the photographs moves the line there and drags it; pressed on the
  *   handle, it carries the line from where it is. The pointer is captured, so a drag can leave the frame.
- * - On a touch screen the page still scrolls under a vertical swipe (touch-action: pan-y); a
- *   sideways drag moves the line, and a tap moves it to the tap. A drag that starts on the handle
- *   moves the line at once.
+ * - On a touch screen the page still scrolls under a vertical swipe and zooms under two fingers
+ *   (touch-action: pan-y pinch-zoom); a sideways drag moves the line, and a tap moves it to the tap.
+ *   A drag that starts on the handle moves the line at once.
  * - Once both photographs have loaded and half the frame is in view, the line makes one slow sweep
  *   to show that it moves. Never with reduced motion, and it stops the moment the visitor touches
  *   the frame or the keys.

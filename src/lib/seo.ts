@@ -13,8 +13,12 @@ type PageMeta = {
   title: string;
   description: string;
   path: string;
-  /** Absolute or root-relative path to a 1200x630 image. Defaults to the route's generated OG image. */
-  image?: string;
+  /**
+   * Absolute or root-relative path to a 1200x630 image. Left out, a route with its own
+   * opengraph-image file (ROUTES_WITH_OWN_CARD) uses that, and every other page the brand card.
+   * null always leaves the choice to the route's own file.
+   */
+  image?: string | null;
   type?: "website" | "article";
   publishedTime?: string;
   modifiedTime?: string;
@@ -23,6 +27,14 @@ type PageMeta = {
   /** Use the title exactly as given (the home page carries the brand first). */
   absoluteTitle?: boolean;
 };
+
+/**
+ * Routes whose folder has its own opengraph-image file: an article and a case study each get a card
+ * with their own title (src/app/insights/[slug] and src/app/projects/[slug]). Next applies such a
+ * file only when the page's metadata has no `images` key at all, so these pages leave the key out.
+ * Add a pattern here when another route gains its own card.
+ */
+const ROUTES_WITH_OWN_CARD = [/^\/insights\/[^/]+$/, /^\/projects\/[^/]+$/];
 
 /**
  * One place that decides titles, canonicals, social cards and indexing for every page.
@@ -42,9 +54,11 @@ export function pageMetadata({
   const fullTitle = absoluteTitle ? title : `${title}${TITLE_SUFFIX}`;
   const canonical = absoluteUrl(path);
   const index = IS_PRODUCTION && !noindex;
-  // Routes with their own opengraph-image file override this (file-based metadata wins); every
-  // other page shares the brand card, because a page-level openGraph object replaces the root one.
-  image ??= absoluteUrl("/opengraph-image");
+  // Every page without a card of its own names the brand card, because a page-level openGraph
+  // object replaces the root one (the root opengraph-image file would otherwise be lost). A route
+  // with its own file gets no `images` key, so Next fills in that file and copies it to twitter.
+  const card =
+    image !== undefined ? image : ROUTES_WITH_OWN_CARD.some((r) => r.test(path)) ? null : absoluteUrl("/opengraph-image");
   return {
     title: { absolute: fullTitle },
     description,
@@ -59,14 +73,14 @@ export function pageMetadata({
       title: fullTitle,
       description,
       locale: "en_MY",
-      ...(image ? { images: [{ url: image, width: 1200, height: 630, alt: title }] } : {}),
+      ...(card ? { images: [{ url: card, width: 1200, height: 630, alt: title }] } : {}),
       ...(type === "article" && publishedTime ? { publishedTime, modifiedTime: modifiedTime ?? publishedTime } : {}),
     },
     twitter: {
       card: "summary_large_image",
       title: fullTitle,
       description,
-      ...(image ? { images: [image] } : {}),
+      ...(card ? { images: [card] } : {}),
     },
   };
 }

@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { SHOW_NOTES } from "@/lib/env";
 import { Figure } from "@/components/ui/Figure";
 import { Label, TitlePair } from "@/components/ui/Typography";
 import type { Service } from "@/lib/content";
@@ -109,7 +110,7 @@ export function Pathways({
                     <span className="t-label tabular-nums text-ink-muted">{String(i + 1).padStart(2, "0")}</span>
                     <span className="link-name t-title mt-3 block">
                       {s.navLabel}
-                      {s.isDraft ? <span className="t-label ml-2 align-middle opacity-60">Draft</span> : null}
+                      {s.isDraft && SHOW_NOTES ? <span className="t-label ml-2 align-middle opacity-60">Draft</span> : null}
                     </span>
                     <span className="t-sub mt-2 block text-balance text-ink-soft">{s.headlineFollow}</span>
                   </Link>

@@ -1,14 +1,25 @@
+import Image from "next/image";
 import Link from "next/link";
 import { Wordmark } from "@/components/brand/Brand";
+import { placeholderImagery } from "@/config/media";
 import { legalNav } from "@/config/navigation";
-import type { NavItem } from "@/lib/nav";
 import { addressLines, studio, telHref, whatsappHref } from "@/config/studio";
+import { publicImage } from "@/lib/content";
+import type { Image as ImageData } from "@/lib/content/schema";
 import { GA_MEASUREMENT_ID, IS_PRODUCTION } from "@/lib/env";
+import type { NavItem } from "@/lib/nav";
 import { ConsentSettingsButton } from "./Analytics";
 import { ContactLink } from "./ContactLink";
 
-/** Footer carries the tagline lockup, as the kit assigns it (p.5: "Covers, hoardings, website footer"). */
+/**
+ * The footer stands on a full-bleed photograph of a warm, sunlit room, after the client's reference
+ * (round 7b): the wordmark set small with the company's line under it, then Navigate, Talk to us and
+ * Office, then a hairline and the legal lines. A shade over the photograph keeps every word legible
+ * (styles/layout/footer.css). The photograph is temporary, so production has none: there the same
+ * layout stands on Chinese Black.
+ */
 export function SiteFooter({ nav }: { nav: NavItem[] }) {
+  const photo: ImageData | null = publicImage(placeholderImagery.footerRoom);
   const wa = whatsappHref("Hello ROUANG, I'd like to talk about a project.");
   const tel = telHref();
   const year = process.env.BUILD_YEAR;
@@ -21,21 +32,37 @@ export function SiteFooter({ nav }: { nav: NavItem[] }) {
   ].filter((s): s is { label: string; href: string } => !!s.href);
 
   return (
-    <footer data-tone="dark" className="relative overflow-hidden border-t border-kapur/10">
-      <div className="page-x pt-24 sm:pt-32">
-        <div className="page-grid gap-y-14">
-          <div className="col-span-12 lg:col-span-4">
-            {/* The tagline lives in the lockup below; the footer opens with the company's own line. */}
-            <p className="t-title max-w-[24rem] text-kapur">
-              {studio.line.lead}
-              <span className="t-follow block text-kapur/70">{studio.line.follow}</span>
+    <footer data-tone="dark" data-photo={photo ? "" : undefined} className="site-footer relative isolate overflow-hidden bg-ink text-kapur">
+      {photo ? (
+        // Atmosphere only, behind the words: it names nothing, so it is hidden from assistive technology.
+        // On every page and always below the fold, so it loads late and never competes with a page's own picture.
+        <div className="site-footer-photo" aria-hidden="true">
+          <Image
+            src={photo.src}
+            alt=""
+            fill
+            sizes="100vw"
+            quality={78}
+            loading="lazy"
+            className="object-cover"
+            style={{ objectPosition: photo.focus ?? "50% 50%" }}
+          />
+        </div>
+      ) : null}
+
+      <div className="site-footer-body page-x">
+        <div className="site-footer-grid">
+          <div className="site-footer-brand">
+            <Wordmark className="h-auto w-[8.75rem]" title="ROUANG" />
+            <p className="mt-5">
+              {studio.descriptor}
+              <br /> for homes and businesses.
             </p>
-            <p className="mt-6 max-w-[24rem] text-kapur/70">{studio.descriptor} for homes and businesses.</p>
           </div>
 
-          <nav aria-label="Footer" className="col-span-6 sm:col-span-3 lg:col-span-2 lg:col-start-6">
-            <p className="t-label mb-5 text-mouse">Navigate</p>
-            <ul className="space-y-2.5">
+          <nav aria-label="Footer">
+            <p className="site-footer-label t-label">Navigate</p>
+            <ul className="site-footer-list t-meta">
               {nav.map((item) => (
                 <li key={item.href}>
                   <Link href={item.href} className="link-fade">
@@ -46,9 +73,9 @@ export function SiteFooter({ nav }: { nav: NavItem[] }) {
             </ul>
           </nav>
 
-          <div className="col-span-6 sm:col-span-4 lg:col-span-2">
-            <p className="t-label mb-5 text-mouse">Talk to us</p>
-            <ul className="space-y-2.5">
+          <div>
+            <p className="site-footer-label t-label">Talk to us</p>
+            <ul className="site-footer-list t-meta">
               <li>
                 <Link href="/contact" className="link-fade">
                   Project enquiry
@@ -63,8 +90,8 @@ export function SiteFooter({ nav }: { nav: NavItem[] }) {
               ) : null}
               {studio.contact.email ? (
                 <li>
-                  {/* Where the column is too narrow for the whole address (a small phone), it breaks after
-                      the @, never in the middle of a word. */}
+                  {/* Where the column is too narrow for the whole address, it breaks after the @, never
+                      in the middle of a word. */}
                   <ContactLink href={`mailto:${studio.contact.email}`} kind="email" location="footer" className="link-fade [overflow-wrap:anywhere]">
                     {studio.contact.email.split("@")[0]}@<wbr />
                     {studio.contact.email.split("@").slice(1).join("@")}
@@ -80,8 +107,8 @@ export function SiteFooter({ nav }: { nav: NavItem[] }) {
               ) : null}
             </ul>
             {social.length ? (
-              // One per line, like the links above: a narrow column would otherwise break the row unevenly.
-              <ul className="mt-6 space-y-2.5" aria-label="ROUANG on social media">
+              // By name, one per line, as in the reference.
+              <ul className="site-footer-list t-meta mt-5" aria-label="ROUANG on social media">
                 {social.map((s) => (
                   <li key={s.label}>
                     <a href={s.href} className="link-fade">
@@ -93,10 +120,10 @@ export function SiteFooter({ nav }: { nav: NavItem[] }) {
             ) : null}
           </div>
 
-          <div className="col-span-12 sm:col-span-5 lg:col-span-3">
-            <p className="t-label mb-5 text-mouse">Office</p>
+          <div className="site-footer-office">
+            <p className="site-footer-label t-label">Office</p>
             {address ? (
-              <address className="not-italic text-kapur/85">
+              <address className="t-meta not-italic">
                 {address.map((line) => (
                   <span key={line} className="block">
                     {line}
@@ -107,20 +134,8 @@ export function SiteFooter({ nav }: { nav: NavItem[] }) {
           </div>
         </div>
 
-        {/* Tagline lockup: the wordmark with RUANG TANPA BATAS set to its width. */}
-        <div className="mt-24 sm:mt-36 [container-type:inline-size]">
-          <Wordmark className="h-auto w-full text-kapur" title="ROUANG, Ruang tanpa batas" />
-          <p
-            aria-hidden="true"
-            lang="ms"
-            className="mt-[1.6cqw] hidden text-[2.05cqw] uppercase leading-none tracking-[0.62em] text-mouse [text-align-last:justify] [text-align:justify] sm:block"
-          >
-            Ruang tanpa batas
-          </p>
-        </div>
-
-        <div className="t-caption mt-14 flex flex-col gap-4 border-t border-kapur/12 pb-28 pt-7 text-mouse lg:flex-row lg:items-start lg:justify-between lg:pb-7">
-          <div className="space-y-1">
+        <div className="site-footer-legal t-caption">
+          <div>
             <p>
               © {year} {studio.legalName}. All rights reserved.
             </p>
@@ -135,7 +150,7 @@ export function SiteFooter({ nav }: { nav: NavItem[] }) {
               </p>
             ) : null}
           </div>
-          {/* Set in Mouse Grey like the line beside them, so on hover they come up to Milky White. */}
+          {/* Set in the quieter tone of the lines beside them; on hover they come up to Milky White. */}
           <ul className="flex flex-wrap gap-x-6 gap-y-2">
             {legalNav.map((item) => (
               <li key={item.href}>

@@ -69,11 +69,12 @@ export function MobileActionBar({ whatsapp }: { whatsapp: string | null }) {
 
   if (pathname.startsWith("/contact")) return null;
 
+  // With reduced motion the bar fades in and out where it stands instead of sliding up.
   return (
     <aside
       data-action-bar
       aria-label="Contact ROUANG"
-      className={`fixed bottom-3 right-3 z-40 flex items-center gap-2 transition-[translate,opacity] duration-500 ease-[var(--ease-brand)] lg:hidden ${
+      className={`fixed bottom-3 right-3 z-40 flex items-center gap-2 transition-[translate,opacity] duration-500 ease-[var(--ease-brand)] motion-reduce:translate-y-0 motion-reduce:transition-opacity lg:hidden ${
         visible ? "translate-y-0 opacity-100" : "pointer-events-none translate-y-[130%] opacity-0"
       }`}
       aria-hidden={!visible}

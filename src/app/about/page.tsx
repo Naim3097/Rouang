@@ -1,11 +1,13 @@
 import type { Metadata } from "next";
-import Link from "next/link";
+import Image from "next/image";
+import type { CSSProperties } from "react";
 import { Mark, Wordmark } from "@/components/brand/Brand";
 import { ProcessSteps } from "@/components/home/Process";
 import { ProjectIndex } from "@/components/projects/ProjectIndex";
-import { ButtonLink } from "@/components/ui/Button";
+import { Capabilities } from "@/components/services/Capabilities";
 import { Breadcrumbs } from "@/components/ui/Breadcrumbs";
 import { Figure } from "@/components/ui/Figure";
+import { CtaPanel } from "@/components/ui/RikyuField";
 import { Pending } from "@/components/ui/Section";
 import { Label, TitlePair } from "@/components/ui/Typography";
 import { brandImagery, placeholderImagery } from "@/config/media";
@@ -13,7 +15,6 @@ import { founders, team } from "@/config/people";
 import { processSteps, processSummary } from "@/config/process";
 import { studio } from "@/config/studio";
 import { getProjects, getServices, projectImage, publicImage } from "@/lib/content";
-import type { Image } from "@/lib/content/schema";
 import { pageMetadata } from "@/lib/seo";
 
 export const ensureStatic = "navigation";
@@ -37,23 +38,51 @@ const purpose = [
   },
 ];
 
-/**
- * One small picture per capability, the same three the Services page shows, keyed by service slug.
- * Temporary Unsplash stand-ins: publicImage() drops them from production, and the columns then read
- * as text alone, as they did before.
+/*
+ * Temporary photographs (src/config/media.ts), dropped from production by publicImage(): every
+ * section keeps its words and its layout without them. None shows ROUANG's work or its people, so
+ * none is captioned, and the ones set beside a person's name are described as nothing (alt=""):
+ * the name is their heading, and a description of a stranger would be read as that person.
  */
-const capabilityImagery: Record<string, Image> = {
-  "design-and-build": placeholderImagery.capabilityDesignBuild,
-  "renovation-and-interior": placeholderImagery.capabilityRenovation,
-  "new-build-and-construction": placeholderImagery.capabilityNewBuild,
+
+/** The Capabilities band, built exactly as the Services page builds it (components/services/Capabilities.tsx). */
+const capabilityImagery = {
+  lead: publicImage(placeholderImagery.capabilitiesLead),
+  thumbs: {
+    "design-and-build": publicImage(placeholderImagery.capabilityDesignBuild),
+    "renovation-and-interior": publicImage(placeholderImagery.capabilityRenovation),
+    "new-build-and-construction": publicImage(placeholderImagery.capabilityNewBuild),
+  },
 };
+
+/*
+ * A headshot at the head of each founder's column, in the order of `founders` (Zhafiri, then
+ * Shaidee). Stand-ins until the founders' own portraits arrive: previews only, never captioned,
+ * alt="". The two are presented alike (about.css, about-founder): the same 4:5 frame, the same
+ * monochrome grade, the eyes on one line a third of the way down and the faces drawn at the same
+ * size. `focus` sets each photograph's eyes on that line, and `zoom` draws in, about the eyes, a
+ * photograph taken from further back: the first stand-in's face is 1.6 times smaller in its
+ * picture than the second's. A new portrait needs only these two values set afresh.
+ */
+const founderImagery = [
+  { image: publicImage(placeholderImagery.founderPortraitA), focus: "50% 47%", zoom: 1.6 },
+  { image: publicImage(placeholderImagery.founderPortraitB), focus: "50% 20%", zoom: 1 },
+];
+
+/** The frame's width (about-founder-figure: 14rem, a fifth of the screen, 18rem at most), times the zoom. */
+const founderSizes = (zoom: number) =>
+  `(min-width: 90rem) ${Math.ceil(18 * zoom)}rem, (min-width: 70rem) ${Math.ceil(20 * zoom)}vw, ${Math.ceil(14 * zoom)}rem`;
 
 export default async function AboutPage() {
   const [projects, services] = await Promise.all([getProjects(), getServices()]);
+  // The opening: a photograph across the whole hero, the words centred on it.
+  const hero = publicImage(placeholderImagery.aboutHero);
   // A real material photograph behind the wordmark; brand-kit atmosphere only as a preview fallback.
   const horizon = projectImage(projects.find((p) => p.slug === "ampang"), "ampang-black-joinery") ?? publicImage(brandImagery.horizonWall);
   // Approach: a drawing being made by hand, beside the words about how the work is planned.
   const drawing = publicImage(placeholderImagery.drawingByHand);
+  // Team: one picture for everyone, a site crew seen from far above.
+  const crew = publicImage(placeholderImagery.siteCrew);
 
   const approach = [
     <p key="framework">
@@ -71,66 +100,89 @@ export default async function AboutPage() {
 
   return (
     <>
-      <section data-tone="light" className="bg-kapur text-ink">
-        <div className="page-x pb-20 pt-[calc(var(--header-h)+3rem)] sm:pb-28">
-          <Breadcrumbs items={[{ name: "About", href: "/about" }]} />
-          <div className="page-grid mt-16 gap-y-10 sm:mt-24">
-            <Label className="col-span-12 text-ink-muted lg:col-span-3">About</Label>
-            <div className="col-span-12 lg:col-span-9">
-              <TitlePair
-                as="h1"
-                size="hero"
-                // "design-led" kept whole: a narrow column would otherwise break it at its hyphen.
-                eyebrow={
-                  <>
-                    About ROUANG, <span className="whitespace-nowrap">design-led</span> construction company
-                  </>
-                }
-                lead={studio.line.lead}
-                follow={studio.line.follow}
-              />
-              <p className="t-sub mt-8 max-w-[38rem] text-ink-soft">
-                ROUANG is a design-led construction company that integrates design thinking, functionality, planning,
-                project management and construction delivery. From renovation and interior enhancement to new-build
-                projects, we approach each project as a coordinated process, translating ideas into well-considered
-                spaces that are distinctive, functional and built to last.
-              </p>
-            </div>
+      {/* The opening: a photograph across the whole hero under a dark shade, and the words centred on it
+          in Milky White. Without the photograph (production, until the studio supplies its own) the
+          ground is Chinese Black and the words sit exactly where they do on the photograph.
+          styles/pages/about.css (about-hero). */}
+      <section data-tone="dark" className="about-hero" aria-labelledby="about-title">
+        {hero ? (
+          <div className="absolute inset-0 -z-10" aria-hidden="true">
+            <Image
+              src={hero.src}
+              // Atmosphere behind the page title, not a photograph of ROUANG's work: nothing to read.
+              alt=""
+              fill
+              // The 3:2 photograph covers the hero: the screen's width on laptops, where the hero is
+              // wider than 3:2; on tablets and phones the hero stands taller, so it is covered by its
+              // height and drawn about one and a half and nearly three times the screen's width.
+              sizes="(min-width: 64rem) 100vw, (min-width: 40rem) 150vw, 270vw"
+              loading="eager"
+              fetchPriority="high"
+              quality={78}
+              className="object-cover"
+              style={{ objectPosition: hero.focus ?? "50% 50%" }}
+            />
+            <span className="about-hero-scrim" />
+          </div>
+        ) : null}
+        <div className="about-hero-inner page-x">
+          <Breadcrumbs tone={hero ? "photo" : "dark"} items={[{ name: "About", href: "/about" }]} />
+          <div className="about-hero-body">
+            <TitlePair
+              as="h1"
+              size="hero"
+              id="about-title"
+              // "design-led" kept whole: a narrow column would otherwise break it at its hyphen.
+              eyebrow={
+                <>
+                  About ROUANG, <span className="whitespace-nowrap">design-led</span> construction company
+                </>
+              }
+              lead={studio.line.lead}
+              follow={studio.line.follow}
+              followClassName="text-kapur"
+              // Full Milky White: at 80% the small capitals measured 3.9:1 over the pale photograph.
+              eyebrowClassName="text-kapur"
+            />
+            <p className="t-sub mx-auto mt-8 max-w-[38rem] text-kapur">
+              ROUANG is a design-led construction company that integrates design thinking, functionality, planning,
+              project management and construction delivery. From renovation and interior enhancement to new-build
+              projects, we approach each project as a coordinated process, translating ideas into well-considered
+              spaces that are distinctive, functional and built to last.
+            </p>
           </div>
         </div>
       </section>
 
-      {/* Approach, in the profile's words (p.2). */}
+      {/* Approach, in the profile's words (p.2): the picture on the left, larger than the words, and the
+          label, statement and paragraphs on the right; stacked, the picture comes first. Without the
+          picture (production) the label takes the first three columns and the words the other nine,
+          like the sections below it. about.css (about-approach). */}
       <section data-tone="light" className="bg-kapur-deep text-ink" aria-labelledby="approach-title">
         <div className="page-x section-y">
-          <div className="page-grid gap-y-10">
-            <Label pill index="01" className="col-span-12 text-ink-muted lg:col-span-3">
-              Approach
-            </Label>
-            <div className="col-span-12 lg:col-span-9">
-              <h2 id="approach-title" className="t-headline max-w-[22ch]">
+          <div className="about-approach page-grid">
+            {drawing ? (
+              <Figure
+                image={drawing}
+                // 4:3, 4:5 on small laptops (about.css).
+                aspect="var(--about-drawing-ratio)"
+                // The 16:9 photograph covers its frame by height and is then drawn in on the hands
+                // (about-drawing, scale 1.3): 1.73 times a 4:3 frame's width, 2.89 times a 4:5
+                // one's. The frame is seven columns on laptops (52% of the screen) and the page's
+                // width stacked (91%).
+                sizes="(min-width: 80rem) 90vw, (min-width: 64rem) 150vw, 157vw"
+                className="about-approach-figure"
+                imgClassName="about-drawing"
+              />
+            ) : null}
+            <div className={`about-approach-text ${drawing ? "" : "about-approach-text-alone"}`}>
+              <Label pill index="01" className="text-ink-muted">
+                Approach
+              </Label>
+              <h2 id="approach-title" className="t-headline mt-6 max-w-[22ch]">
                 Great spaces are shaped by purposeful design and delivered through disciplined execution.
               </h2>
-              {/* With the picture: the picture and the two paragraphs side by side under the statement, the
-                  paragraphs one column so the two halves stand about the same height. Without it (production,
-                  until the studio supplies its own), the two paragraphs are the two columns. */}
-              <div className="mt-12 grid items-start gap-x-[var(--grid-gap)] gap-y-8 text-ink-soft md:grid-cols-2">
-                {drawing ? (
-                  <>
-                    <Figure
-                      image={drawing}
-                      aspect="3/2"
-                      // The frame is drawn in on the hands and the drawing (about-drawing), so the picture
-                      // is asked for at half as wide again as its frame.
-                      sizes="(min-width: 1024px) 50vw, (min-width: 768px) 70vw, 150vw"
-                      imgClassName="about-drawing"
-                    />
-                    <div className="space-y-6">{approach}</div>
-                  </>
-                ) : (
-                  approach
-                )}
-              </div>
+              <div className="mt-8 max-w-[40rem] space-y-5 text-ink-soft">{approach}</div>
             </div>
           </div>
         </div>
@@ -160,52 +212,10 @@ export default async function AboutPage() {
         </div>
       </section>
 
-      {/* Capabilities, each leading to its service page */}
+      {/* Capabilities, each row leading to its service page: the Services page's own band, the same
+          component with the same pictures, so the two pages show the three capabilities identically. */}
       {services.length ? (
-        <section data-tone="dark" aria-labelledby="capabilities-title">
-          <div className="page-x section-y">
-            <div className="page-grid gap-y-10">
-              <div className="col-span-12 lg:col-span-3">
-                <Label pill index="03" className="text-mouse">
-                  Capabilities
-                </Label>
-              </div>
-              <div className="col-span-12 lg:col-span-9">
-                <h2 id="capabilities-title" className="t-headline max-w-[20ch]">
-                  Design, renovation and construction, under one coordinated process.
-                </h2>
-                <ol className="mt-14 grid gap-x-[var(--grid-gap)] border-t border-kapur/15 md:grid-cols-3">
-                  {services.map((s, i) => {
-                    const pictured = capabilityImagery[s.slug];
-                    const img = pictured ? publicImage(pictured) : null;
-                    return (
-                      <li key={s.slug} className="border-b border-kapur/15">
-                        <Link href={`/services/${s.slug}`} className={`block py-8 ${img ? "about-capability" : ""}`}>
-                          {img ? (
-                            <Figure
-                              // A stand-in picture inside a link already named by its words: decorative.
-                              image={{ ...img, alt: "" }}
-                              aspect="3/2"
-                              sizes="(min-width: 1024px) 22vw, (min-width: 768px) 30vw, (min-width: 640px) 38vw, 92vw"
-                              tone="dark"
-                              className="about-capability-figure"
-                              imgClassName="about-capability-img"
-                            />
-                          ) : null}
-                          <div>
-                            <span className="t-label tabular-nums text-mouse">{String(i + 1).padStart(2, "0")}</span>
-                            <h3 className="link-name t-title mt-4">{s.title}</h3>
-                            <p className="t-meta mt-3 text-kapur/75">{s.summary}</p>
-                          </div>
-                        </Link>
-                      </li>
-                    );
-                  })}
-                </ol>
-              </div>
-            </div>
-          </div>
-        </section>
+        <Capabilities index="03" services={services} lead={capabilityImagery.lead} thumbs={capabilityImagery.thumbs} />
       ) : null}
 
       {/* Process, set as the home page sets it (home/Process.tsx): the label, the title pair and the summary
@@ -241,26 +251,46 @@ export default async function AboutPage() {
               <h2 id="founders-title" className="t-headline">
                 The founders
               </h2>
-              <div className="mt-14 grid gap-x-[var(--grid-gap)] gap-y-16 lg:grid-cols-2">
-                {founders.map((f) => (
-                  <article key={f.name} className="border-t border-ink/15 pt-6">
-                    <h3 className="t-title">{f.name}</h3>
-                    <p className="mt-2">{f.role}</p>
-                    <p className="t-caption mt-2 text-ink-muted">{f.credentials}</p>
-                    <div className="mt-6 space-y-4 text-ink-soft">
-                      {f.bio.map((para) => (
-                        <p key={para}>{para}</p>
-                      ))}
-                    </div>
-                  </article>
-                ))}
+              {/* Two columns, one per founder, from tablets (stacked on phones): a headshot at the head of
+                  each (the same 4:5 frame and capped width for both, at the column's start), then the
+                  name, role, degrees and biography. Stand-in headshots until the founders' own
+                  portraits arrive; in production the columns read as text alone. about.css (about-founder). */}
+              <div className="mt-14 grid gap-x-[var(--grid-gap)] gap-y-16 md:grid-cols-2">
+                {founders.map((f, i) => {
+                  const picture = founderImagery[i];
+                  return (
+                    <article key={f.name} className="border-t border-ink/15 pt-8">
+                      {picture?.image ? (
+                        <Figure
+                          // A stranger beside a founder's name: never captioned, never described.
+                          image={{ ...picture.image, alt: "", focus: picture.focus }}
+                          aspect="4/5"
+                          sizes={founderSizes(picture.zoom)}
+                          className="about-founder-figure"
+                          imgClassName="about-founder-photo"
+                          style={{ "--about-founder-zoom": picture.zoom } as CSSProperties}
+                        />
+                      ) : null}
+                      <h3 className="t-title">{f.name}</h3>
+                      <p className="mt-2">{f.role}</p>
+                      <p className="t-caption mt-2 text-ink-muted">{f.credentials}</p>
+                      <div className="mt-6 max-w-[40rem] space-y-4 text-ink-soft">
+                        {f.bio.map((para) => (
+                          <p key={para}>{para}</p>
+                        ))}
+                      </div>
+                    </article>
+                  );
+                })}
               </div>
             </div>
           </div>
         </div>
       </section>
 
-      {/* The team (p.8): names and roles only, as no portraits have been supplied. */}
+      {/* The team (p.8): names and roles, under one picture for the whole team. A stand-in (a site crew
+          seen from far above, no face to be taken for anyone's) until the studio's own team photograph
+          is in; in production the names stand alone under the heading. */}
       <section data-tone="light" className="bg-kapur text-ink" aria-labelledby="team-title">
         <div className="page-x section-y">
           <div className="page-grid gap-y-10">
@@ -271,7 +301,16 @@ export default async function AboutPage() {
               <h2 id="team-title" className="t-headline">
                 Our team
               </h2>
-              <ul className="mt-14 grid gap-x-[var(--grid-gap)] border-t border-ink/15 sm:grid-cols-2 lg:grid-cols-3">
+              {crew ? (
+                <Figure
+                  // Not ROUANG's team: described as nothing, so it is never read as them.
+                  image={{ ...crew, alt: "" }}
+                  aspect="var(--about-team-ratio)"
+                  sizes="(min-width: 64rem) 68vw, 92vw"
+                  className="about-team-figure mt-10 sm:mt-12"
+                />
+              ) : null}
+              <ul className={`grid gap-x-[var(--grid-gap)] border-t border-ink/15 sm:grid-cols-2 lg:grid-cols-3 ${crew ? "mt-10 sm:mt-12" : "mt-14"}`}>
                 {team.map((m) => (
                   <li key={m.name} className="border-b border-ink/15 py-6">
                     <p className="t-title">{m.name}</p>
@@ -280,9 +319,12 @@ export default async function AboutPage() {
                 ))}
               </ul>
               <div className="mt-10">
-                <Pending title="Portraits and founding year">
-                  The team is listed as text because no portraits have been supplied. Portraits shot in the same light as
-                  the project photography could be added with each person&rsquo;s consent.
+                <Pending title="Founders’ portraits, team pictures and founding year">
+                  The founders&rsquo; headshots are stand-ins of strangers, and the picture over the team is a stock
+                  photograph of a site crew seen from far above. Both are shown in previews only and never captioned.
+                  Still owed: a head-and-shoulders portrait of each founder, shot alike (backdrop, light, distance), to
+                  replace the stand-ins; and the team&rsquo;s pictures, once the client has settled between headshots
+                  of each member and one team photograph. Every picture taken with the person&rsquo;s consent.
                   {studio.foundingYear ? "" : " The year ROUANG was founded is also still needed."}
                 </Pending>
               </div>
@@ -316,8 +358,10 @@ export default async function AboutPage() {
             </div>
           </div>
           {/* Phones and tablets: a band of a set shape above the words (4:3, then 3:2), never most of the
-              screen. Side by side: exactly as tall as the words beside it. */}
-          <div className="relative order-1 aspect-[4/3] sm:aspect-[3/2] lg:order-2 lg:aspect-auto lg:min-h-full">
+              screen: capped at three quarters of it, so on a phone held sideways the photograph crops
+              rather than running a screen and a half (w-full keeps the capped band full width). Side by
+              side: exactly as tall as the words beside it. */}
+          <div className="relative order-1 aspect-[4/3] max-h-[min(75svh,760px)] w-full sm:aspect-[3/2] lg:order-2 lg:aspect-auto lg:max-h-none lg:min-h-full">
             {horizon ? <Figure image={horizon} sizes="(min-width: 1024px) 50vw, 100vw" aspect="auto" className="absolute inset-0 h-full" tone="dark" /> : null}
             <div className="absolute inset-0 flex items-center justify-center p-10">
               <Wordmark className="h-auto w-[min(80%,26rem)] text-kapur" title="ROUANG" />
@@ -370,14 +414,14 @@ export default async function AboutPage() {
         </section>
       ) : null}
 
-      <section data-tone="dark">
-        <div className="page-x section-y flex flex-col items-start gap-10">
-          <TitlePair lead="Have a space in mind?" follow="Tell us how you want to use it." />
-          <ButtonLink href="/contact" variant="light">
-            Discuss your project
-          </ButtonLink>
-        </div>
-      </section>
+      {/* The close: the rounded green panel the Services page also ends on, on the grey of the section
+          above it (Projects, or the mark when there are no projects to show). */}
+      <CtaPanel
+        id="cta-title"
+        lead="Have a space in mind?"
+        follow="Tell us how you want to use it."
+        surface={projects.length ? "kapur-deep" : "kapur"}
+      />
     </>
   );
 }

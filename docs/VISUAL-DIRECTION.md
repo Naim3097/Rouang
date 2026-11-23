@@ -109,13 +109,15 @@ service's own text runs on under 02 What we do, so its headings are set one leve
 ## Motion
 
 Purposeful and quiet: on a first visit ROUANG is spelled out on white and fades onto the page; the
-hero film, the pinned home scenes and the walk inside a project are driven by the visitor's own
-scrolling, never by a clock, and the scroll itself glides (Lenis); photographs settle as they come
+hero film and the pinned home scenes are driven by the visitor's own scrolling, never by a clock, and
+the scroll itself glides (Lenis); the walk inside a project is the one exception since round 6: the
+scroll picks its stage and each change is a short crossfade in time; photographs settle as they come
 into view; project images morph between the index and the case study (View Transitions). There is no
 page-wide crossfade: it ran after every load and held back the first paint. With reduced motion
 everything is static, and nothing depends on animation to be read: the hero is one still of the
 finished room, the walk becomes the rooms held still, each its own stack of discs, and screen readers always get every
-frame and caption as a list.
+frame and caption as a list. Nor do the header and the phone's contact bar slide as the page
+scrolls: the header goes and comes back at once, and the bar fades in and out where it stands.
 
 **The opening, as built (round 3).** One continuous passage from the hero into 01 Work, and nothing
 in it slides vertically:
@@ -218,6 +220,20 @@ in it slides vertically:
   house follows *built* (beside it on a phone on its side, below it otherwise), whole by the time it
   reaches the middle of the screen. Reduced motion and no JavaScript: the exploded drawing, still.
   Without scroll-driven animation: the finished house, still.
+  Round 6 (the client's mockup, 23 Nov): three dotted rings in Milky White stand behind the house,
+  centred where the finished house stands (the middle of its width, halfway from the ridge to the
+  lowest corner of the garden), so the hanging layers come together at their centre. The outer ring
+  is 0.96 of the drawing's height across (in the mockup, about the house's height), the others 0.865
+  and 0.70 of it, so they scale with the house, and the house is sized so the outer ring stays whole
+  on the screen (on a phone the rings run off both sides alike). Each ring is a row of round dots,
+  fainter towards the middle (46%, 22% and 9% of full strength), so the middle stays clean behind the
+  house. Wherever a floor or the roof stands in front of them the rings are cut away, as in the mockup.
+  Where the screen is too narrow for the outer ring to clear the sentence (under about 1400 px wide)
+  they fade out on the left before its longest line. The still picture's rings are an SVG masked by
+  the layers' outlines; where the house comes together the canvas draws them too, to the SVG's own
+  measure, beneath the house and cut away by each layer as it moves, rising with the drawing as the
+  roof lands. The still states keep their rings: behind the exploded drawing, or behind the finished
+  house, which is too compact to stand in front of any but the inner ring.
 - **03 What we do.** Two doors, for homes and for businesses, either side of the three capabilities,
   which sit on one centre line in Rikyū Grey that runs the height of the composition. The door
   photographs are seen the same way, straight down a long room to its end (the Ampang corridor and
@@ -228,34 +244,35 @@ in it slides vertically:
   centre line (132 px at 1440), and each capability sets its line in two to keep it so. On phones,
   photographs and words keep to the page margin, like every other section. As the composition enters
   on wide screens the doors draw apart by about 3vw, finished before it is fully on screen. Still on
-  tablets and phones.
-- **04 Inside a project.** A walk in depth, never sideways, taken in steps (round 5: the client asked
-  for the rings of round 4's concentric ripple to feel stacked, stair-like rather than a smooth
-  transition, and to carry the photographs instead of flat colour). Each room is a stack of five discs,
-  like terraces seen from above: the photograph's own disc on top and four rings stepping down and out
-  beneath it. Every disc is a print of the room's photograph at its own size, so the picture steps at
-  each edge like a terrace; each ring is a shade darker than the one it carries (ink at 13% a step),
-  has a fine Milky White lip and casts a soft shadow on the ring below. (Rings alternating between the
-  room being left and the room opening were tried and set aside: the screen flicked back to the last
-  room at every other step.) The plate opens on the first room's stack, centred between the title and
-  the words at its foot. Scrolling, every move is one disc, in its own short stretch of the scroll,
-  with a firm ease and then a hold: the discs sweep out past the corners of the screen one at a time,
-  the outer ring first and the photograph last, each a step lighter, until the room fills the screen
-  in full colour. Then that room darkens and in its middle the next stack is built from the middle
-  out, its photograph popping up first and each ring stepping out from under the one inside it; held a
-  moment, it sweeps open in turn, each room stacked over the last, from the dining room under the
-  glazed gable to the grain of the timber. A disc grows as a whole, its photograph with it, so only
-  transforms and opacity move, and a photograph printed on five discs is one download. The rooms and
-  their captions are only set up once the section is a screen below the fold, so the browser runs
-  their moves on the compositor rather than the main thread (set up at load, far off screen, Chrome
-  keeps them on the main thread for good). Every stack is sized to the shorter side of the screen,
-  so it stays round and centred on phones, tablets and phones on their side. The walk opens on the gable dining room because, cut to a landscape band, it
-  still holds the screens, pendants, chairs and glass wall. A short landscape screen keeps the label
-  and gives the lead's room to the stack. The lead and captions stay clear of the corner where the
-  preview pill sits; the project and its case-study link, on screen all through the walk on laptops
-  and desktops, carry a soft shade of their own so they read over any disc. With reduced motion, the
-  opening plate and then the five rooms held still, each its own stack and its caption beneath: the
-  two spaces side by side, then the three materials (one column on phones).
+  tablets and phones. Round 6: both door photographs keep one 4:5 frame (each had been stretched to
+  the composition's height at a shape of its own); the homes door hangs from the top, the business
+  door stands on the foot, so the two still meet the composition's top and foot on a diagonal.
+- **04 Inside a project.** A walk in depth, never sideways, taken in stages, from the dining room
+  under the glazed gable to the grain of the timber. Each room is a stack of five discs, like terraces
+  seen from above (round 5: the client asked for the rings to feel stacked, stair-like, and to carry
+  the photographs): the photograph's own disc on top and four rings stepping down and out beneath it.
+  Every disc is a print of the room's photograph at its own size, so the picture steps at each edge
+  like a terrace; each ring is a shade darker than the one it carries (ink at 13% a step), has a fine
+  Milky White lip and casts a soft shadow on the ring below. A photograph printed on five discs is one
+  download. Round 6 replaced round 5's transitions, as the client asked for conventional, natural
+  ones: the discs no longer sweep out past the corners of the screen one at a time, scrubbed to the
+  scroll, until a room fills it. Every room now stays at the plate's size: its stack is centred
+  between the title and the words at the foot and as large as that room allows (on laptops and
+  desktops about 57% of the screen's height), so nothing grows past the plate and nothing is clipped,
+  masked or laid out again. While the plate is pinned the scroll only picks the stage: the plate, then
+  one per room, each 45svh of scroll (under three screens for five rooms). The change between two
+  stages is a short transition in time (0.9 s, the house easing) of opacity and scale only: going
+  in, the next room crossfades in over the last as one piece, settling from 3% larger onto the stack,
+  while its caption crossfades in at the foot, rising a little; coming back, the room lifts off the
+  same way. A room's discs never fade on their own, so there is no dim double exposure between two
+  rooms, and the walk looks the same whether the page is scrolled slowly, quickly or stopped. The
+  stage is counted by the section's one scroll-driven animation, a whole number read by style
+  queries, so no script runs and only the room arriving or leaving moves (inside.css). A short
+  landscape screen keeps the label and gives the lead's room to the stack. The lead and captions
+  stay clear of the corner where the preview pill sits and of the contact bar on phones.
+  With reduced motion, or without scroll-driven animation or style queries, the opening plate and
+  then the five rooms held still, each its own stack and its caption beneath: the two spaces side by
+  side, then the three materials (one column on phones).
 - **05 Process.** One line runs through the six steps, from the first numbered ring to the last,
   horizontal from 1360 px and vertical below. The whole line is always there as a faint hairline; a
   Rikyū deep line travels along it with the scroll and each ring fills as the line reaches it. The
@@ -265,10 +282,15 @@ in it slides vertically:
   is symmetrical about the centre of the page. Running down (tablets and laptops under 1360 px) the
   list is one centred block, at most 58 rem wide, ring, icon and title on the left of the centre line
   and the text on the right; on phones the line keeps to the left and the block fills the page between
-  its margins. The About page draws its process with the same steps (ProcessSteps), left-aligned
-  under its left-aligned heading.
-- **06 Insights and 07 Start a conversation** are still: the latest article leads, wide, with three
-  more beside it; the page ends on the green it turned to at 02.
+  its margins. Since round 6 the About page sets its process the same way: the label, title pair and
+  summary on the centre line and the same steps centred under them (`ProcessSteps centred`).
+- **06 Insights** is still, laid out after the client's mockup (round 6): the latest article on the
+  left, a little over half the width, with a wide picture over its words (16:9, then the mockup's
+  long 21:9 from 1280 px, where the rows beside it no longer run to four or five lines), and the next
+  two as rows on the right, a 2:1 thumbnail beside each title, parted by hairlines, then the button.
+  Tablets and phones stack them: the lead full width, then the two rows. Without pictures (the live
+  site, while they are temporary) the cards are words alone.
+- **07 Start a conversation** is still; the page ends on the green it turned to at 02.
 
 **One page, one language.** What holds the sections together:
 
@@ -286,8 +308,12 @@ in it slides vertically:
 - **Motion.** Each moving section has one movement of its own, and none repeats another's: the film
   runs, the flagship strip travels right to left, the cards rise, the studio pans, the doors draw
   apart, the walk goes into depth, the process line is drawn. All of it is scroll-driven (CSS scroll
-  timelines, and the hero's film), so it stops when the scroll stops and runs back with it; only
-  transforms, opacity and clip-paths change, and nothing is read from the layout while scrolling.
+  timelines, the hero's film and the studio's canvas), so it stops when the scroll stops and runs
+  back with it, except the walk (round 6): the scroll picks its stage and the change runs in time,
+  0.9 s, so it looks the same at any speed of scrolling. Only transforms,
+  opacity and clip-paths change. Nothing is read from the layout while scrolling except by the
+  studio's canvas, which measures the drawing and its rings on each frame while the section is within
+  a screen and a half of the window, and redraws only when the house has moved.
 - **Phones and touch.** Every hover has a touch counterpart that needs no tap: the cards open as they
   pass the middle of the screen, or in turn across the row on a tablet held on its side; links simply
   follow on a tap. Horizontal runs keep to the scroll
@@ -297,6 +323,63 @@ in it slides vertically:
   bitmap tile (an SVG noise filter held a frame up for 150 ms as the section came near), the enquiry
   form's message box grows with its text instead of carrying a drag handle (which cost the same), and
   the hero's film stops following the scroll once the hero is off screen.
+
+## Inner pages, as built (round 6)
+
+The client's brief of 23 November put proportion first: no picture may dominate the screen or push
+the words out of balance. Every in-flow picture now sits in a frame of set shape inside the page
+margins and covers it around its focus point. The shapes are few (3:2, 4:3, 4:5, 16:9, 21:9 for bands
+only, 2:1 for thumbnails), and no frame stands taller than min(80svh, 760 px) on a desktop
+(portraits min(72svh, 720 px)) or 75svh on a phone. Only heroes and bands meant to bleed go edge to
+edge. Each page's rules are in its own stylesheet (src/styles/pages).
+
+- **Services.** The opening words are centred, and under them stands a before-and-after comparison,
+  after the client's reference video (its behaviour, not its look): two photographs in one frame,
+  parted by a line carrying a small Milky White pill. The frame is 4:3 on phones, 3:2 on tablets and
+  16:9 from 1024 px, at most 68 rem wide and 60% of the screen high, so its handle is on a laptop's
+  first screen. The line follows a drag on the photographs or the handle, and the keys on the handle
+  (a slider); a vertical swipe still scrolls the page. Once both photographs are in and half the
+  frame is in view, the line makes one slow sweep to show that it moves, never with reduced motion.
+  01 Capabilities follows the client's reference: on wide screens a photograph the full height of the
+  band on the left (40%, 46% from 1280 px) carries the label and its line in light type, and on the
+  right, on the quiet grey, the three capabilities are numbered rows parted by hairlines, each with
+  its summary and a 2:1 picture, each a link to its page. Narrower, the photograph is a band across
+  the screen (4:3, then 16:9) and the rows follow. 02 Who we work with sets a 4:3 picture over each of
+  its two columns. A service page opens on a band under its words (21:9 wide, 16:9 on tablets, 3:2 on
+  phones) and sets a 4:5 picture in the margin beside its own text, held in view as the text runs on
+  (above the text, landscape, on narrower screens).
+- **About.** 01 Approach sets a 3:2 picture of drawing by hand beside its two paragraphs, framed on
+  the hands and the drawing, with no face in it. 03 Capabilities heads each column with a 3:2
+  picture, the same size in every column. 04 Process is set as the home page sets it (above). The
+  name's photograph is a band of set shape on phones and tablets (4:3, then 3:2) and exactly as tall
+  as the words beside it on wide screens; the mark is sized to the words beside it, never the larger
+  of the two. In previews only, each founder has an empty 4:5 frame beside the name until the studio
+  supplies real portraits.
+- **Insights.** Every article has a picture, in one language: the frame, the category line, then the
+  title. The index keeps one row per article with a 2:1 picture in the margin column (3:2 at full
+  width on phones), the shape of the home page's rows and of Read next, so an article's card keeps
+  one shape across the site. An article opens on a picture from the title's edge to the page margin:
+  4:3 on phones, 16:9 wider, at most 60% of a desktop screen's height.
+- **Case studies.** The opener is 80svh high, no longer the full screen. The gallery is laid in
+  rows: one wide view, or two or three photographs side by side, built from the gallery's order and
+  each photograph's span
+  (content/projects). Every frame is one of three shapes, portrait 4:5, landscape 3:2 or wide 16:9,
+  and the photographs in a row share one height, each taking a share of the width in proportion to
+  its shape, so tops and feet line up. No row is taller than min(72svh, 720 px); a row that would be
+  is drawn narrower and centred, keeping its shapes rather than cropping flatter. Phones: one
+  photograph after another at full width, portraits 4:5 and landscapes 3:2.
+- **Projects.** Every plate is the same 4:3. A group of exactly three or six sits three across on large
+  screens, so no plate stands alone beside an empty half.
+
+**Temporary photographs.** Where the studio has no photograph of its own yet, the client allowed
+photographs from Unsplash as stand-ins, so the new layouts can be judged with real pictures in place
+(`placeholderImagery` and `insightImagery` in src/config/media.ts). They are temporary: none shows a
+ROUANG project, none is captioned or described as one, and their alt text is generic. The
+before-and-after pair is two different kitchens, standing in until the studio supplies a pair taken
+from the same spot. `publicImage()` drops every one of them from production, where each layout takes
+its form without the picture (an Insights card is words alone, the Capabilities panel is dark, the
+comparison is left out), and the launch check blocks a production build while any is still
+referenced. Replace each with the studio's own photograph, then delete its entry.
 
 ## Photography: what was chosen and why
 

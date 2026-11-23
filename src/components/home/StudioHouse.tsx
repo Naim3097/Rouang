@@ -15,8 +15,9 @@ import { useEffect, useRef, type CSSProperties, type RefObject } from "react";
  * It is drawn twice over:
  * - In CSS, as a still picture: each layer a box the size of the viewBox, masked by its line work.
  *   The house hangs apart as drawn; it stands whole where the browser has no scroll-driven
- *   animation. This is what shows without JavaScript, with reduced motion, and until the canvas
- *   below has drawn.
+ *   animation. This is what shows without JavaScript, with reduced motion, if the drawing cannot be
+ *   loaded (data-still), and until the canvas below has drawn, as long as the house still hangs
+ *   apart there: past that point it steps aside, and the canvas fades in (studio.css).
  * - On a canvas, which takes over where the house comes together. The house is solid: what a
  *   higher layer stands in front of is cut out of the lower ones, so the field shows through
  *   rather than a patch of flat green. Moving masks in CSS do the same, but the browser then
@@ -435,9 +436,10 @@ function useHouseCanvas(ref: RefObject<HTMLDivElement | null>) {
     const artBox = house?.querySelector<HTMLElement>(".studio-house-art");
     const canvas = house?.querySelector<HTMLCanvasElement>(".studio-house-canvas");
     const ringSvg = house?.querySelector<SVGSVGElement>(".studio-rings");
+    const still = house?.querySelector<HTMLElement>(".studio-house-stack");
     const scene = house?.closest<HTMLElement>(".studio-scene");
     const stage = scene?.firstElementChild;
-    if (!house || !artBox || !canvas || !ringSvg || !scene || !stage) return;
+    if (!house || !artBox || !canvas || !ringSvg || !still || !scene || !stage) return;
     // Where the house does not come together, the still picture stays.
     if (!CSS.supports("animation-timeline: view()")) return;
     const reduce = window.matchMedia("(prefers-reduced-motion: reduce)");
@@ -463,9 +465,15 @@ function useHouseCanvas(ref: RefObject<HTMLDivElement | null>) {
       drawn = "";
     };
 
-    const render = () => {
-      frame = 0;
-      if (dead || reduce.matches || !near || !paths) return;
+    // The drawing cannot be loaded or drawn: the still picture stays, whatever the scroll (studio.css).
+    const fail = () => {
+      if (dead) return;
+      dead = true;
+      off();
+      house.setAttribute("data-still", "");
+    };
+
+    const paint = (layers: Record<LayerFile, Path2D>) => {
       const [w, h] = size;
       if (!w || !h) return;
       // Device pixels per CSS pixel on the canvas, and where the drawing lies on it.
@@ -478,7 +486,7 @@ function useHouseCanvas(ref: RefObject<HTMLDivElement | null>) {
       const oy = Math.round((box.top - area.top) * k);
       if (!art || art.scale !== scale) {
         release(art);
-        art = makeArt(paths, scale, ink);
+        art = makeArt(layers, scale, ink);
         drawn = "";
       }
       if (canvas.width !== w || canvas.height !== h) {
@@ -515,7 +523,22 @@ function useHouseCanvas(ref: RefObject<HTMLDivElement | null>) {
       if (key === drawn) return;
       drawn = key;
       draw(ctx, art, rings, t, lift, ink, ox, oy);
-      if (!house.hasAttribute("data-canvas")) house.setAttribute("data-canvas", "");
+      if (!house.hasAttribute("data-canvas")) {
+        // Where the still picture has stepped aside (a reload part way through, studio.css), the
+        // canvas fades in at the pose the scroll has reached; elsewhere the two agree, and it takes
+        // over unseen.
+        house.setAttribute("data-canvas", Number(getComputedStyle(still).opacity) < 1 ? "fade" : "");
+      }
+    };
+
+    const render = () => {
+      frame = 0;
+      if (dead || reduce.matches || !near || !paths) return;
+      try {
+        paint(paths);
+      } catch {
+        fail();
+      }
     };
 
     const schedule = () => {
@@ -528,9 +551,7 @@ function useHouseCanvas(ref: RefObject<HTMLDivElement | null>) {
           paths = p;
           schedule();
         })
-        .catch(() => {
-          // The still picture stays.
-        });
+        .catch(fail);
     };
 
     // The canvas's own size in device pixels, so the drawing maps one to one onto the screen.
@@ -585,6 +606,7 @@ function useHouseCanvas(ref: RefObject<HTMLDivElement | null>) {
       release(art);
       close(rings);
       off();
+      house.removeAttribute("data-still");
     };
   }, [ref]);
 }

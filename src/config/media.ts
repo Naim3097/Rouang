@@ -196,6 +196,103 @@ export const placeholderImagery = {
     credit: "Unsplash, unsplash.com/photos/o-ANXY28n_w",
     provisional: true,
   },
+
+  // About (round 7, 23 Nov 2026). The hero behind the opening words, a stand-in for each founder's
+  // portrait and one for the team photograph. No faces anywhere: a stranger's face must never be
+  // read as Zhafiri's, Shaidee's or the team's, so the founders' frames hold still lifes of the work
+  // and the team picture is a site crew seen from far above.
+  aboutHero: {
+    src: unsplash("1611827886404-495e633249ae"),
+    alt: "A pale stone stair rising past a screen of timber slats under a skylight",
+    width: 2400,
+    height: 1600,
+    focus: "50% 45%",
+    credit: "Unsplash, unsplash.com/photos/8vLUJOdQR2Q",
+    provisional: true,
+  },
+  founderDesk: {
+    src: unsplash("1781888688940-5730c3fd5baf"),
+    alt: "Floor plans and a laptop on a marble desk",
+    width: 2400,
+    height: 3598,
+    focus: "50% 62%",
+    credit: "Unsplash, unsplash.com/photos/rn00OVh0gEI",
+    provisional: true,
+  },
+  founderSite: {
+    src: unsplash("1791560120599-bc1063fb6a81"),
+    alt: "Two white hard hats and work gloves hanging on hooks",
+    width: 2400,
+    height: 3600,
+    focus: "50% 55%",
+    credit: "Unsplash, unsplash.com/photos/uBhOzqx8__0",
+    provisional: true,
+  },
+  siteCrew: {
+    src: unsplash("1541888894402-f3b1af908be4"),
+    alt: "A small crew in hard hats standing on a new concrete slab, seen from above",
+    width: 2400,
+    height: 1600,
+    focus: "50% 58%",
+    credit: "Unsplash, unsplash.com/photos/s9XDWLJ_LyE",
+    provisional: true,
+  },
+
+  // Round 7b (23 Nov 2026): the client asked for professional headshots in the founders' frames.
+  // Stand-ins only, until the studio's own portraits arrive. Like every photograph here they are
+  // provisional: publicImage() drops them from production and the launch check blocks a live build
+  // while they are referenced, so a stranger's face never goes live under a founder's name.
+  founderPortraitA: {
+    src: unsplash("1625850902501-cc6baef3e3b2"),
+    alt: "Head-and-shoulders portrait of a man in a black T-shirt against a dark mottled backdrop",
+    width: 2400,
+    height: 3607,
+    focus: "50% 38%",
+    credit: "Unsplash, unsplash.com/photos/dwogG5EROW4",
+    provisional: true,
+  },
+  founderPortraitB: {
+    src: unsplash("1624395213043-fa2e123b2656"),
+    alt: "Head-and-shoulders portrait of a man in a black T-shirt against a dark backdrop",
+    width: 2400,
+    height: 3600,
+    focus: "50% 34%",
+    credit: "Unsplash, unsplash.com/photos/hr_feH2URs0",
+    provisional: true,
+  },
+
+  // The team, as one professional group portrait (the client's choice, 23 Nov 2026): a stand-in
+  // until the studio's own team photograph, never captioned as ROUANG's people.
+  teamGroup: {
+    src: unsplash("1601513043334-36a0088140d4"),
+    alt: "A group portrait of five colleagues standing against a plain studio backdrop",
+    width: 2400,
+    height: 1600,
+    focus: "50% 40%",
+    credit: "Unsplash, unsplash.com/photos/On_2YI8_cBU",
+    provisional: true,
+  },
+
+  // The footer's background (round 7b), after the client's reference: a warm, sunlit interior.
+  // footerRoom is the first choice; footerWall (plaster with leaf shadows) is the closer match in
+  // tone but has no depth of room.
+  footerRoom: {
+    src: unsplash("1690927324993-53afef8c85ee"),
+    alt: "Sunlight falling through a slatted skylight across a pale wall, with a tree in silhouette",
+    width: 2400,
+    height: 1600,
+    focus: "60% 50%",
+    credit: "Unsplash, unsplash.com/photos/BtSNothdKo4",
+    provisional: true,
+  },
+  footerWall: {
+    src: unsplash("1690983323067-aabb5b097c2a"),
+    alt: "Soft leaf shadows on a beige plaster wall",
+    width: 2400,
+    height: 1600,
+    credit: "Unsplash, unsplash.com/photos/lRIvBrnVEwA",
+    provisional: true,
+  },
 } satisfies Record<string, Image>;
 
 /** The temporary picture for each article, by slug. */

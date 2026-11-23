@@ -1,0 +1,154 @@
+/* footer (round 7b, 23 Nov 2026). The site footer (components/layout/SiteFooter.tsx). Imported by globals.css.
+ *
+ * After the client's reference: the whole footer stands on a full-bleed photograph of a warm, sunlit
+ * room, with its words in Milky White. The photograph opens the band on its own (--footer-open), then
+ * the wordmark and the company's line sit on the left with Navigate, Talk to us and Office beside
+ * them, and a hairline and the legal lines close it. In production the photograph is gone (it is
+ * temporary): the same layout then stands on Chinese Black, the band opens on the ordinary section
+ * space and the quieter lines return to Mouse Grey. */
+
+.site-footer {
+  /* The photograph alone above the words: about a sixth of the width, held so the band stays
+     generous without filling a laptop screen. On a phone, enough that the words still start below the
+     header bar when it returns over the footer. */
+  --footer-open: clamp(7rem, 16vw, 17rem);
+  /* Labels, the legal lines. Mouse Grey on Chinese Black (6:1); over the photograph a step under
+     Milky White, which the shade below keeps at 4.5:1 or more. */
+  --footer-quiet: var(--color-mouse);
+}
+
+.site-footer[data-photo] {
+  --footer-quiet: rgb(243 243 243 / 0.86);
+  /* Links ease back less on hover, as on the Rikyū panel, so a hovered link still reads over the photograph. */
+  --link-fade: 0.8;
+}
+
+/* Without the photograph a dark section above would run straight into the footer: the hairline
+   keeps them apart. */
+.site-footer:not([data-photo]) {
+  --footer-open: var(--section-space);
+  border-top: 1px solid var(--hairline-dark);
+}
+
+/* ——— The photograph and its shade ——— */
+
+.site-footer-photo {
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+}
+
+/* Chinese Black multiplied over the photograph: it darkens every channel in proportion, so the warm
+   light stays warm instead of greying over. Light where the photograph stands on its own, then deep
+   enough under the words that Milky White keeps 4.5:1 even across the brightest shafts of sun. */
+.site-footer-photo::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  mix-blend-mode: multiply;
+  background: linear-gradient(
+    to bottom,
+    rgb(20 20 20 / 0.18) 0,
+    rgb(20 20 20 / 0.66) var(--footer-open),
+    rgb(20 20 20 / 0.72) 100%
+  );
+}
+
+/* ——— The words ——— */
+
+.site-footer-body {
+  position: relative;
+  padding-top: var(--footer-open);
+  /* Below 1024px the phone action bar (MobileActionBar) floats at the foot of the screen: the legal
+     lines keep clear of it. */
+  padding-bottom: 7rem;
+}
+
+@media (width >= 64rem) {
+  .site-footer-body {
+    /* The same distance as the side margins, so the band is framed evenly. */
+    padding-bottom: var(--page-gutter);
+  }
+}
+
+/* Phones: the company's line, then Navigate beside Talk to us (the wider column, for the e-mail
+   address), then Office. Tablets: the three columns side by side under the line. From 1024px the
+   reference's proportions: the line takes about a third of the width, and Navigate, Talk to us and
+   Office start at about 35, 56 and 79 per cent of it. */
+.site-footer-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 2fr) minmax(0, 3fr);
+  column-gap: var(--grid-gap);
+  row-gap: 2.75rem;
+}
+
+.site-footer-brand,
+.site-footer-office {
+  grid-column: 1 / -1;
+}
+
+@media (width >= 40rem) {
+  .site-footer-grid {
+    grid-template-columns: minmax(0, 3fr) minmax(0, 4fr) minmax(0, 5fr);
+    row-gap: 3.5rem;
+  }
+
+  .site-footer-office {
+    grid-column: auto;
+  }
+}
+
+@media (width >= 64rem) {
+  .site-footer-grid {
+    grid-template-columns: minmax(0, 14fr) minmax(0, 8fr) minmax(0, 9fr) minmax(0, 9fr);
+  }
+
+  .site-footer-brand {
+    grid-column: auto;
+  }
+}
+
+.site-footer-label {
+  margin-bottom: 1.25rem;
+  color: var(--footer-quiet);
+}
+
+/* A little more room between links where they are tapped, close-set from 1024px as in the reference. */
+.site-footer-list > li + li {
+  margin-top: 0.5rem;
+}
+
+@media (width >= 64rem) {
+  .site-footer-label {
+    margin-bottom: 1.5rem;
+  }
+
+  .site-footer-list > li + li {
+    margin-top: 0.25rem;
+  }
+}
+
+/* The hairline and the legal lines: stacked on phones and tablets, side by side from 1024px with the
+   privacy notice level with them on the right. */
+.site-footer-legal {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  margin-top: 4rem;
+  padding-top: 1.5rem;
+  border-top: 1px solid var(--hairline-dark);
+  color: var(--footer-quiet);
+}
+
+.site-footer[data-photo] .site-footer-legal {
+  border-top-color: rgb(243 243 243 / 0.4);
+}
+
+@media (width >= 64rem) {
+  .site-footer-legal {
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+    margin-top: 6rem;
+  }
+}

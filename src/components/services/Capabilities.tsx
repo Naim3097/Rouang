@@ -2,6 +2,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { Label } from "@/components/ui/Typography";
 import type { Service } from "@/lib/content";
+import { SHOW_NOTES } from "@/lib/env";
 import type { Image as ImageData } from "@/lib/content/schema";
 
 /* ——— Services, 01 Capabilities: a photograph and the three ways to work with us ———
@@ -44,18 +45,23 @@ export function Capabilities({
       <div className={`cap-lead ${lead ? "" : "cap-lead-plain"}`} data-tone="dark">
         {lead ? (
           <>
-            <Image
-              src={lead.src}
-              alt={lead.alt}
-              fill
-              // The 3:2 photograph covers its panel. Wide screens: a tall panel, covered by its height
-              // (measured 69vw wide at 1440, 82vw at 1024). Tablets: a 16:9 band, the screen's width.
-              // Phones: a 4:3 band, covered by its height.
-              sizes="(min-width: 64rem) 82vw, (min-width: 40rem) 100vw, 113vw"
-              quality={78}
-              className="object-cover"
-              style={{ objectPosition: lead.focus ?? "50% 50%" }}
-            />
+            {/* Settles as it comes into view, like every photograph on the site (data-reveal, globals.css). */}
+            <div className="absolute inset-0" data-reveal="image">
+              <div className="absolute inset-0">
+                <Image
+                  src={lead.src}
+                  alt={lead.alt}
+                  fill
+                  // The 3:2 photograph covers its panel. Wide screens: a tall panel, covered by its height
+                  // (measured 69vw wide at 1440, 82vw at 1024). Tablets: a 16:9 band, the screen's width.
+                  // Phones: a 4:3 band, covered by its height.
+                  sizes="(min-width: 64rem) 82vw, (min-width: 40rem) 100vw, 113vw"
+                  quality={78}
+                  className="object-cover"
+                  style={{ objectPosition: lead.focus ?? "50% 50%" }}
+                />
+              </div>
+            </div>
             <span className="cap-scrim" aria-hidden="true" />
           </>
         ) : null}
@@ -81,22 +87,25 @@ export function Capabilities({
                 <span className="cap-num t-label tabular-nums">{String(i + 1).padStart(2, "0")}</span>
                 <span className="cap-rule" aria-hidden="true" />
                 <h3 className="cap-title t-title">
-                  <span className="cap-name">{s.title}</span>
-                  {s.isDraft ? <span className="t-label ml-3 align-middle opacity-60">Draft</span> : null}
+                  <span className="link-name">{s.title}</span>
+                  {s.isDraft && SHOW_NOTES ? <span className="t-label ml-3 align-middle opacity-60">Draft</span> : null}
                 </h3>
                 <p className="cap-body t-meta text-ink-soft">{s.summary}</p>
                 {thumb ? (
-                  <span className="cap-thumb">
-                    {/* The row's name and summary say where it leads; the picture adds nothing to read. */}
-                    <Image
-                      src={thumb.src}
-                      alt=""
-                      fill
-                      sizes={thumbSizes(thumb)}
-                      quality={78}
-                      className="object-cover"
-                      style={thumb.focus ? { objectPosition: thumb.focus } : undefined}
-                    />
+                  <span className="cap-thumb" data-reveal="image">
+                    {/* The row's name and summary say where it leads; the picture adds nothing to read.
+                        The inner span settles into view; the picture itself takes the hover. */}
+                    <span className="absolute inset-0 block">
+                      <Image
+                        src={thumb.src}
+                        alt=""
+                        fill
+                        sizes={thumbSizes(thumb)}
+                        quality={78}
+                        className="object-cover"
+                        style={thumb.focus ? { objectPosition: thumb.focus } : undefined}
+                      />
+                    </span>
                   </span>
                 ) : null}
               </Link>

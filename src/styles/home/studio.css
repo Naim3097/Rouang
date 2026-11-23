@@ -87,8 +87,8 @@
    with a 3.56° vertical shear (593 at its far corner), because the drawing turns the roof slightly
    against the floors: so both eaves sit on the walls and vertical lines stay vertical.
    Where the house comes together as the page scrolls, a canvas draws it instead and this picture
-   steps aside (data-canvas). It stays without JavaScript, with reduced motion, and until the canvas
-   has drawn.
+   steps aside (data-canvas). It stays without JavaScript and with reduced motion; until the canvas
+   has drawn, it shows only while the house still hangs apart (see the canvas, below).
    Mind the comments inside the rules here: a lone apostrophe in one makes the compiler drop the
    custom property that follows it. */
 
@@ -129,14 +129,26 @@
     container-type: inline-size;
   }
 
-  /* The left edge of the drawing on the screen, for the rings (below): the house centred in the
-     second column. */
+  /* Centred in the second column, and no wider than keeps the outer ring whole on the screen, half
+     a gutter in from its right edge: the ring reaches 0.76 of the drawing (2750 / 1810 / 2) beyond
+     its middle. A percentage here is of the column. */
+  .studio-house {
+    width: min(100%, var(--studio-house-h) * 1810 / 2866, (50% + var(--page-gutter) / 2) / 0.76);
+  }
+
+  /* The left edge of the drawing on the screen, for the rings (below): the house above, centred in
+     the second column (--studio-col). */
   .studio-house-art {
+    --studio-col: calc(100cqw - 17.5 * var(--fs-h2) - clamp(2rem, 5vw, 5rem));
     --art-x: calc(
-      var(--page-gutter) +
+      var(--page-gutter) + 100cqw -
         (
-          100cqw + 17.5 * var(--fs-h2) + clamp(2rem, 5vw, 5rem) -
-            min(100cqw - 17.5 * var(--fs-h2) - clamp(2rem, 5vw, 5rem), var(--studio-house-h) * 1810 / 2866)
+          var(--studio-col) +
+            min(
+              var(--studio-col),
+              var(--studio-house-h) * 1810 / 2866,
+              (var(--studio-col) / 2 + var(--page-gutter) / 2) / 0.76
+            )
         ) /
         2
     );
@@ -324,6 +336,61 @@
 
 .studio-house[data-canvas] .studio-house-stack {
   display: none;
+}
+
+/* Before the canvas has drawn, the still picture can only show the house hanging apart. As the page
+   scrolls down to it the canvas is ready long before, but a reload part way through the Studio (or
+   a return to it) paints the page before the drawing is loaded. So wherever a script will draw the
+   canvas, the still picture steps aside once the scroll has passed where the house sets off (as
+   the canvas times it, StudioHouse.tsx), and the canvas then fades in at the pose the scroll has
+   reached (data-canvas set to fade), rather than the house jumping from one pose to another. Before
+   that point the two agree, and the canvas takes over unseen. If the drawing cannot be loaded, the
+   still picture stays (data-still). Without a script, or where the browser cannot tell, it stays. */
+@supports (animation-timeline: view()) {
+  @media (prefers-reduced-motion: no-preference) and (scripting: enabled) {
+    /* Elsewhere the house comes together as the drawing crosses the screen, from 12% of the way,
+       measured to the edges of the screen (no inset for the header), as the canvas measures it. */
+    .studio-house-art {
+      view-timeline: --studio-art block;
+      view-timeline-inset: 0px;
+    }
+
+    .studio-house:not([data-canvas], [data-still]) :is(.studio-house-stack, .studio-rings) {
+      animation: studio-still-out linear both;
+      animation-timeline: --studio-art;
+      animation-range: cover 12% cover 13%;
+    }
+  }
+
+  /* Where the stage pins, from 4% of the pinned run, as the canvas measures it: the run is the
+     scene less a screen (390svh less 100svh), counted from where the top of the scene meets the
+     top of the screen. The timeline of the scene counts from below the header instead (it keeps
+     the scroll padding of the page, the header and 1rem, globals.css), so the offsets add that
+     back. */
+  @media (min-width: 64rem) and (prefers-reduced-motion: no-preference) and (scripting: enabled) {
+    .studio-house:not([data-canvas], [data-still]) :is(.studio-house-stack, .studio-rings) {
+      animation-timeline: --studio;
+      animation-range:
+        contain calc(var(--header-h) + 1rem + 0.04 * 290svh)
+        contain calc(var(--header-h) + 1rem + 0.05 * 290svh);
+    }
+  }
+}
+
+.studio-house[data-canvas="fade"] .studio-house-canvas {
+  animation: studio-canvas-in var(--dur-quick) var(--ease-brand) both;
+}
+
+@keyframes studio-still-out {
+  to {
+    opacity: 0;
+  }
+}
+
+@keyframes studio-canvas-in {
+  from {
+    opacity: 0;
+  }
 }
 
 .studio-house-frame,
@@ -595,8 +662,20 @@
       animation-range: contain 41.1% contain 74.1%;
     }
 
+    /* No larger than keeps the outer ring whole on the screen, half a gutter in from its right edge,
+       wherever the house stands: against the sentence (the ring reaching 1.26 of the drawing to the
+       right of its left edge: half the drawing, then the outer ring, 2750 / 1810 / 2) or centred on
+       70.9% of the width (0.76 of the drawing to the right of that). The edge is the stage, so a
+       scroll bar is allowed for. Where a landscape tablet is narrow for its height the house is a
+       little smaller, the rings in proportion; from about 1280px wide this changes nothing. The pan
+       then takes the rings out of the frame with the house, leaving no arc beside the studio. */
     .studio-house-art {
-      --art-h: min(100cqh, 100cqw * 2866 / 1810);
+      --art-h: min(
+        100cqh,
+        100cqw * 2866 / 1810,
+        (100cqw + var(--page-gutter) / 2) * 2866 / 1810 / 1.26,
+        (var(--house-left) + 100cqw + var(--page-gutter) / 2 - 70.9vw) * 2866 / 1810 / 0.76
+      );
       --art-ml: clamp(0px, 70.9vw - var(--house-left) - var(--art-h) * 905 / 2866, 100cqw - var(--art-h) * 1810 / 2866);
       --art-x: calc(var(--house-left) + var(--art-ml));
       height: var(--art-h);

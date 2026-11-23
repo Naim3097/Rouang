@@ -1,5 +1,6 @@
 import { EnquiryForm } from "@/components/contact/EnquiryForm";
 import { ContactLink } from "@/components/layout/ContactLink";
+import { RikyuField } from "@/components/ui/RikyuField";
 import { Label } from "@/components/ui/Typography";
 import { studio, telHref, whatsappHref } from "@/config/studio";
 import { TURNSTILE_SITE_KEY } from "@/lib/env";
@@ -10,9 +11,9 @@ export function EnquiryPanel({ index }: { index: string }) {
   const wa = whatsappHref("Hello ROUANG, I'd like to talk about a project.");
   const tel = telHref();
   return (
-    <section data-tone="rikyu" aria-labelledby="enquiry-title" className="relative overflow-hidden">
-      <div className="pattern-halftone pointer-events-none absolute inset-y-0 right-0 w-[70%]" aria-hidden="true" />
-      <div className="page-x section-y relative">
+    // The green field (gradient and halftone dots) is RikyuField, which the other green sections share.
+    <RikyuField aria-labelledby="enquiry-title">
+      <div className="page-x section-y">
         <div className="page-grid gap-y-14">
           <div className="col-span-12 lg:col-span-5">
             <Label index={index} pill className="text-kapur">
@@ -60,6 +61,6 @@ export function EnquiryPanel({ index }: { index: string }) {
           </div>
         </div>
       </div>
-    </section>
+    </RikyuField>
   );
 }

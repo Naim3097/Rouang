@@ -1,6 +1,7 @@
 /* services (round 6, 23 Nov 2026). The Services index and the three service pages: the before-and-after
    comparison under the index's opening words (components/services/BeforeAfter.tsx, ba-*), the
-   Capabilities band (components/services/Capabilities.tsx, cap-*), and on a service page its project
+   Capabilities band (components/services/Capabilities.tsx, cap-*), the index's "Who we work with"
+   pair (round 7, svc-sectors), and on a service page its project
    photograph and the photograph beside its own text (svc-*). Imported by globals.css. */
 
 /* ——— Before and after (ba-*) ———
@@ -8,7 +9,8 @@
    on the figure by the component. Registered, so it can ease between places and carry the first
    sweep: the "after" photograph's clip, the line and the handle all follow it, and nothing is resized.
    The frame keeps to a ratio and never stands taller than 70% of the screen: 4:3 across a phone,
-   3:2 on tablets, 16:9 on wide screens at 68rem at most. */
+   3:2 on tablets, 16:9 on wide screens at 68rem at most and no taller than 60% of the screen, so
+   on a laptop the handle and most of the photograph are on the first screen under the words. */
 
 @property --ba-pos {
   syntax: "<number>";
@@ -29,8 +31,10 @@
   background: var(--color-kapur-deep);
   /* The line and the handle measure themselves against the frame (cqi). */
   container-type: inline-size;
-  /* A vertical swipe still scrolls the page; a sideways one is the comparison's. */
+  /* A vertical swipe still scrolls the page and two fingers still zoom it; a sideways drag is the
+     comparison's. (pan-y alone first, for an engine that does not know pinch-zoom.) */
   touch-action: pan-y;
+  touch-action: pan-y pinch-zoom;
   cursor: ew-resize;
   user-select: none;
   -webkit-user-select: none;
@@ -49,7 +53,7 @@
 
 @media (min-width: 64rem) {
   .ba {
-    width: min(100%, 68rem, 70svh * 16 / 9);
+    width: min(100%, 68rem, 60svh * 16 / 9);
   }
 
   .ba-frame {
@@ -84,7 +88,8 @@
 }
 
 /* The handle: a small pill in Milky White, like the site's buttons, with a chevron each way and the
-   line passing through it. It follows the line but keeps inside the frame at either end. */
+   line passing through it. It follows the line but keeps inside the frame at either end, half a rem
+   in from the edge, so its focus rings (6px at most) are never cut off by the frame. */
 .ba-handle {
   position: absolute;
   top: 50%;
@@ -100,7 +105,7 @@
     0 0 0 1px rgb(20 20 20 / 0.08),
     0 0 0 6px rgb(243 243 243 / 0.3),
     0 12px 28px -12px rgb(20 20 20 / 0.55);
-  translate: calc(clamp(1.875rem, var(--ba-pos) * 1cqi, 100cqi - 1.875rem) - 50%) -50%;
+  translate: calc(clamp(2.375rem, var(--ba-pos) * 1cqi, 100cqi - 2.375rem) - 50%) -50%;
   cursor: grab;
   transition:
     scale var(--dur-quick) var(--ease-brand),
@@ -309,7 +314,7 @@
 .cap-num {
   grid-area: num;
   min-width: 1.5rem;
-  color: var(--color-ink-soft);
+  color: var(--color-ink-muted);
 }
 
 .cap-rule {
@@ -338,25 +343,11 @@
   background: rgb(20 20 20 / 0.06);
 }
 
-/* Hover and focus, quietly: the name underlines and the picture comes a fraction closer. */
-.cap-name {
-  text-decoration-line: underline;
-  text-decoration-thickness: 1px;
-  text-underline-offset: 0.2em;
-  text-decoration-color: transparent;
-  transition: text-decoration-color var(--dur-quick) var(--ease-brand);
-}
-
-.cap-row:focus-visible .cap-name {
-  text-decoration-color: currentColor;
-}
-
-@media (hover: hover) {
-  .cap-row:hover .cap-name {
-    text-decoration-color: currentColor;
-  }
-}
-
+/* Hover and focus, quietly: the name eases a step quieter, as every card and index row's name does
+   (.link-name, globals.css), and the picture comes a fraction closer. Keyboard focus is the
+   site's outline ring. The picture's settle as it comes into view runs on the span around it
+   (data-reveal), the hover on the picture itself, so the two never set the same property on one
+   element. */
 @media (prefers-reduced-motion: no-preference) {
   .cap-thumb img {
     transition: scale var(--dur-reveal) var(--ease-brand);
@@ -413,6 +404,29 @@
   }
 }
 
+/* Under 64rem the band is sized by the screen's width, so on a phone or a tablet turned on its side
+   it would stand taller than the screen. It is held to 75% of the screen's height (the sizing
+   standard) at the full width, and the photograph covers the shorter frame. */
+@media (max-width: 63.999rem) {
+  .cap-lead:not(.cap-lead-plain) {
+    width: 100%;
+    max-height: 75svh;
+  }
+}
+
+/* On its side the words fill most of the shorter band, so the shade holds nearly as far down as
+   they reach, as it does on a phone held upright. */
+@media (max-width: 63.999rem) and (orientation: landscape) {
+  .cap-scrim {
+    background: linear-gradient(
+      180deg,
+      rgb(20 20 20 / 0.66) 0%,
+      rgb(20 20 20 / 0.62) 80%,
+      rgb(20 20 20 / 0.42) 100%
+    );
+  }
+}
+
 @media (min-width: 64rem) {
   .cap {
     grid-template-columns: minmax(0, 40fr) minmax(0, 60fr);
@@ -458,12 +472,56 @@
   }
 }
 
-/* ——— A service page's own project photograph, under the opening words (svc-feature) ———
-   A band inside the page margins: 21:9 on wide screens, 16:9 on tablets, 3:2 on phones, where a
-   21:9 band would thin to a strip. */
+/* Without the photograph the band does not split: a dark half-panel the height of the rows would
+   stand mostly empty beside them. The panel stays across the top, only as tall as its words, and
+   the rows follow under it, as on a phone. */
+@media (min-width: 64rem) {
+  .cap:has(> .cap-lead-plain) {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .cap-lead-plain + .cap-list {
+    padding-left: var(--page-gutter);
+  }
+}
+
+/* ——— 02 Who we work with (svc-sectors) ———
+   The two kinds of client under the centred title, at the distance the home page keeps between its
+   centred title and the two doors under it (.pw-spread). One card under the other on phones, each
+   picture the full width at 4:3; side by side from 40rem. From 64rem the pair keeps to the hero
+   comparison's measure (.ba above): at most 68rem, and no wider than the 16:9 frame that fits 60% of
+   the screen's height, so its outer edges stand under the frame's and the page shares one centred
+   measure. Under 64rem it runs the full width inside the margins. */
+
+.svc-sectors {
+  display: grid;
+  column-gap: var(--grid-gap);
+  margin-top: clamp(3rem, 6vw, 5rem);
+  margin-inline: auto;
+}
+
+@media (min-width: 40rem) {
+  .svc-sectors {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (min-width: 64rem) {
+  .svc-sectors {
+    max-width: min(68rem, 60svh * 16 / 9);
+  }
+}
+
+/* ——— A service page's photograph under the opening words (svc-feature) ———
+   The page's own project photograph, or until a service has one, a temporary picture, so all three
+   pages open the same way. A band inside the page margins: 21:9 on wide screens, 16:9 on tablets,
+   3:2 on phones, where a 21:9 band would thin to a strip. Never taller than 75% of the screen (a
+   phone on its side) or 760px; the photograph covers the shorter frame. */
 
 .svc-feature {
   position: relative;
+  width: 100%;
+  max-height: min(75svh, 760px);
   aspect-ratio: 3 / 2;
   overflow: hidden;
 }
@@ -483,13 +541,16 @@
 /* ——— A service page's photograph, beside its own text (svc-*) ———
    Wide screens: in the margin column beside the text, 4:5, held in view while the text runs on.
    It starts level with the text's first heading (prose-rouang sets 2em above an h3, at the lead
-   size). Narrower screens: above the text at its width, 3:2 on phones and 16:9 on tablets. */
+   size). Narrower screens: above the text at its width, 3:2 on phones and 16:9 on tablets, and
+   never taller than 75% of the screen (a phone on its side). */
 
 .svc-photo {
   position: relative;
+  width: 100%;
   aspect-ratio: 3 / 2;
   overflow: hidden;
   max-width: 40rem;
+  max-height: min(75svh, 760px);
 }
 
 @media (min-width: 40rem) {

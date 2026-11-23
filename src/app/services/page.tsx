@@ -1,13 +1,14 @@
 import type { Metadata } from "next";
 import { BeforeAfter } from "@/components/services/BeforeAfter";
 import { Capabilities } from "@/components/services/Capabilities";
-import { ButtonLink } from "@/components/ui/Button";
 import { Breadcrumbs } from "@/components/ui/Breadcrumbs";
 import { Figure } from "@/components/ui/Figure";
+import { CtaPanel } from "@/components/ui/RikyuField";
 import { Label, TitlePair } from "@/components/ui/Typography";
 import { placeholderImagery } from "@/config/media";
 import { areaLabel } from "@/config/studio";
 import { getServices, publicImage } from "@/lib/content";
+import type { Image as ImageData } from "@/lib/content/schema";
 import { pageMetadata } from "@/lib/seo";
 
 export const ensureStatic = "navigation";
@@ -34,6 +35,20 @@ const sectors = [
     image: publicImage(placeholderImagery.forBusinesses),
   },
 ] as const;
+
+/** The sector pictures are drawn 4:3. */
+const SECTOR_FRAME = 4 / 3;
+
+/**
+ * `sizes` for a sector picture: half the pair's width (services.css, svc-sectors), at most 33rem
+ * from 80rem, about 40% of the screen at 64rem, 45% on tablets and the full width inside the margins
+ * on phones; widened when a wider photograph has to cover the 4:3 frame.
+ */
+function sectorSizes(image: ImageData) {
+  const cover = Math.max(1, image.width / image.height / SECTOR_FRAME);
+  const at = (w: string) => (cover === 1 ? w : `calc(${w} * ${cover.toFixed(2)})`);
+  return [`(min-width: 80rem) ${at("33rem")}`, `(min-width: 64rem) ${at("40vw")}`, `(min-width: 40rem) ${at("45vw")}`, at("92vw")].join(", ");
+}
 
 /*
  * Temporary photographs (src/config/media.ts), dropped from production by publicImage(): the page
@@ -65,7 +80,7 @@ export default async function ServicesPage() {
       <section data-tone="light" className="bg-kapur text-ink">
         <div className="page-x pb-[var(--section-space)] pt-[calc(var(--header-h)+3rem)]">
           <Breadcrumbs items={[{ name: "Services", href: "/services" }]} />
-          <div className="mx-auto mt-12 flex max-w-[62rem] flex-col items-center text-center sm:mt-16">
+          <div className="mx-auto mt-10 flex max-w-[62rem] flex-col items-center text-center sm:mt-12">
             <TitlePair
               as="h1"
               size="hero"
@@ -84,9 +99,10 @@ export default async function ServicesPage() {
               before={before}
               after={after}
               priority
-              // The frame: the page's width inside its margins, at most 68rem and 70% of the screen's height in 16:9.
+              // The frame: the page's width inside its margins, at most 68rem, and in 16:9 no taller than
+              // 60% of the screen's height, so its handle is on the first screen of a laptop.
               sizes="(min-width: 80rem) 68rem, 92vw"
-              className="mt-12 sm:mt-16"
+              className="mt-10 sm:mt-12"
             />
           ) : null}
         </div>
@@ -96,47 +112,40 @@ export default async function ServicesPage() {
         <Capabilities index="01" services={services} lead={capabilityImagery.lead} thumbs={capabilityImagery.thumbs} />
       ) : null}
 
-      <section data-tone="dark" aria-labelledby="sectors-title">
+      {/* 02 Who we work with, set as the site sets a centred section (home Process, About Process): the
+          label and the title pair on the centre line, and under them the two kinds of client side by side,
+          on the hero comparison's measure (services.css, svc-sectors). */}
+      <section data-tone="light" className="bg-kapur text-ink" aria-labelledby="sectors-title">
         <div className="page-x section-y">
-          <div className="page-grid gap-y-10">
-            <div className="col-span-12 lg:col-span-4">
-              <Label pill index="02" className="text-mouse">
-                Who we work with
-              </Label>
-              <h2 id="sectors-title" className="t-sub mt-6 max-w-[24rem] text-kapur/85">
-                Homes and businesses, existing and new.
-              </h2>
-            </div>
-            <ul className="col-span-12 grid gap-x-[var(--grid-gap)] border-t border-kapur/15 sm:grid-cols-2 lg:col-span-7 lg:col-start-6">
-              {sectors.map((s) => (
-                <li key={s.key} className="border-b border-kapur/15 py-8">
-                  {s.image ? (
-                    // Each photograph over its words, the two at one ratio side by side from 40rem.
-                    <Figure
-                      image={s.image}
-                      aspect="4/3"
-                      tone="dark"
-                      sizes="(min-width: 64rem) 30vw, (min-width: 40rem) 52vw, 100vw"
-                      className="mb-6"
-                    />
-                  ) : null}
-                  <h3 className="t-title">{s.label}</h3>
-                  <p className="mt-3 max-w-[30rem] text-kapur/75">{s.body}</p>
-                </li>
-              ))}
-            </ul>
+          <div className="flex flex-col items-center text-center">
+            <Label pill index="02" className="text-ink-muted">
+              Who we work with
+            </Label>
+            <TitlePair id="sectors-title" lead="Homes and businesses," follow="existing and new." className="mt-6" />
           </div>
+          <ul className="svc-sectors border-t border-ink/15">
+            {sectors.map((s) => (
+              <li key={s.key} className="border-b border-ink/15 py-8">
+                {s.image ? (
+                  // Each photograph over its words, the two at one ratio side by side from 40rem.
+                  <Figure image={s.image} aspect="4/3" sizes={sectorSizes(s.image)} className="mb-6" />
+                ) : null}
+                <h3 className="t-title">{s.label}</h3>
+                <p className="mt-3 max-w-[30rem] text-ink-soft">{s.body}</p>
+              </li>
+            ))}
+          </ul>
         </div>
       </section>
 
-      <section data-tone="light" className="bg-kapur text-ink">
-        <div className="page-x section-y flex flex-col items-start gap-8">
-          <TitlePair lead="Not sure which applies?" follow="Describe the space and we'll tell you." />
-          <ButtonLink href="/contact" variant="dark">
-            Discuss your project
-          </ButtonLink>
-        </div>
-      </section>
+      {/* The close: the green panel on the same Milky White, after 02's own bottom padding. */}
+      <CtaPanel
+        id="services-cta-title"
+        lead="Not sure which applies?"
+        follow="Describe the space and we’ll tell you."
+        href="/contact"
+        surface="kapur"
+      />
     </>
   );
 }

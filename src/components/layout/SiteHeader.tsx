@@ -29,7 +29,8 @@ export function SiteHeader({ whatsapp, nav }: { whatsapp: string | null; nav: Na
 
   // Tone: whichever [data-tone] section crosses a one-pixel line at the header's middle, found by
   // an IntersectionObserver so scrolling never forces a layout read. A nested section wins over
-  // the one containing it, as the topmost layer does on screen.
+  // the one containing it, as the topmost layer does on screen. A section marked data-header-skip (a
+  // rounded panel inside the page margins, RikyuField) is passed over: the band around it sets the tone.
   useEffect(() => {
     const header = ref.current;
     if (!header) return;
@@ -64,7 +65,7 @@ export function SiteHeader({ whatsapp, nav }: { whatsapp: string | null; nav: Na
         },
         { rootMargin: `-${mid}px 0px -${Math.max(0, window.innerHeight - mid - 1)}px 0px` },
       );
-      for (const el of document.querySelectorAll<HTMLElement>("[data-tone]")) {
+      for (const el of document.querySelectorAll<HTMLElement>("[data-tone]:not([data-header-skip])")) {
         if (!header.contains(el)) io.observe(el);
       }
     };
@@ -127,7 +128,9 @@ export function SiteHeader({ whatsapp, nav }: { whatsapp: string | null; nav: Na
       data-site-header
       data-header-tone={tone ?? undefined}
       onFocusCapture={() => setHidden(false)}
-      className={`site-header fixed inset-x-0 top-0 z-50 transition-[translate,background-color,color] duration-500 ease-[var(--ease-brand)] ${
+      // With reduced motion the header no longer slides: it goes and comes back at once, and only
+      // its colours ease.
+      className={`site-header fixed inset-x-0 top-0 z-50 transition-[translate,background-color,color] duration-500 ease-[var(--ease-brand)] motion-reduce:transition-[background-color,color] ${
         hidden ? "-translate-y-full" : "translate-y-0"
       } ${solid ? bar : dark ? "text-kapur" : "text-ink"}`}
     >

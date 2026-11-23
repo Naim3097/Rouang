@@ -43,6 +43,7 @@ export function InsightsList({ insights, index }: { insights: Insight[]; index: 
                   image={images.get(lead.slug) ?? null}
                   className="ins-frame-feature"
                   sizes="(min-width: 1024px) 48vw, 100vw"
+                  decorative
                 />
               ) : null}
             </Link>
@@ -64,6 +65,7 @@ export function InsightsList({ insights, index }: { insights: Insight[]; index: 
                           image={images.get(a.slug) ?? null}
                           className="ins-frame-thumb"
                           sizes="(min-width: 1024px) 19vw, 40vw"
+                          decorative
                         />
                       ) : null}
                     </Link>

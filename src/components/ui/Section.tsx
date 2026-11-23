@@ -1,5 +1,5 @@
 import type { ReactNode } from "react";
-import { SHOW_DRAFTS } from "@/lib/env";
+import { SHOW_NOTES } from "@/lib/env";
 
 type Tone = "light" | "dark" | "rikyu";
 
@@ -47,9 +47,9 @@ export function Crosses({ className = "" }: { className?: string }) {
   );
 }
 
-/** Shown only in previews where the studio still owes content. Renders nothing in production. */
+/** A note of content the studio still owes. Local development only (SHOW_NOTES): never on a deployed site. */
 export function Pending({ title, children, tone = "light" }: { title: string; children: ReactNode; tone?: "light" | "dark" }) {
-  if (!SHOW_DRAFTS) return null;
+  if (!SHOW_NOTES) return null;
   return (
     <div
       className={`rounded-[2px] border border-dashed p-5 ${tone === "dark" ? "border-kapur/25 text-mouse" : "border-ink/25 text-ink-muted"}`}

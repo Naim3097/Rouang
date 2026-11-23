@@ -1,0 +1,46 @@
+/* contact (round 7b, 23 Nov 2026). The Contact page (app/contact/page.tsx). Imported by globals.css. */
+
+/* ——— The form and the other ways in (contact-body, contact-direct) ———
+   Under the centred opening, on the measure Services sets its comparison and its two kinds of client
+   on (services.css, .ba and .svc-sectors): at most 68rem, centred, and the full width inside the
+   margins below that. A hairline across it parts the opening from what is to be filled in.
+   From 64rem the form takes seven columns of the grid and the details four, with one column of air
+   between them; the details stay in view beside the form while it is filled in. Below 64rem the
+   details follow the form: in two columns on a tablet (the ways to write or call beside the office),
+   one above the other on a phone. */
+
+.contact-body {
+  max-width: 68rem;
+  margin-inline: auto;
+  row-gap: 3.5rem;
+  border-top: 1px solid var(--hairline-light);
+  padding-top: clamp(2.5rem, 4vw, 3.5rem);
+}
+
+.contact-direct {
+  display: grid;
+  row-gap: 2.5rem;
+  /* The form's own gap between its two columns (EnquiryForm, gap-7), so on a tablet the office
+     lines up under the form's right-hand fields. */
+  column-gap: 1.75rem;
+  align-content: start;
+  border-top: 1px solid var(--hairline-light);
+  padding-top: 2.5rem;
+}
+
+@media (min-width: 40rem) {
+  .contact-direct {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (min-width: 64rem) {
+  .contact-direct {
+    grid-template-columns: minmax(0, 1fr);
+    align-self: start;
+    position: sticky;
+    top: calc(var(--header-h) + 2rem);
+    border-top: 0;
+    padding-top: 0;
+  }
+}

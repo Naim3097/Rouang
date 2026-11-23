@@ -8,7 +8,7 @@ import { SiteHeader } from "@/components/layout/SiteHeader";
 import { SmoothScroll } from "@/components/layout/SmoothScroll";
 import { JsonLd } from "@/components/ui/JsonLd";
 import { studio, whatsappHref } from "@/config/studio";
-import { GA_MEASUREMENT_ID, GOOGLE_SITE_VERIFICATION, IS_PRODUCTION, SITE_URL } from "@/lib/env";
+import { GA_MEASUREMENT_ID, GOOGLE_SITE_VERIFICATION, IS_PRODUCTION, SHOW_NOTES, SITE_URL } from "@/lib/env";
 import { liveNav } from "@/lib/nav";
 import { organizationSchema, websiteSchema } from "@/lib/schema";
 // Lenis's own rules (SmoothScroll), before the site's so the site can override them.
@@ -57,7 +57,7 @@ export default async function RootLayout({ children }: LayoutProps<"/">) {
         <MobileActionBar whatsapp={whatsapp} />
         <SmoothScroll />
         <Analytics measurementId={IS_PRODUCTION ? GA_MEASUREMENT_ID : null} />
-        {!IS_PRODUCTION ? <PreviewBar /> : null}
+        {SHOW_NOTES ? <PreviewBar /> : null}
         <JsonLd data={[organizationSchema(), websiteSchema()]} />
       </body>
     </html>

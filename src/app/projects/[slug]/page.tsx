@@ -4,6 +4,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { type CSSProperties, ViewTransition } from "react";
 import { CurveRule } from "@/components/brand/Brand";
+import { shownImage } from "@/components/projects/images";
 import { TitleBlock } from "@/components/projects/TitleBlock";
 import { DraftTag } from "@/components/projects/ProjectIndex";
 import { ButtonLink } from "@/components/ui/Button";
@@ -15,7 +16,7 @@ import { Pending } from "@/components/ui/Section";
 import { Label } from "@/components/ui/Typography";
 import { getProject, getProjects, getServices, publicImage, type Project, staticSlugs } from "@/lib/content";
 import type { GalleryItem, Image as ImageData } from "@/lib/content/schema";
-import { SHOW_DRAFTS } from "@/lib/env";
+import { SHOW_DRAFTS, SHOW_NOTES } from "@/lib/env";
 import { pageMetadata } from "@/lib/seo";
 
 export const ensureStatic = "navigation";
@@ -51,9 +52,9 @@ export default async function ProjectPage({ params }: PageProps<"/projects/[slug
   const next = projects.length > 1 ? projects[(index + 1) % projects.length] : null;
   const related = services.filter((s) => project.services.includes(s.slug));
 
-  const hero = publicImage(project.hero);
-  const gallery = project.gallery.map((g) => publicImage(g)).filter(Boolean) as GalleryItem[];
-  const showStubs = SHOW_DRAFTS && !project.placeholder;
+  const hero = shownImage(project.hero);
+  const gallery = project.gallery.map((g) => shownImage(g)).filter((g) => g !== null);
+  const showStubs = SHOW_NOTES && !project.placeholder;
 
   const chapters: Chapter[] = [
     { key: "brief", label: "The brief", title: "What the space had to do", body: project.brief, hint: "The client's brief in a few sentences: who uses the space, what was wrong with it, what had to change." },
@@ -65,13 +66,29 @@ export default async function ProjectPage({ params }: PageProps<"/projects/[slug
 
   // Photographs are threaded through the story rather than parked at the end, a row at a time: the
   // first row opens the case study, each chapter with its own words gets the next, and the rest close
-  // it. A chapter still awaiting the studio's words (a preview stub) takes none, so the rows fall the
-  // same way in previews as on the live site.
+  // it. A chapter still awaiting the studio's words (a stub, shown on the development server only)
+  // takes none, so the rows fall the same way there as on every deployed site. Chapters are numbered
+  // in the order they show, so a missing one leaves no gap in the numbering.
   const rows = planGallery(gallery);
   const lead = rows[0] ?? null;
   let cursor = 1;
   const threaded = visibleChapters.map((c) => (c.body ? (rows[cursor++] ?? null) : null));
   const remainder = rows.slice(cursor);
+
+  // The ground the closing section follows: the last section rendered above it (the sections run
+  // facts, chapters, In motion, materials, constraints, more photographs). On the same Milky White,
+  // a curve rule divides the two and the section above gives the space; after a change of ground
+  // (the grey materials band, or a dark one), the change itself divides them, as on /projects, so
+  // the closing section takes a section's full space above its heading and draws no rule.
+  const groundAbove = remainder.length
+    ? "kapur"
+    : project.challenges.length || showStubs
+      ? "dark"
+      : project.materials.length
+        ? "deep"
+        : project.loops.length
+          ? "dark"
+          : "kapur";
 
   const facts = [project.sector === "commercial" ? "Commercial" : "Residential", project.type, project.location, project.visualisation ? "Design proposal" : null]
     .filter(Boolean)
@@ -79,6 +96,7 @@ export default async function ProjectPage({ params }: PageProps<"/projects/[slug
 
   // Images too small to fill a large screen open inset, at a size they can hold.
   const insetHero = !!hero && !("pending" in hero) && hero.width < 1800 && !project.film;
+  const single = project.loops.length === 1;
 
   return (
     <article>
@@ -98,9 +116,26 @@ export default async function ProjectPage({ params }: PageProps<"/projects/[slug
               </div>
               <p className="t-sub col-span-12 max-w-[40rem] self-end text-kapur/85 lg:col-span-4">{project.standfirst ?? project.summary}</p>
             </div>
+            {/* A render keeps its own proportions, uncropped. It is never wider than its file, nor
+                taller than min(75svh, 760px), so a landscape phone still sees all of it. */}
             <ViewTransition name={`project-${project.slug}`} share="project-image" default="none">
-              <div className="relative mx-auto mt-14 w-full sm:mt-20" style={{ maxWidth: `${hero.width}px`, aspectRatio: `${hero.width}/${hero.height}` }}>
-                <Image src={hero.src} alt={hero.alt} fill loading="eager" fetchPriority="high" sizes={`(min-width: ${hero.width}px) ${hero.width}px, 100vw`} quality={85} className="object-cover" />
+              <div
+                className="relative mx-auto mt-14 w-full sm:mt-20"
+                style={{
+                  maxWidth: `min(${hero.width}px, min(75svh, 760px) * ${(hero.width / hero.height).toFixed(4)})`,
+                  aspectRatio: `${hero.width}/${hero.height}`,
+                }}
+              >
+                <Image
+                  src={hero.src}
+                  alt={hero.alt}
+                  fill
+                  loading="eager"
+                  fetchPriority="high"
+                  sizes={`min(${hero.width}px, 92vw, ${Math.ceil((75 * hero.width) / hero.height)}vh, ${Math.ceil((760 * hero.width) / hero.height)}px)`}
+                  quality={85}
+                  className="object-cover"
+                />
               </div>
             </ViewTransition>
           </div>
@@ -232,32 +267,41 @@ export default async function ProjectPage({ params }: PageProps<"/projects/[slug
                   <span id="motion-title">In motion</span>
                 </Label>
               </div>
-              {/* One loop is shown on its own at a readable size; more sit in a row. Three on a phone:
-                  the first across the width and two under it, rather than one left on its own. */}
+              {/* One loop is shown at a readable size with its caption set beside it, so the band is
+                  not left half empty; more sit in a row. Three on a phone: the first across the width
+                  and two under it, rather than one left on its own. */}
               <ul
                 className={`col-span-12 grid gap-[var(--grid-gap)] lg:col-span-9 ${
-                  project.loops.length === 1
-                    ? "max-w-[26rem] grid-cols-1"
+                  single
+                    ? "grid-cols-1"
                     : project.loops.length === 2
                       ? "grid-cols-2"
                       : `grid-cols-2 sm:grid-cols-3 ${project.loops.length === 3 ? "[&>li:first-child]:col-span-2 sm:[&>li:first-child]:col-span-1" : ""}`
                 }`}
               >
-                {project.loops.map((l) => (
+                {project.loops.map((l, i) => (
                   <li key={l.src}>
-                    <figure>
-                      <div className="relative aspect-[4/5] overflow-hidden bg-ink-raised">
-                        <Image
-                          src={l.poster}
-                          alt={l.alt}
-                          fill
-                          sizes={project.loops.length === 1 ? "(min-width: 640px) 26rem, 100vw" : "(min-width: 1024px) 24vw, (min-width: 640px) 31vw, 92vw"}
-                          quality={78}
-                          className="object-cover"
-                        />
+                    {/* A lone portrait loop: never wider than 26rem, nor taller than 75svh (a 4:5 frame
+                        60svh wide), so it fits a landscape phone; its caption sits beside it from md. */}
+                    <figure
+                      className={
+                        single
+                          ? "md:grid md:grid-cols-[min(26rem,60svh)_minmax(0,24rem)] md:items-end md:gap-x-[var(--grid-gap)]"
+                          : undefined
+                      }
+                    >
+                      <div className={`relative aspect-[4/5] overflow-hidden bg-ink-raised ${single ? "max-w-[min(26rem,60svh)]" : ""}`}>
+                        <Image src={l.poster} alt={l.alt} fill sizes={loopSizes(project.loops.length, i)} quality={78} className="object-cover" />
                         <Film sources={[{ src: l.src }]} label={l.alt} compact />
                       </div>
-                      {l.caption ? <figcaption className="t-caption mt-3 text-mouse">{l.caption}</figcaption> : null}
+                      {single ? (
+                        <figcaption className="mt-3 md:mt-0 md:pb-1">
+                          <span className="t-label block text-mouse">Filmed at {project.title}</span>
+                          {l.caption ? <span className="t-caption mt-2 block text-kapur/80 md:t-sub md:mt-4">{l.caption}</span> : null}
+                        </figcaption>
+                      ) : l.caption ? (
+                        <figcaption className="t-caption mt-3 text-mouse">{l.caption}</figcaption>
+                      ) : null}
                     </figure>
                   </li>
                 ))}
@@ -357,8 +401,8 @@ export default async function ProjectPage({ params }: PageProps<"/projects/[slug
 
       {/* ——— Related services and the next step ——— */}
       <section data-tone="light" className="bg-kapur text-ink">
-        <div className="page-x pb-[var(--section-space)]">
-          <CurveRule className="mb-16 text-ink/25" at="30%" />
+        <div className={`page-x ${groundAbove === "kapur" ? "pb-[var(--section-space)]" : "section-y"}`}>
+          {groundAbove === "kapur" ? <CurveRule className="mb-16 text-ink/25" at="30%" /> : null}
           <div className="page-grid gap-y-10">
             <div className="col-span-12 lg:col-span-6">
               <h2 className="t-headline">
@@ -366,7 +410,8 @@ export default async function ProjectPage({ params }: PageProps<"/projects/[slug
                 <span className="t-follow block text-rikyu">Start with a conversation.</span>
               </h2>
               <div className="mt-10 flex flex-wrap gap-3">
-                <ButtonLink href={`/contact?project=${project.sector}`} variant="dark">
+                {/* An ink focus ring: in the button's own Milky White it would vanish into the page. */}
+                <ButtonLink href={`/contact?project=${project.sector}`} variant="dark" className="focus-visible:outline-ink">
                   Discuss your project
                 </ButtonLink>
               </div>
@@ -396,6 +441,17 @@ export default async function ProjectPage({ params }: PageProps<"/projects/[slug
       {next ? <NextProject project={next} /> : null}
     </article>
   );
+}
+
+/**
+ * The poster's `sizes`, matching the In motion band: one loop at most 416px wide and 60vh (its cap);
+ * two side by side; three or more in threes from 640px (in the band's nine columns from 1024px), and
+ * in twos on a phone, where the first of exactly three runs the full width.
+ */
+function loopSizes(count: number, i: number) {
+  if (count === 1) return "min(92vw, 416px, 60vh)";
+  if (count === 2) return "(min-width: 1024px) 35vw, 46vw";
+  return `(min-width: 1024px) 24vw, (min-width: 640px) 31vw, ${count === 3 && i === 0 ? "92vw" : "46vw"}`;
 }
 
 /** Phones get the narrow clip and larger screens the wide one; a missing one leaves those screens the still. */
@@ -491,6 +547,8 @@ function GalleryRow({ row, className = "" }: { row: GalleryRowData; className?: 
   const first = row.cells[0];
   // A wide view is never drawn wider than its file, so a small render is not blown up.
   const max = row.wide && !("pending" in first) ? `${first.width}px` : undefined;
+  // The row's 720px height cap, lowered for a wide view whose file is narrower than 720px × 16:9.
+  const capPx = row.wide && !("pending" in first) ? Math.min(720, first.width / WIDE) : 720;
   return (
     <div
       className={`cs-row ${className}`}
@@ -501,8 +559,12 @@ function GalleryRow({ row, className = "" }: { row: GalleryRowData; className?: 
           key={"pending" in img ? img.pending : img.src}
           image={img}
           aspect="var(--cs-a)"
-          // Phones: the width of the page. Larger screens: the frame's share of the row.
-          sizes={`(min-width: 640px) ${Math.ceil((ratios[k] / sum) * 92)}vw, 92vw`}
+          // Phones: the width of the page. Larger screens: the frame's share of the row, but never
+          // more than the row's height cap, min(72svh, 720px), allows its shape (nor, for a wide
+          // view, its file's own width), as case-study.css draws it. The space after "min(" is
+          // deliberate: next/image only reads a vw share preceded by whitespace when it picks the
+          // widths for the srcset, and without it the smaller files would be left out.
+          sizes={`(min-width: 640px) min( ${Math.ceil((ratios[k] / sum) * 92)}vw, ${Math.ceil(72 * ratios[k])}vh, ${Math.ceil(capPx * ratios[k])}px), 92vw`}
           className={`cs-cell ${ratios[k] > 1 ? "cs-cell-land" : ""}`}
           style={{ "--cs-r": ratios[k].toFixed(4) } as CSSProperties}
           showCaption
@@ -518,7 +580,8 @@ function NextProject({ project }: { project: Project }) {
   return (
     <section data-tone="dark" aria-label="Next project">
       <Link href={`/projects/${project.slug}`} className="next-link group relative block overflow-hidden">
-        <div className="relative h-[70svh] min-h-[28rem]">
+        {/* At least 28rem, so the title has room, but never more than 75svh on a landscape phone. */}
+        <div className="relative h-[70svh] min-h-[min(28rem,75svh)]">
           {photo ? (
             <ViewTransition name={`project-${project.slug}`} share="project-image" default="none">
               <div className="absolute inset-0 transition-[clip-path] duration-[1.2s] ease-[var(--ease-settle)] [clip-path:circle(38%_at_72%_50%)] group-hover:[clip-path:circle(120%_at_72%_50%)] group-focus-visible:[clip-path:circle(120%_at_72%_50%)]">

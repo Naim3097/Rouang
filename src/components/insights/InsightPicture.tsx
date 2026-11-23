@@ -9,19 +9,24 @@ import type { Image as ImageData } from "@/lib/content/schema";
  * rhythm when only some articles have a picture. Lists with no pictures at all leave the frame out.
  *
  * The frame sits after the words in the markup and is moved before them on screen, so a card's link
- * is announced by its title first and the picture's description last.
+ * is announced by its title. Inside a link the picture is `decorative` (alt=""), as every picture in a
+ * link on the site is: the link already names the article, and the photograph only illustrates its
+ * subject. Only an article's own lead picture, outside any link, keeps its description.
  */
 export function InsightPicture({
   image,
   sizes,
   className = "",
   lead = false,
+  decorative = false,
 }: {
   image: ImageData | null;
   sizes: string;
   className?: string;
-  /** An article's own picture, in the first screen: loaded at once, without the settle. */
+  /** A picture in the first screen (an article's own, the index's first): loaded at once, without the settle. */
   lead?: boolean;
+  /** The picture sits inside a link that already names the article: no description of its own. */
+  decorative?: boolean;
 }) {
   return (
     <div className={`ins-frame ${className}`} data-ins-frame="" data-reveal={image && !lead ? "image" : undefined}>
@@ -29,7 +34,7 @@ export function InsightPicture({
         {image ? (
           <Image
             src={image.src}
-            alt={image.alt}
+            alt={decorative ? "" : image.alt}
             fill
             sizes={sizes}
             quality={78}

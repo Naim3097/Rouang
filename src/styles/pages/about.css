@@ -1,51 +1,254 @@
-/* about (round 6, 23 Nov 2026). The About page (app/about/page.tsx). Imported by globals.css.
-   The process is drawn by styles/home/process.css; nothing here changes it. */
+/* about (round 7, 23 and 24 Nov 2026). The About page (app/about/page.tsx). Imported by globals.css.
+   03 Capabilities is the Services page's own band (styles/pages/services.css, cap-*), the closing
+   call to action is CtaPanel (components/ui/RikyuField.tsx) and the process is drawn by
+   styles/home/process.css; nothing here changes them. */
 
-/* ——— 01 Approach: the drawing by hand. ———
-   The photograph is wider than its 3:2 frame and shows the whole desk; the frame is drawn in on the
-   hands, the scale rule and the drawing, below the shoulders, so no face and no lettering on
-   clothing is in it. Scaled from the foot of the frame, centred across it. */
-.about-drawing {
-  object-position: 50% 100%;
-  scale: 1.5;
-  transform-origin: 50% 100%;
+/* ——— The opening (about-hero) ———
+   A photograph across the whole hero under a dark shade, and the words centred on it both ways.
+   The breadcrumbs keep their place under the header, as on every other page; the words are centred
+   in the space below them, and from tablets the hero's foot mirrors the header and the breadcrumbs,
+   so the words stand on the centre of the whole hero. Wide screens: a deliberate hero, at most 88%
+   of the screen and 56rem. Tablets: at most 72% and 46rem. Phones: only as tall as the words.
+   Where the words, not the screen, set the hero's height (a short laptop screen, a phone on its
+   side), a breath of 2rem to 3.5rem still parts them from the breadcrumbs, mirrored at the foot. */
+
+.about-hero {
+  --about-hero-top: calc(var(--header-h) + 3rem);
+  position: relative;
+  isolation: isolate;
+  display: flex;
+  overflow: hidden;
 }
 
-/* ——— 03 Capabilities: one small picture per column. ———
-   Each column is one link: the picture (3:2, the same size in every column), then the number, title
-   and summary under it. Between 40rem and 48rem, where a single column would make the pictures
-   large, the picture stands to the left of the words instead. */
-.about-capability-figure {
+.about-hero-inner {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  padding-top: var(--about-hero-top);
+  padding-bottom: clamp(3rem, 9vw, 4rem);
+}
+
+.about-hero-body {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-block: auto;
+  padding-top: clamp(2.5rem, 8vw, 4rem);
+  text-align: center;
+}
+
+@media (min-width: 40rem) {
+  .about-hero {
+    min-height: min(72svh, 46rem);
+  }
+
+  /* The header, the breadcrumbs' line and the breath under it, mirrored at the foot. */
+  .about-hero-inner {
+    --about-hero-breath: clamp(2rem, 6svh, 3.5rem);
+    padding-bottom: calc(var(--about-hero-top) + var(--fs-caption) * 1.5 + var(--about-hero-breath));
+  }
+
+  .about-hero-body {
+    padding-top: var(--about-hero-breath);
+  }
+}
+
+@media (min-width: 64rem) {
+  .about-hero {
+    min-height: min(88svh, 56rem);
+  }
+}
+
+/* The shade. The photograph is pale (white walls, a skylight), so on phones and tablets, where the
+   words run the width of the hero, the shade holds the whole frame at 62%: even a pure white pixel
+   under it keeps Milky White text at 4.6:1, wherever the words fall (measured with the words
+   hidden: 4.7:1 or more behind every line). The band under the header deepens further, so the
+   navigation reads over the skylight. Every word on it is full Milky White: at 80% the eyebrow
+   fell to 3.9:1. */
+.about-hero-scrim {
+  position: absolute;
+  inset: 0;
+  background:
+    linear-gradient(180deg, rgb(20 20 20 / 0.45) 0%, rgb(20 20 20 / 0) calc(var(--header-h) + 4rem)),
+    rgb(20 20 20 / 0.62);
+}
+
+/* Laptops: the words keep to the middle, so the shade is shaped rather than flat: 64% over the
+   words, easing to 48% at the sides and the foot, so the stair keeps its light and depth. The band
+   under the header reaches further down, holding the breadcrumbs in the top corner at the same
+   strength as before. Measured with the words hidden, the worst pixel behind every line holds
+   4.99:1 or more (breadcrumbs 5.5:1, navigation 6.1:1) from 1024 to 1920 wide. */
+@media (min-width: 64rem) {
+  .about-hero-scrim {
+    background:
+      linear-gradient(
+        180deg,
+        rgb(20 20 20 / 0.45) 0%,
+        rgb(20 20 20 / 0.3) calc(var(--header-h) + 4.5rem),
+        rgb(20 20 20 / 0) calc(var(--header-h) + 9rem)
+      ),
+      radial-gradient(ellipse 50% 60% at 50% 52%, rgb(20 20 20 / 0.64) 0 55%, rgb(20 20 20 / 0.48) 100%);
+  }
+}
+
+/* ——— 01 Approach (about-approach) ———
+   Wide screens: the picture in the left seven columns, the label, statement and paragraphs in the
+   right five, set in from the gutter so the two stand a clear step apart, and centred on each
+   other. The picture is 4:3; on small laptops (64rem to 80rem), where the five columns of words
+   run longer, it is 4:5 under the portrait cap, so the two halves stay about the same height.
+   Narrower screens stack them, the picture first, 4:3 the full width of the page. */
+
+.about-approach {
+  row-gap: clamp(2.5rem, 6vw, 3.5rem);
+  align-items: center;
+}
+
+.about-approach-figure,
+.about-approach-text {
+  grid-column: 1 / -1;
+}
+
+.about-approach-figure {
+  --about-drawing-ratio: 4 / 3;
+}
+
+/* A phone on its side: the frame keeps the page's width and is held to three quarters of the
+   screen; the picture covers the shorter frame. Side by side, a short laptop screen holds it to
+   80% (the sizing standard). */
+.about-approach-figure > div {
+  max-height: min(75svh, 760px);
+}
+
+@media (min-width: 64rem) {
+  .about-approach-figure {
+    grid-column: 1 / span 7;
+  }
+
+  .about-approach-figure > div {
+    max-height: min(80svh, 760px);
+  }
+
+  .about-approach-text {
+    grid-column: 8 / span 5;
+    padding-left: clamp(0rem, 2.5vw, 3rem);
+  }
+
+  /* Without the picture (production, until the studio supplies its own) the section is set like
+     Purpose, the founders and the team below it: the label in the first three of the page's twelve
+     columns, the statement and the paragraphs in the other nine, so all four start on one line. */
+  .about-approach-text.about-approach-text-alone {
+    display: grid;
+    grid-column: 1 / -1;
+    grid-template-columns: repeat(12, minmax(0, 1fr));
+    column-gap: var(--grid-gap);
+    align-items: start;
+    padding-left: 0;
+  }
+
+  .about-approach-text-alone > :first-child {
+    grid-column: 1 / span 3;
+    grid-row: 1 / span 2;
+  }
+
+  .about-approach-text-alone > h2 {
+    grid-column: 4 / -1;
+    grid-row: 1;
+    margin-top: 0;
+  }
+
+  .about-approach-text-alone > :last-child {
+    grid-column: 4 / -1;
+    grid-row: 2;
+    margin-top: 2rem;
+  }
+}
+
+/* The drawing by hand. The photograph (16:9) is wider than its frame and shows the whole desk; the
+   frame is drawn in on the hands, the pencil, the scale rule and the drawing, from below the chest
+   down, so no face and no lettering on clothing is in it. Scaled 1.3 from the frame's lower left
+   corner. 4:3, set 70% across: the window runs from the left forearm to the hand on the roll of
+   paper. 4:5, set 35% across: from the forearm to the roll (the photograph's 19% to 54% across,
+   23% down to its foot), the drawing hand at its centre and the other hand left out, so no
+   fingertip is cut at the edge. A frame held wider than its ratio by a short screen (80% of it
+   side by side, 72% for the 4:5, 75% stacked) shows more across and crops more of the top, never
+   more above: on a very short laptop screen a fingertip of the far hand can show. */
+.about-drawing {
+  object-position: 70% 100%;
+  scale: 1.3;
+  transform-origin: 0% 100%;
+}
+
+@media (min-width: 64rem) and (max-width: 79.99rem) {
+  .about-approach-figure {
+    --about-drawing-ratio: 4 / 5;
+  }
+
+  /* A portrait: the sizing standard's portrait cap. */
+  .about-approach-figure > div {
+    max-height: min(72svh, 720px);
+  }
+
+  .about-drawing {
+    object-position: 35% 100%;
+  }
+}
+
+/* ——— 05 Who we are: a headshot at the head of each founder's column (about-founder) ———
+   Two columns from tablets, one per founder; stacked on phones. The same 4:5 frame and the same
+   width for both founders, at the column's start, capped so it never takes over the column (about
+   two thirds of it): 14rem on phones and tablets, a fifth of the screen on laptops, 18rem at most.
+   Both columns open with the frame, so the two frames, and the names under them, share one line. */
+.about-founder-figure {
+  width: min(100%, clamp(14rem, 20vw, 18rem));
   margin-bottom: 1.75rem;
 }
 
-@media (min-width: 40rem) and (max-width: 47.99rem) {
-  .about-capability {
-    display: grid;
-    grid-template-columns: minmax(0, 2fr) minmax(0, 3fr);
-    column-gap: var(--grid-gap);
-    align-items: start;
-  }
+/* One treatment for both stand-ins: a monochrome grade with a little more contrast, which evens
+   out their different backdrops (one mottled brown, one charcoal) and skin tones, and a soft dark
+   vignette that takes the lighter backdrop down towards the darker one and leaves the faces as
+   they are. Framed alike: each photograph's `focus` (app/about/page.tsx) sets its eyes on one line
+   a third of the way down the frame (34%), and its zoom draws it in about that line, so the eyes
+   stay on it and the faces come out the same size. */
+.about-founder-photo {
+  filter: grayscale(1) contrast(1.1);
+  scale: var(--about-founder-zoom, 1);
+  transform-origin: 50% 34%;
+}
 
-  .about-capability-figure {
-    margin-bottom: 0;
+/* Ink while the photograph loads, so the frame never shows the vignette over the grey. */
+.about-founder-figure > div {
+  background-color: var(--color-ink-raised);
+}
+
+.about-founder-figure > div::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(ellipse 75% 65% at 50% 40%, rgb(20 20 20 / 0) 40%, rgb(20 20 20 / 0.5) 100%);
+  pointer-events: none;
+}
+
+/* ——— 06 Our team: one picture for the whole team (about-team) ———
+   Under the heading, the full width of the section's column: 3:2 on phones, 16:9 from tablets,
+   never taller than 760px or 80% of the screen beside the words on laptops; stacked (a phone or a
+   tablet, even on its side), 75% of it, as the sizing standard holds phones. */
+.about-team-figure {
+  --about-team-ratio: 3 / 2;
+}
+
+.about-team-figure > div {
+  max-height: min(75svh, 760px);
+}
+
+@media (min-width: 40rem) {
+  .about-team-figure {
+    --about-team-ratio: 16 / 9;
   }
 }
 
-/* The picture settles a little closer on hover or keyboard focus, as the project plates do. */
-@media (prefers-reduced-motion: no-preference) {
-  .about-capability-img {
-    transition: scale 1.6s var(--ease-brand);
-  }
-
-  .about-capability:focus-visible .about-capability-img {
-    scale: 1.03;
-  }
-}
-
-@media (hover: hover) and (prefers-reduced-motion: no-preference) {
-  .about-capability:hover .about-capability-img {
-    scale: 1.03;
+@media (min-width: 64rem) {
+  .about-team-figure > div {
+    max-height: min(80svh, 760px);
   }
 }
 

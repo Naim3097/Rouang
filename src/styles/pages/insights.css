@@ -65,8 +65,11 @@
   padding-top: clamp(1.25rem, 1.8vw, 1.75rem);
 }
 
+/* Never taller than three quarters of the screen, so a phone held sideways still shows the words
+   with the picture (the frame keeps its width; the photograph covers the shorter frame). */
 .ins-frame-feature {
   aspect-ratio: 3 / 2;
+  max-height: min(75svh, 760px);
   margin-bottom: 1.5rem;
 }
 
@@ -136,8 +139,10 @@
 }
 
 /* ——— Index (/insights) ———
-   One row per article, as before, now with its picture: 3/2 in the margin column under the page's
-   label, the words in the column under its title. Phones stack the picture over the words. */
+   One row per article, as before, now with its picture in the margin column under the page's label
+   and the words in the columns under its title. The picture is the home page's row thumbnail, 2/1, as
+   in "Read next", so an article's card keeps one shape across the site. Phones stack the picture,
+   full width at 3/2, over the words. */
 .ins-index-card {
   align-items: start;
   row-gap: 1.25rem;
@@ -147,11 +152,19 @@
   order: -1;
 }
 
+@media (min-width: 40rem) {
+  .ins-index-card > .ins-frame {
+    aspect-ratio: 2 / 1;
+  }
+}
+
 /* ——— Article ———
    The lead picture hangs under the title block from the title's own edge to the page margin: 4/3 on
-   phones, 16/9 wider, and never more than 60% of the screen's height on a desktop. */
+   phones, 16/9 wider, never more than three quarters of the screen's height (a phone held sideways),
+   and no more than 60% of it on a desktop. */
 .ins-frame-lead {
   aspect-ratio: 4 / 3;
+  max-height: min(75svh, 760px);
 }
 
 @media (min-width: 40rem) {

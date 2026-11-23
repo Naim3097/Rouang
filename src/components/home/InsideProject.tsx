@@ -7,7 +7,7 @@ import type { Project } from "@/lib/content";
 import { publicImage } from "@/lib/content";
 import { SHOW_DRAFTS } from "@/lib/env";
 
-/* ——— 04 Inside a project: a walk into the flagship, each room laid over the last as a stack of rings ——— */
+/* ——— 04 Inside a project: a walk into the flagship, each room filling the section and crossfading into the next ——— */
 
 const ROLE_LABEL = { space: "Space", material: "Material", whole: "Whole" } as const;
 
@@ -15,51 +15,52 @@ const ROLE_LABEL = { space: "Space", material: "Material", whole: "Whole" } as c
  * The walk, in the order it is taken: from the dining room in to the grain of the timber, so each
  * step forward is also a step closer. Real photographs of the finished interior only, and not the
  * ones 01 Work and What we do already show. Each caption says only what its photograph shows.
- * `focus` places the photograph in its round frame (object-position).
  * Five rooms at most: styles/home/inside.css lists a stage for each.
+ *
+ * Every photograph is a portrait (the two spaces 9:16, the three materials 3:4) and fills the
+ * whole section, so `focus` (object-position) carries both crops at once. On a landscape screen
+ * the photograph runs the full width and its height is cut: the second number picks the band kept
+ * (about the middle third of a space at 16:10, half of a material). On a phone the photograph runs
+ * the full height and its width is cut: the first number picks the strip kept (four fifths of a
+ * space, three fifths of a material). Each keeps its subject in the middle of the screen, clear of
+ * the title above it and the words at its foot.
  */
 const WALK = [
   {
     file: "rembayung-gable-dining",
     caption: "Dining beneath the glazed gable: rattan-backed chairs, slatted timber screens and rattan pendants.",
-    focus: "50% 48%",
+    focus: "46% 51%",
   },
   {
     file: "rembayung-brick-wall",
     caption: "Batik set into timber screens against the brick wall, beside stained glass in green and blue.",
-    focus: "50% 34%",
+    focus: "42% 28%",
   },
   {
     file: "rembayung-service-counter",
     caption: "The service counter: a slatted timber front, set with panels of patterned glass.",
-    focus: "50% 38%",
+    focus: "62% 36%",
   },
   {
     file: "rembayung-batik-shelves",
     caption: "Batik, folded on open timber shelves.",
-    focus: "50% 56%",
+    focus: "76% 54%",
   },
   {
     file: "rembayung-counter-edge",
     caption: "A timber counter, detailed with a routed edge.",
-    focus: "50% 50%",
+    focus: "62% 56%",
   },
 ] as const;
 
 /**
- * Each room is a stack of discs, like terraces seen from above: the photograph's own disc on top and
- * four rings stepping down and out beneath it. Every disc is a print of the room's photograph at its
- * own size, so the picture steps at each edge, and each ring sits a shade darker than the one it
- * carries. `--j` counts a disc out from the photograph (0 to TIERS - 1), `--k` in from the outer ring.
- */
-const TIERS = 5;
-
-/**
  * Scroll given to each stage of the walk, in svh. The stages are the plate (title and lead), then one
- * per room. Scrolling only decides which stage shows; the change itself is a short timed transition
+ * per room. Scrolling only decides which stage shows; the change itself is a timed crossfade
  * (inside.css), so the walk moves the same whether the page is scrolled slowly, quickly or stopped.
+ * Under half a screen each (about four notches of a mouse wheel), so the plate holds still only long
+ * enough to look at each room: six stages pin it for under three screens.
  */
-const STAGE = 65;
+const STAGE = 45;
 
 type Frame = {
   src: string;
@@ -67,45 +68,23 @@ type Frame = {
   role: string;
   caption: string;
   focus: string;
+  /** How wide the photograph is drawn when it fills the stage (cover). */
+  sizes: string;
 };
 
 /**
- * One room's stack of discs, the outer ring first in the document so each disc lies over the one
- * outside it. The photograph printed on all five is one download: every print has the same src and
- * sizes.
+ * A photograph filling the stage is drawn the screen's width, except on a screen narrower than the
+ * photograph itself (a phone, upright), where it is drawn the screen's height and so wider than the
+ * screen: a 3:4 photograph on a phone is 75vh across, half as wide again as the phone.
  */
-function Tiers({ frame, sizes }: { frame: Frame; sizes: string }) {
-  return Array.from({ length: TIERS }, (_, k) => {
-    const j = TIERS - 1 - k;
-    return (
-      <div key={j} className="inside-ring" style={{ ["--j" as string]: j, ["--k" as string]: k }}>
-        <Image
-          src={frame.src}
-          alt=""
-          fill
-          sizes={sizes}
-          className="rounded-full object-cover"
-          style={{ objectPosition: frame.focus }}
-        />
-      </div>
-    );
-  });
-}
+const coverSizes = (w: number, h: number) => `(max-aspect-ratio: ${w}/${h}) ${Math.ceil((w / h) * 100)}vh, 100vw`;
 
 const STEPS: Record<number, string> = { 3: "Three", 4: "Four", 5: "Five" };
 
 const count = (i: number, n: number) => `${String(i + 1).padStart(2, "0")} / ${String(n).padStart(2, "0")}`;
 
-/**
- * How wide a stack is drawn on the plate, at most: the room between the title and the words at the
- * foot (a little over half the screen's height on laptops and desktops, inside.css), and on phones
- * and tablets most of the screen's width.
- */
-const PLATE_SIZES = "(min-width: 64rem) min(62vh, 80vw), (min-width: 40rem) 72vw, 88vw";
-
-/** The rooms held still: the two spaces side by side, then the three materials (inside-discs). */
-const discSizes = (i: number) =>
-  i < 2 ? "(min-width: 64rem) 34rem, (min-width: 40rem) 44vw, 84vw" : "(min-width: 64rem) 24rem, (min-width: 40rem) 29vw, 84vw";
+/** The rooms held still (no scroll-driven animation): the two spaces side by side, then the three materials. */
+const stillSizes = (i: number) => (i < 2 ? "(min-width: 40rem) min(30rem, 44vw), 88vw" : "(min-width: 40rem) min(22rem, 29vw), 88vw");
 
 /** The walk's photographs that the project shows. */
 function walkFrames(project: Project): Frame[] {
@@ -120,6 +99,7 @@ function walkFrames(project: Project): Frame[] {
         role: ROLE_LABEL[img.role ?? "space"],
         caption: w.caption,
         focus: w.focus,
+        sizes: coverSizes(img.width, img.height),
       },
     ];
   });
@@ -147,25 +127,36 @@ export function InsideProject({ project, index }: { project: Project | null; ind
       <Crosses className="z-10" />
       <div className="inside-scene" style={scene}>
         <div className="inside-stage">
-          {/* The rooms, each a stack of discs printed with its photograph, each laid over the last.
-              Decoration for sighted visitors: the list below gives screen readers every photograph
-              and caption in order. */}
+          {/* The rooms, each photograph filling the stage, each laid over the last. Decoration for
+              sighted visitors: the list below gives screen readers every photograph and caption in
+              order. */}
           <div className="inside-rooms" aria-hidden="true">
             {frames.map((f) => (
               <div key={f.src} className="inside-room">
-                <Tiers frame={f} sizes={PLATE_SIZES} />
+                <Image
+                  src={f.src}
+                  alt=""
+                  fill
+                  sizes={f.sizes}
+                  quality={78}
+                  className="inside-photo"
+                  style={{ objectPosition: f.focus }}
+                />
               </div>
             ))}
           </div>
+          {/* The shade the words sit on: deepest under the title and along the foot, clear between. */}
+          <div className="inside-scrim" aria-hidden="true" />
 
           <div className="inside-intro page-x">
-            <Label index={index} pill className="mx-auto text-mouse">
+            <Label index={index} pill className="mx-auto text-kapur/80">
               Inside a project
             </Label>
             <TitlePair
               id="inside-title"
               lead={`A walk through ${project.title}`}
               follow="from the room to the grain"
+              followClassName="text-kapur"
               className="mt-6 text-center"
             />
           </div>
@@ -174,7 +165,7 @@ export function InsideProject({ project, index }: { project: Project | null; ind
             {frames.map((f, i) => (
               <li key={f.src}>
                 <figure>
-                  {/* The photograph itself is shown in its circle; here it only needs its description. */}
+                  {/* The photograph itself fills the stage; here it only needs its description. */}
                   <span role="img" aria-label={f.alt} />
                   <figcaption>
                     {count(i, n)} · {f.role}: {f.caption}
@@ -188,7 +179,7 @@ export function InsideProject({ project, index }: { project: Project | null; ind
               left, the project and the way to its case study on the right. */}
           <div className="inside-foot page-x">
             <div className="inside-words">
-              <p className="inside-lead t-sub text-kapur/80">
+              <p className="inside-lead t-sub text-kapur">
                 {STEPS[n] ?? n} steps in, each one closer: first its spaces, then its materials, down to the grain
                 of the timber.<span className="inside-hint"> Scroll to step inside.</span>
               </p>
@@ -196,7 +187,7 @@ export function InsideProject({ project, index }: { project: Project | null; ind
                 {frames.map((f, i) => (
                   <div key={f.src} className="inside-cap">
                     <div className="inside-cap-in">
-                      <p className="t-label tabular-nums text-kapur/80">
+                      <p className="t-label tabular-nums text-kapur/85">
                         {count(i, n)} · {f.role}
                       </p>
                       <p className="t-sub mt-2 text-kapur">{f.caption}</p>
@@ -207,7 +198,7 @@ export function InsideProject({ project, index }: { project: Project | null; ind
             </div>
             <div className="inside-project hidden lg:flex">
               <p className="t-title">{project.title}</p>
-              <p className="t-meta mt-1 text-kapur/75">{scope}</p>
+              <p className="t-meta mt-1 text-kapur/85">{scope}</p>
               <ButtonLink href={href} variant="outline" className="mt-6">
                 Read the case study
               </ButtonLink>
@@ -216,16 +207,23 @@ export function InsideProject({ project, index }: { project: Project | null; ind
         </div>
       </div>
 
-      {/* With reduced motion, or where scroll-driven animation is missing: after the plate, the same
-          rooms held still, each its own stack of discs, and its caption beneath: the two spaces side
-          by side, then the three materials. */}
-      <div className="inside-discs page-x" aria-hidden="true">
+      {/* Where scroll-driven animation is missing: after the plate, the same rooms held still, each
+          captioned beneath: the two spaces side by side, then the three materials. */}
+      <div className="inside-stills page-x" aria-hidden="true">
         {frames.map((f, i) => (
-          <figure key={f.src} className="inside-disc">
-            <div className="inside-disc-stack">
-              <Tiers frame={f} sizes={discSizes(i)} />
+          <figure key={f.src} className="inside-still">
+            <div className="inside-still-frame">
+              <Image
+                src={f.src}
+                alt=""
+                fill
+                sizes={stillSizes(i)}
+                quality={78}
+                className="object-cover"
+                style={{ objectPosition: f.focus }}
+              />
             </div>
-            <figcaption className="mx-auto mt-7 max-w-[22rem] text-center">
+            <figcaption className="mt-5 max-w-[26rem]">
               <p className="t-label tabular-nums text-kapur/80">
                 {count(i, n)} · {f.role}
               </p>

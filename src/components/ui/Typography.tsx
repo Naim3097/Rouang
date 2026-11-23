@@ -56,10 +56,16 @@ export function TitlePair({
   size = "section",
   className = "",
   id,
+  followClassName = "text-rikyu",
+  eyebrowClassName = "text-ink-muted",
 }: {
   as?: ElementType;
   lead: ReactNode;
   follow?: ReactNode;
+  /** The follow line's colour. Rikyū Grey on the page; Milky White on the green or over a photograph. */
+  followClassName?: string;
+  /** The eyebrow's colour, likewise. */
+  eyebrowClassName?: string;
   /** Small caps line inside the heading, e.g. "Interior design projects", so the h1 names its subject.
    * It comes last in the markup, so assistive technology reads the page name first, and is shown above. */
   eyebrow?: ReactNode;
@@ -71,8 +77,8 @@ export function TitlePair({
   return (
     <Tag id={id} className={`${leadClass} ${eyebrow ? "flex flex-col" : ""} ${className}`}>
       <span className="block">{lead}</span>
-      {follow ? <span className="t-follow block text-rikyu">{follow}</span> : null}
-      {eyebrow ? <span className="t-label order-first mb-6 block text-ink-muted">{eyebrow}</span> : null}
+      {follow ? <span className={`t-follow block ${followClassName}`}>{follow}</span> : null}
+      {eyebrow ? <span className={`t-label order-first mb-6 block ${eyebrowClassName}`}>{eyebrow}</span> : null}
     </Tag>
   );
 }

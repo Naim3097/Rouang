@@ -23,6 +23,14 @@ export const IS_PRODUCTION = SITE_ENV === "production";
 /** Drafts and layout placeholders are only ever rendered outside production. */
 export const SHOW_DRAFTS = !IS_PRODUCTION;
 
+/**
+ * The agency's working notes: "Draft" tags, the "Awaiting studio" boxes, empty chapter stubs and the
+ * preview bar. Since 23 Nov 2026 (client round 7) they show on the local development server only,
+ * never on a deployed site, preview or live: the client reviews the preview as a visitor would. The
+ * open items themselves are still listed by /preview and by the launch check.
+ */
+export const SHOW_NOTES = SITE_ENV === "development";
+
 function resolveSiteUrl(): string {
   const explicit = process.env.NEXT_PUBLIC_SITE_URL;
   if (explicit) return explicit.replace(/\/+$/, "");

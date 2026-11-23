@@ -1,7 +1,8 @@
 import type { Metadata } from "next";
 import Image from "next/image";
 import { notFound } from "next/navigation";
-import { Icon, Mark } from "@/components/brand/Brand";
+import { Mark } from "@/components/brand/Brand";
+import { ProcessSteps } from "@/components/home/Process";
 import { ProjectIndex } from "@/components/projects/ProjectIndex";
 import { ButtonLink } from "@/components/ui/Button";
 import { Breadcrumbs } from "@/components/ui/Breadcrumbs";
@@ -9,10 +10,10 @@ import { JsonLd } from "@/components/ui/JsonLd";
 import { Pending } from "@/components/ui/Section";
 import { Label, TitlePair } from "@/components/ui/Typography";
 import { placeholderImagery } from "@/config/media";
-import { processSteps } from "@/config/process";
+import { processSteps, processSummary } from "@/config/process";
 import { getProject, getProjects, getService, getServices, projectImage, publicImage, staticSlugs } from "@/lib/content";
 import type { Image as ImageData } from "@/lib/content/schema";
-import { SHOW_DRAFTS } from "@/lib/env";
+import { SHOW_DRAFTS, SHOW_NOTES } from "@/lib/env";
 import { serviceSchema } from "@/lib/schema";
 import { pageMetadata } from "@/lib/seo";
 
@@ -31,6 +32,17 @@ const servicePhotos: Record<string, ImageData | null> = {
   "design-and-build": publicImage(placeholderImagery.serviceDesignBuild),
   "renovation-and-interior": publicImage(placeholderImagery.serviceRenovation),
   "new-build-and-construction": publicImage(placeholderImagery.serviceNewBuild),
+};
+
+/*
+ * Until a service has a project photograph of its own (its feature), a temporary one stands in the
+ * same band under the opening words, so all three pages open the same way. Uncaptioned for the same
+ * reason; in production publicImage() drops it and the page opens straight into its sections.
+ */
+const serviceBands: Record<string, { image: ImageData | null; focus?: string }> = {
+  "design-and-build": { image: publicImage(placeholderImagery.diningByWindow), focus: "50% 62%" },
+  // An upright photograph in a wide band: keep the run of trusses against the sky.
+  "new-build-and-construction": { image: publicImage(placeholderImagery.roofTrusses), focus: "50% 42%" },
 };
 
 /** `sizes` for the photograph beside the text, widened where it has to cover its frame (services.css, svc-*). */
@@ -65,6 +77,14 @@ export default async function ServicePage({ params }: PageProps<"/services/[slug
   const faqs = service.faqs.filter((f) => f.confirmed || SHOW_DRAFTS);
   const featureProject = service.feature ? await getProject(service.feature.project) : null;
   const feature = service.feature ? projectImage(featureProject, service.feature.image) : null;
+  const shownFeature = feature && featureProject ? { image: feature, project: featureProject } : null;
+  // The band under the opening words: the service's own project photograph (captioned), or else its temporary one.
+  const band = shownFeature ? null : (serviceBands[service.slug] ?? null);
+  const opening = shownFeature
+    ? { image: shownFeature.image, focus: shownFeature.image.focus }
+    : band?.image
+      ? { image: band.image, focus: band.focus ?? band.image.focus }
+      : null;
   const photo = servicePhotos[service.slug] ?? null;
   // A service for one kind of client preselects it on the enquiry form.
   const enquiryHref = service.sectors.length === 1 ? `/contact?project=${service.sectors[0]}` : "/contact";
@@ -74,7 +94,7 @@ export default async function ServicePage({ params }: PageProps<"/services/[slug
     offers.length || service.projectTypes.length ? "what" : null,
     projects.length ? "work" : null,
     processSteps.length ? "process" : null,
-    faqs.length || SHOW_DRAFTS ? "questions" : null,
+    faqs.length || SHOW_NOTES ? "questions" : null,
   ].filter(Boolean);
   const index = (key: string) => String(shown.indexOf(key) + 1).padStart(2, "0");
 
@@ -105,28 +125,41 @@ export default async function ServicePage({ params }: PageProps<"/services/[slug
         </div>
       </section>
 
-      {feature && featureProject ? (
-        <section data-tone="light" className="bg-kapur text-ink" aria-label={`Photograph: ${featureProject.title}`}>
+      {opening ? (
+        <section
+          data-tone="light"
+          className="bg-kapur text-ink"
+          aria-label={shownFeature ? `Photograph: ${shownFeature.project.title}` : undefined}
+        >
           <div className="page-x pb-[var(--section-space)]">
-            {/* A band at 21:9 on wide screens; 16:9 on tablets and 3:2 on phones, so it never thins to a strip (services.css). */}
-            <div className="svc-feature" data-reveal="image">
+            {/* A band at 21:9 on wide screens; 16:9 on tablets and 3:2 on phones, so it never thins to a strip (services.css).
+                It starts on or just under the first screen, so it loads at once and without the scroll settle, as
+                Figure does for a photograph near the top of a page. */}
+            <div className="svc-feature">
               <Image
-                src={feature.src}
-                alt={feature.alt}
+                src={opening.image.src}
+                alt={opening.image.alt}
                 fill
                 // The page's width inside its margins: a photograph narrower than the band covers it by its width.
                 sizes="92vw"
                 quality={78}
+                loading="eager"
+                fetchPriority="high"
                 className="object-cover"
-                style={feature.focus ? { objectPosition: feature.focus } : undefined}
+                style={opening.focus ? { objectPosition: opening.focus } : undefined}
               />
             </div>
-            <p className="t-caption mt-4 text-ink-muted">
-              <span className="font-medium text-ink">{featureProject.title}</span>
-              {/* The place, unless the project is named after it (Ampang). */}
-              {featureProject.location && !featureProject.title.includes(featureProject.location) ? ` · ${featureProject.location}` : ""} ·{" "}
-              {featureProject.visualisation ? "Design proposal by ROUANG" : `${featureProject.scope.join(", ")} by ROUANG`}
-            </p>
+            {shownFeature ? (
+              <p className="t-caption mt-4 text-ink-muted">
+                <span className="font-medium text-ink">{shownFeature.project.title}</span>
+                {/* The place, unless the project is named after it (Ampang). */}
+                {shownFeature.project.location && !shownFeature.project.title.includes(shownFeature.project.location)
+                  ? ` · ${shownFeature.project.location}`
+                  : ""}{" "}
+                ·{" "}
+                {shownFeature.project.visualisation ? "Design proposal by ROUANG" : `${shownFeature.project.scope.join(", ")} by ROUANG`}
+              </p>
+            ) : null}
           </div>
         </section>
       ) : null}
@@ -234,31 +267,30 @@ export default async function ServicePage({ params }: PageProps<"/services/[slug
         </section>
       ) : null}
 
-      {/* Process, briefly */}
+      {/* Process, drawn as the home page and About draw it (home/Process.tsx): the label and the title pair on the
+          centre line, the steps on their line under them. On Milky White, the ground the rings are painted on. */}
       {processSteps.length ? (
-      <section data-tone="dark">
-        <div className="page-x section-y">
-          <div className="page-grid gap-y-10">
-            <Label as="h2" pill index={index("process")} className="col-span-12 text-mouse lg:col-span-3">
-              How it runs
-            </Label>
-            <ol className="col-span-12 grid gap-x-[var(--grid-gap)] gap-y-10 sm:grid-cols-2 lg:col-span-9 lg:grid-cols-3">
-              {processSteps.map((s, i) => (
-                <li key={s.title}>
-                  <Icon name={s.icon} className="-ml-2 h-12 w-12 text-kapur" />
-                  <p className="t-label mt-5 text-mouse">{String(i + 1).padStart(2, "0")}</p>
-                  <h3 className="t-title mt-2">{s.title}</h3>
-                  <p className="t-meta mt-2 text-kapur/75">{s.body}</p>
-                </li>
-              ))}
-            </ol>
+        <section data-tone="light" className="bg-kapur text-ink" aria-labelledby="process-title">
+          <div className="page-x section-y">
+            <div className="flex flex-col items-center text-center">
+              <Label pill index={index("process")} className="text-ink-muted">
+                Process
+              </Label>
+              <TitlePair
+                id="process-title"
+                lead="How a project runs"
+                follow="from the first discussion to handover"
+                className="mt-6"
+              />
+              <p className="mt-8 max-w-[38rem] text-balance text-ink-soft">{processSummary}</p>
+            </div>
+            <ProcessSteps centred />
           </div>
-        </div>
-      </section>
+        </section>
       ) : null}
 
       {/* Questions */}
-      {faqs.length || SHOW_DRAFTS ? (
+      {faqs.length || SHOW_NOTES ? (
         <section data-tone="light" className="bg-kapur text-ink">
           <div className="page-x section-y">
             <div className="page-grid gap-y-10">
@@ -279,7 +311,7 @@ export default async function ServicePage({ params }: PageProps<"/services/[slug
                         </summary>
                         <div className="pb-7 text-ink-soft">
                           {f.a}
-                          {!f.confirmed ? <span className="t-label ml-2 text-ink-muted">(answer awaiting confirmation from ROUANG)</span> : null}
+                          {!f.confirmed && SHOW_NOTES ? <span className="t-label ml-2 text-ink-muted">(answer awaiting confirmation from ROUANG)</span> : null}
                         </div>
                       </details>
                     ))}

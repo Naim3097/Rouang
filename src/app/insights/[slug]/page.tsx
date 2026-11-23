@@ -9,6 +9,7 @@ import { Breadcrumbs } from "@/components/ui/Breadcrumbs";
 import { JsonLd } from "@/components/ui/JsonLd";
 import { Label } from "@/components/ui/Typography";
 import { getInsight, getInsights, getProjects, getServices, staticSlugs } from "@/lib/content";
+import { SHOW_NOTES } from "@/lib/env";
 import { articleSchema } from "@/lib/schema";
 import { pageMetadata } from "@/lib/seo";
 
@@ -60,7 +61,7 @@ export default async function InsightPage({ params }: PageProps<"/insights/[slug
           <div className="page-grid mt-16 gap-y-8 sm:mt-24">
             <div className="col-span-12 lg:col-span-3">
               <Label className="text-ink-muted">{article.category}</Label>
-              {article.isDraft ? <p className="t-label mt-3 text-ink-muted">Draft · not yet reviewed by ROUANG</p> : null}
+              {article.isDraft && SHOW_NOTES ? <p className="t-label mt-3 text-ink-muted">Draft · not yet reviewed by ROUANG</p> : null}
             </div>
             <div className="col-span-12 lg:col-span-8">
               <h1 className="t-headline-hero max-w-[24ch]">{article.title}</h1>
@@ -177,7 +178,8 @@ export default async function InsightPage({ params }: PageProps<"/insights/[slug
                       <InsightPicture
                         image={moreImages.get(a.slug) ?? null}
                         className="ins-frame-thumb"
-                        sizes="(min-width: 640px) 20vw, 40vw"
+                        sizes="(min-width: 1024px) 20vw, 37vw"
+                        decorative
                       />
                     ) : null}
                   </Link>

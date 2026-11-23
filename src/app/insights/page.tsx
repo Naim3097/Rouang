@@ -45,16 +45,18 @@ export default async function InsightsPage() {
       <section data-tone="light" className="bg-kapur text-ink" aria-label="Articles">
         <div className="page-x pb-[var(--section-space)]">
           {insights.length ? (
-            // One row per article, each one link: its picture (3/2) in the margin column under the
-            // page's label, the words under the page title. Phones put the picture over the words.
-            // With no pictures to show (a live page, while they are temporary) the rows are words alone,
-            // laid out as before: the category in the margin, the reading time on the right.
+            // One row per article, each one link: its picture in the margin column under the page's
+            // label, at the 2/1 of the home page's rows and "Read next" (3/2 over the words on phones),
+            // the words under the page title. The first picture is in the first screen on a desktop,
+            // so it loads at once. With no pictures to show (a live page, while they are temporary)
+            // the rows are words alone, laid out as before: the category in the margin, the reading
+            // time on the right.
             <ol className="border-t border-ink/15">
-              {insights.map((a) => (
+              {insights.map((a, i) => (
                 <li key={a.slug} className="border-b border-ink/15">
                   {withPictures ? (
                     <Link href={`/insights/${a.slug}`} className="ins-link ins-index-card page-grid py-8 sm:py-10">
-                      <div className="col-span-12 sm:col-span-7 lg:col-span-6 lg:col-start-4">
+                      <div className="col-span-12 sm:col-span-7 lg:col-span-8 lg:col-start-4">
                         <p className="t-label text-ink-muted">{insightMeta(a)}</p>
                         <h2 className="t-title mt-3">
                           <span className="link-name">{a.title}</span>
@@ -65,6 +67,8 @@ export default async function InsightsPage() {
                         image={images.get(a.slug) ?? null}
                         className="col-span-12 sm:col-span-5 lg:col-span-3"
                         sizes="(min-width: 1024px) 22vw, (min-width: 640px) 38vw, 100vw"
+                        lead={i === 0}
+                        decorative
                       />
                     </Link>
                   ) : (

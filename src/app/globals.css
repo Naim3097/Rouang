@@ -33,6 +33,11 @@
   /* Tailwind's own transition default (150ms, its own curve) becomes the house one. */
   --default-transition-duration: 500ms;
   --default-transition-timing-function: cubic-bezier(0.2, 0.7, 0.1, 1);
+
+  /* One radius for a panel set inside the page margins (rounded-panel): the green calls to action
+     (RikyuField). Pills stay fully round and photographs keep square corners. 20px on phones,
+     32px from about 1440. */
+  --radius-panel: clamp(1.25rem, 2.2vw, 2rem);
 }
 
 :root {
@@ -380,6 +385,13 @@
   opacity: 0.4;
 }
 
+/* The words inside a rounded green call to action (CtaPanel, components/ui/RikyuField.tsx): about
+   the room a section gives its title, a little less, since the panel is already framed by the page
+   margins around it. */
+.cta-panel {
+  padding: clamp(3.5rem, 7.5vw, 7rem) clamp(1.5rem, 6vw, 6rem);
+}
+
 /* ——— Buttons: pill with an open ring at the end. The label says exactly what happens next (kit p.14). ——— */
 
 .btn {
@@ -619,6 +631,9 @@
 @import "../styles/pages/about.css";
 @import "../styles/pages/insights.css";
 @import "../styles/pages/case-study.css";
+@import "../styles/pages/projects.css";
+@import "../styles/pages/contact.css";
+@import "../styles/layout/footer.css";
 
 /* ——— Projects page: built work, then design proposals, each a plain grid of equal plates. ———
    The sector filter sets data-filter on their wrapper. A group left with nothing to show goes,
