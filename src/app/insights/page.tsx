@@ -1,5 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
+import { insightImage, insightMeta } from "@/components/insights/imagery";
+import { InsightPicture } from "@/components/insights/InsightPicture";
 import { Breadcrumbs } from "@/components/ui/Breadcrumbs";
 import { Label, TitlePair } from "@/components/ui/Typography";
 import { getInsights } from "@/lib/content";
@@ -21,6 +23,8 @@ export async function generateMetadata(): Promise<Metadata> {
 
 export default async function InsightsPage() {
   const insights = await getInsights();
+  const images = new Map(insights.map((a) => [a.slug, insightImage(a.slug)]));
+  const withPictures = insights.some((a) => images.get(a.slug));
   return (
     <>
       <section data-tone="light" className="bg-kapur text-ink">
@@ -41,24 +45,44 @@ export default async function InsightsPage() {
       <section data-tone="light" className="bg-kapur text-ink" aria-label="Articles">
         <div className="page-x pb-[var(--section-space)]">
           {insights.length ? (
+            // One row per article, each one link: its picture (3/2) in the margin column under the
+            // page's label, the words under the page title. Phones put the picture over the words.
+            // With no pictures to show (a live page, while they are temporary) the rows are words alone,
+            // laid out as before: the category in the margin, the reading time on the right.
             <ol className="border-t border-ink/15">
               {insights.map((a) => (
                 <li key={a.slug} className="border-b border-ink/15">
-                  <Link href={`/insights/${a.slug}`} className="page-grid gap-y-3 py-10">
-                    <p className="t-label col-span-12 text-ink-muted lg:col-span-3">
-                      {a.category}
-                      {a.isDraft ? " · Draft" : ""}
-                    </p>
-                    <div className="col-span-12 lg:col-span-6">
-                      <h2 className="t-title">
-                        <span className="link-name">{a.title}</span>
-                      </h2>
-                      <p className="mt-4 max-w-[36rem] text-ink-soft">{a.description}</p>
-                    </div>
-                    <p className="t-caption col-span-12 text-ink-muted lg:col-span-2 lg:col-start-11 lg:text-right">
-                      {a.readingMinutes} min read
-                    </p>
-                  </Link>
+                  {withPictures ? (
+                    <Link href={`/insights/${a.slug}`} className="ins-link ins-index-card page-grid py-8 sm:py-10">
+                      <div className="col-span-12 sm:col-span-7 lg:col-span-6 lg:col-start-4">
+                        <p className="t-label text-ink-muted">{insightMeta(a)}</p>
+                        <h2 className="t-title mt-3">
+                          <span className="link-name">{a.title}</span>
+                        </h2>
+                        <p className="mt-3 max-w-[36rem] text-ink-soft">{a.description}</p>
+                      </div>
+                      <InsightPicture
+                        image={images.get(a.slug) ?? null}
+                        className="col-span-12 sm:col-span-5 lg:col-span-3"
+                        sizes="(min-width: 1024px) 22vw, (min-width: 640px) 38vw, 100vw"
+                      />
+                    </Link>
+                  ) : (
+                    <Link href={`/insights/${a.slug}`} className="page-grid gap-y-3 py-10">
+                      <p className="t-label col-span-12 text-ink-muted lg:col-span-3">
+                        {insightMeta(a, { readingTime: false })}
+                      </p>
+                      <div className="col-span-12 lg:col-span-6">
+                        <h2 className="t-title">
+                          <span className="link-name">{a.title}</span>
+                        </h2>
+                        <p className="mt-4 max-w-[36rem] text-ink-soft">{a.description}</p>
+                      </div>
+                      <p className="t-caption col-span-12 text-ink-muted lg:col-span-2 lg:col-start-11 lg:text-right">
+                        {a.readingMinutes} min read
+                      </p>
+                    </Link>
+                  )}
                 </li>
               ))}
             </ol>

@@ -1,6 +1,5 @@
 import Image from "next/image";
-import type { CSSProperties, ReactNode } from "react";
-import { RevealFocus } from "@/components/home/RevealFocus";
+import type { CSSProperties } from "react";
 import { ButtonLink } from "@/components/ui/Button";
 import { Crosses, Pending, Section } from "@/components/ui/Section";
 import { Label, TitlePair } from "@/components/ui/Typography";
@@ -8,7 +7,7 @@ import type { Project } from "@/lib/content";
 import { publicImage } from "@/lib/content";
 import { SHOW_DRAFTS } from "@/lib/env";
 
-/* ——— 04 Inside a project: a walk into the flagship, one room opening in the middle of the last ——— */
+/* ——— 04 Inside a project: a walk into the flagship, each room laid over the last as a stack of rings ——— */
 
 const ROLE_LABEL = { space: "Space", material: "Material", whole: "Whole" } as const;
 
@@ -16,10 +15,8 @@ const ROLE_LABEL = { space: "Space", material: "Material", whole: "Whole" } as c
  * The walk, in the order it is taken: from the dining room in to the grain of the timber, so each
  * step forward is also a step closer. Real photographs of the finished interior only, and not the
  * ones 01 Work and What we do already show. Each caption says only what its photograph shows.
- * `focus` places the photograph when the screen crops it (object-position): on a landscape screen
- * these upright photographs show only a band about a third of their height.
- * The walk opens on the dining room under the glazed gable, whose band holds the timber screens,
- * the pendants, the chairs and the glass wall, the clearest room of the set; it is held longest.
+ * `focus` places the photograph in its round frame (object-position).
+ * Five rooms at most: styles/home/inside.css lists a stage for each.
  */
 const WALK = [
   {
@@ -53,61 +50,16 @@ const WALK = [
  * Each room is a stack of discs, like terraces seen from above: the photograph's own disc on top and
  * four rings stepping down and out beneath it. Every disc is a print of the room's photograph at its
  * own size, so the picture steps at each edge, and each ring sits a shade darker than the one it
- * carries (inside.css draws them from --j, the disc's place counted out from the photograph, 0 to
- * TIERS - 1). Round 5 also tried rings alternating between the room being left and the room opening:
- * the screen flicked back to the last room at every other step, so every ring carries its own room.
+ * carries. `--j` counts a disc out from the photograph (0 to TIERS - 1), `--k` in from the outer ring.
  */
 const TIERS = 5;
 
 /**
- * Scroll given to each move of the walk, in svh. Every move is a single disc stepping out with a firm
- * ease and then holding, so the walk goes in steps. A room opens over the last in three beats: its
- * stack is built from the middle out, the photograph's disc first and each ring stepping out from
- * under it (BUILD each), and held a moment (BREATH); then its discs sweep out past the edges of the
- * screen one at a time, the outer ring first and the photograph last (MOVE each, REST between), until
- * the room fills the screen; then a pause in that room (HOLD). The first room is already stacked on
- * the plate, so it only sweeps open, after a short LEAD while the title steps out; the last room is
- * held longest before the page moves on.
+ * Scroll given to each stage of the walk, in svh. The stages are the plate (title and lead), then one
+ * per room. Scrolling only decides which stage shows; the change itself is a short timed transition
+ * (inside.css), so the walk moves the same whether the page is scrolled slowly, quickly or stopped.
  */
-const LEAD = 6;
-const BUILD = 2.5;
-const BREATH = 5;
-const MOVE = 6;
-const REST = 3.5;
-const HOLD = 16;
-const HOLD_LAST = 26;
-
-/**
- * One room's stack of discs, the outer ring first in the document so each disc lies over the one
- * outside it. The photograph printed on all five is one download: every print of it has the same src
- * and sizes. `times` places each disc's moves on the pinned run; the photograph's own disc carries
- * `children` (the shade for the caption and the dimming). Each disc sits in a step of its own
- * (inside-step), which carries the move that builds the stack, so that the disc and its step each
- * have one move of their scale and both can run on the compositor.
- */
-function Tiers({
-  frame,
-  sizes,
-  times,
-  children,
-}: {
-  frame: Frame;
-  sizes: string;
-  times?: (j: number) => CSSProperties;
-  children?: ReactNode;
-}) {
-  return Array.from({ length: TIERS }, (_, k) => {
-    const j = TIERS - 1 - k;
-    return (
-      <div key={j} className="inside-step" style={{ ["--j" as string]: j, ...times?.(j) }}>
-        <div className="inside-tier">
-          <Image src={frame.src} alt="" fill sizes={sizes} className="object-cover" style={{ objectPosition: frame.focus }} />
-          {j > 0 ? <div className="inside-tone" /> : children}
-        </div>
-      </div>
-    );
-  });
-}
+const STAGE = 65;
 
 type Frame = {
   src: string;
@@ -118,56 +70,26 @@ type Frame = {
 };
 
 /**
- * Where each room's moves sit on the pinned run, as custom properties for styles/home/inside.css.
- * Per disc (`tier`): it steps out from under the disc inside it over b0..b1 and sweeps out past the
- * edges of the screen over p0..p1. Per room (`frame`): it fills the screen at o-b (its rings dropped
- * by o-c; the shade for its caption coming up over vi..ci, the caption itself over ci..o-b), and it
- * gives way to the next room from n-a (darkening while the next stack is built, to n-d, as its caption
- * leaves, by co; the room itself dropped once the next room's outer ring covers it, g-a..g-b).
+ * One room's stack of discs, the outer ring first in the document so each disc lies over the one
+ * outside it. The photograph printed on all five is one download: every print has the same src and
+ * sizes.
  */
-function walkTimes(n: number) {
-  const sweep = TIERS * MOVE + (TIERS - 1) * REST;
-  const lead = (i: number) => (i === 0 ? LEAD : TIERS * BUILD + BREATH);
-  const hold = (i: number) => (i === n - 1 ? HOLD_LAST : HOLD);
-  const starts: number[] = [];
-  const run = Array.from({ length: n }, (_, i) => i).reduce((at, i) => (starts.push(at), at + lead(i) + sweep + hold(i)), 0);
-  const pct = (v: number) => `${((v / run) * 100).toFixed(3)}%`;
-  const peel = (i: number) => starts[i] + lead(i);
-  const open = (i: number) => peel(i) + sweep;
-
-  const frame = starts.map((a, i): CSSProperties => {
-    const next = i + 1 < n ? starts[i + 1] : null;
-    const at = (v: (b: number) => number) => (next === null ? "100%" : pct(v(next)));
-    return {
-      ["--o-b" as string]: pct(open(i)),
-      ["--o-c" as string]: pct(open(i) + 0.5),
-      ["--vi" as string]: pct(open(i) - MOVE),
-      ["--ci" as string]: pct(open(i) - MOVE * 0.4),
-      ["--n-a" as string]: at((b) => b),
-      ["--n-d" as string]: at((b) => b + TIERS * BUILD),
-      ["--co" as string]: at((b) => b + TIERS * BUILD * 0.6),
-      ["--g-a" as string]: at(() => peel(i + 1) + MOVE),
-      ["--g-b" as string]: at(() => peel(i + 1) + MOVE + 0.5),
-    };
+function Tiers({ frame, sizes }: { frame: Frame; sizes: string }) {
+  return Array.from({ length: TIERS }, (_, k) => {
+    const j = TIERS - 1 - k;
+    return (
+      <div key={j} className="inside-ring" style={{ ["--j" as string]: j, ["--k" as string]: k }}>
+        <Image
+          src={frame.src}
+          alt=""
+          fill
+          sizes={sizes}
+          className="rounded-full object-cover"
+          style={{ objectPosition: frame.focus }}
+        />
+      </div>
+    );
   });
-  // Disc j of room i: built inside out, swept outside in.
-  const tier = (i: number) => (j: number): CSSProperties => {
-    const b0 = starts[i] + j * BUILD;
-    const p0 = peel(i) + (TIERS - 1 - j) * (MOVE + REST);
-    return {
-      ["--b0" as string]: pct(b0),
-      ["--b1" as string]: pct(b0 + BUILD),
-      ["--p0" as string]: pct(p0),
-      ["--p1" as string]: pct(p0 + MOVE),
-    };
-  };
-  const scene: CSSProperties = {
-    ["--run" as string]: `${run}svh`,
-    ["--intro-out" as string]: pct(LEAD + MOVE * 0.6),
-  };
-  // Where keyboard focus entering the scene moves the page to: the first room open, its caption in.
-  const settle = (open(0) + hold(0) / 2) / run;
-  return { frame, tier, scene, settle };
 }
 
 const STEPS: Record<number, string> = { 3: "Three", 4: "Four", 5: "Five" };
@@ -175,12 +97,11 @@ const STEPS: Record<number, string> = { 3: "Three", 4: "Four", 5: "Five" };
 const count = (i: number, n: number) => `${String(i + 1).padStart(2, "0")} / ${String(n).padStart(2, "0")}`;
 
 /**
- * How wide every disc of the walk is drawn at its widest: a square whose inscribed circle reaches the
- * farthest corner of the screen from the stack's centre (twice hypot(50vw, 50vh) when the stack is
- * centred, a little more for the plate's), so the photograph inside it covers the screen. One sizes
- * for every disc, so a photograph printed on several is fetched once.
+ * How wide a stack is drawn on the plate, at most: the room between the title and the words at the
+ * foot (a little over half the screen's height on laptops and desktops, inside.css), and on phones
+ * and tablets most of the screen's width.
  */
-const TIER_SIZES = "max(125vw, 132vh)";
+const PLATE_SIZES = "(min-width: 64rem) min(62vh, 80vw), (min-width: 40rem) 72vw, 88vw";
 
 /** The rooms held still: the two spaces side by side, then the three materials (inside-discs). */
 const discSizes = (i: number) =>
@@ -212,25 +133,27 @@ export function InsideProject({ project, index }: { project: Project | null; ind
   const frames = walkFrames(project);
 
   const n = frames.length;
-  const times = walkTimes(n);
+  const stages = n + 1;
+  const scene: CSSProperties = {
+    ["--run" as string]: `${stages * STAGE}svh`,
+    ["--inside-stages" as string]: stages,
+    ["--inside-last" as string]: stages - 1,
+  };
   const href = `/projects/${project.slug}`;
   const scope = [project.scope.join(", "), project.location].filter(Boolean).join(" · ");
 
   return (
-    <section data-tone="dark" aria-labelledby="inside-title" className="relative border-t border-kapur/10">
+    <section data-tone="dark" aria-labelledby="inside-title" className="inside relative border-t border-kapur/10">
       <Crosses className="z-10" />
-      <div className="inside-scene" style={times.scene}>
+      <div className="inside-scene" style={scene}>
         <div className="inside-stage">
-          {/* The rooms, each a stack of discs printed with its photograph, stacked one over the last.
+          {/* The rooms, each a stack of discs printed with its photograph, each laid over the last.
               Decoration for sighted visitors: the list below gives screen readers every photograph
               and caption in order. */}
           <div className="inside-rooms" aria-hidden="true">
-            {frames.map((f, i) => (
-              <div key={f.src} className="inside-room" style={times.frame[i]}>
-                <Tiers frame={f} sizes={TIER_SIZES} times={times.tier(i)}>
-                  <div className="inside-veil" />
-                  <div className="inside-dim" />
-                </Tiers>
+            {frames.map((f) => (
+              <div key={f.src} className="inside-room">
+                <Tiers frame={f} sizes={PLATE_SIZES} />
               </div>
             ))}
           </div>
@@ -271,8 +194,7 @@ export function InsideProject({ project, index }: { project: Project | null; ind
               </p>
               <div className="inside-caps" aria-hidden="true">
                 {frames.map((f, i) => (
-                  <div key={f.src} className="inside-cap" style={times.frame[i]}>
-                    {/* Its way in and its way out are on two elements, one move each. */}
+                  <div key={f.src} className="inside-cap">
                     <div className="inside-cap-in">
                       <p className="t-label tabular-nums text-kapur/80">
                         {count(i, n)} · {f.role}
@@ -293,9 +215,6 @@ export function InsideProject({ project, index }: { project: Project | null; ind
           </div>
         </div>
       </div>
-      {/* Tabbing to the case-study link mid-way through the first room's sweep would leave the page on a half-open
-          step; it moves on to the first room, open, instead. */}
-      <RevealFocus scene=".inside-scene" settle={times.settle} />
 
       {/* With reduced motion, or where scroll-driven animation is missing: after the plate, the same
           rooms held still, each its own stack of discs, and its caption beneath: the two spaces side

@@ -33,13 +33,33 @@ gallery:
     width: 2400
     height: 1200
     span: wide
+  - src: /images/projects/seri-wirani-bangi/seri-wirani-facade.jpg
+    alt: "Design visualisation: the front of the house, white with a timber-framed focal feature"
+    width: 1200
+    height: 2400
+    span: half
+  - src: /images/projects/seri-wirani-bangi/seri-wirani-master-bedroom.jpg
+    alt: "Design visualisation: the master bedroom, with a textured feature wall, concealed linear lighting and light timber furniture"
+    width: 2400
+    height: 1200
+    span: half
+  - src: /images/projects/seri-wirani-bangi/seri-wirani-dining-kitchen.jpg
+    alt: "Design visualisation: the dining table, with the kitchen and its timber island behind"
+    width: 2400
+    height: 1200
+    span: half
   - src: /images/projects/seri-wirani-bangi/seri-wirani-axis.jpg
     alt: "Design visualisation: a long view through the house from the entrance towards the garden"
     width: 1200
     height: 2400
-    span: narrow
-  - src: /images/projects/seri-wirani-bangi/seri-wirani-dining-kitchen.jpg
-    alt: "Design visualisation: the dining table, with the kitchen and its timber island behind"
+    span: half
+  - src: /images/projects/seri-wirani-bangi/seri-wirani-bathroom.jpg
+    alt: "Design visualisation: the master bathroom, with stone-toned surfaces, black fittings and daylight from a planted lightwell"
+    width: 1350
+    height: 2400
+    span: half
+  - src: /images/projects/seri-wirani-bangi/seri-wirani-kitchen.jpg
+    alt: "Design visualisation: the kitchen, with timber upper cabinets, pendant lights and an island with stools"
     width: 2400
     height: 1200
     span: half
@@ -47,27 +67,7 @@ gallery:
     alt: "Design visualisation: the dry kitchen, with a dark timber island and recessed timber shelf against white cabinetry"
     width: 2400
     height: 1200
-    span: half
-  - src: /images/projects/seri-wirani-bangi/seri-wirani-kitchen.jpg
-    alt: "Design visualisation: the kitchen, with timber upper cabinets, pendant lights and an island with stools"
-    width: 2400
-    height: 1200
-    span: half
-  - src: /images/projects/seri-wirani-bangi/seri-wirani-bathroom.jpg
-    alt: "Design visualisation: the master bathroom, with stone-toned surfaces, black fittings and daylight from a planted lightwell"
-    width: 1350
-    height: 2400
-    span: narrow
-  - src: /images/projects/seri-wirani-bangi/seri-wirani-master-bedroom.jpg
-    alt: "Design visualisation: the master bedroom, with a textured feature wall, concealed linear lighting and light timber furniture"
-    width: 2400
-    height: 1200
-    span: half
-  - src: /images/projects/seri-wirani-bangi/seri-wirani-facade.jpg
-    alt: "Design visualisation: the front of the house, white with a timber-framed focal feature"
-    width: 1200
-    height: 2400
-    span: narrow
+    span: wide
 brief: null
 concept: |
   The proposal keeps the house's familiar pitched roof and changes it selectively. Flat horizontal canopies, framed openings and screens are added in chosen places, and old and new are tied together by one consistent datum line.

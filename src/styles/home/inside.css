@@ -1,54 +1,42 @@
 /* Home, Inside a project (InsideProject.tsx). Imported by globals.css. */
 
-/* ——— Inside a project: a walk into the flagship, one room opening in the middle of the last. ———
+/* ——— Inside a project: a walk into the flagship, each room laid over the last as a stack of rings. ———
    The section opens on a plate a screen high: the title, then the first room as a stack of discs,
    and the words for it at the foot. The stack is a set of terraces seen from above: the photograph's
    own disc on top and four rings stepping down and out beneath it. Every disc is a print of the
    photograph at its own size, so the picture steps at each edge; each ring is a shade darker than the
    one it carries, has a fine Milky White lip and casts a soft shadow on the ring below.
-   With scroll-driven animation the stage pins and the walk goes in steps. Every move is one disc,
-   in its own short stretch of the scroll, with a firm ease, and then a hold. The first room's discs
-   sweep out past the edges of the screen one at a time, the outer ring first and the photograph last,
-   each a step lighter than the one before, until the room fills the screen. Then the room darkens and
-   in its middle the next room's stack is built from the middle out, its photograph first and each
-   ring stepping out from under the one inside it; held a moment, it sweeps open in turn. So the rooms
-   stack, each over the last, from the whole room in to the grain of the timber.
-   While scrolling only transforms (each disc's scale: the photograph is printed on it, so it grows
-   with it) and opacity change; nothing is clipped or laid out again.
+   With scroll-driven animation the plate pins and the walk goes in stages: the plate, then one stage
+   per room. Scrolling only picks the stage. The change between two stages is a short transition in
+   time, in the house easing, of opacity and scale only: going in, the next room's discs settle onto
+   the stack one after another, the outer ring first and the photograph last, while its caption
+   crossfades in at the foot; coming back, the room's discs lift off the other way, the photograph
+   first, and show the room beneath. Each room stays where the plate's stack is, so nothing grows
+   past the plate and nothing is clipped, masked or laid out again.
    Without scroll-driven animation, or with reduced motion: the plate as it stands, then the five rooms
    held still, each its own stack, captioned beneath. */
 
-/* A disc's place in its stack as a share of its full width (--inside-s; the disc inside it,
-   --inside-s-in) and that full width's radius (--inside-cover). Registered, so each is worked out once,
-   to a plain number or length, where it is set, and what reads it (the moves' keyframes among them)
-   reads that value rather than the long expression behind it. */
-@property --inside-s {
+/* Which stage of the walk shows, 0 (the plate) to the last room (set by InsideProject.tsx). */
+@property --inside-at {
+  syntax: "<integer>";
+  inherits: false;
+  initial-value: 0;
+}
+
+/* Whether a room, the lead or a caption is reached: 1, or 0 not yet. Everything in it reads it, so a
+   change to it is the only thing that moves them. Registered, so it is a plain number, and a room's
+   discs are worked out again only when their own room's number changes. */
+@property --inside-on {
   syntax: "<number>";
   inherits: true;
   initial-value: 1;
 }
 
-@property --inside-s-in {
-  syntax: "<number>";
-  inherits: true;
-  initial-value: 1;
-}
-
-@property --inside-cover {
-  syntax: "<length>";
-  inherits: true;
-  initial-value: 0px;
-}
-
-/* A stack is drawn round its centre, half way across and --v down, out to --rs: the photograph's disc
-   is --k0 of it and each ring --kd wider than the one inside it (--j counts the discs out from the
-   photograph), so the outer ring is --rs itself. Radii are in cqmin where they follow the screen, so
-   the discs keep to the shorter side and stay round.
-   The plate's stack sits in the room between the title (--plate-top) and the words at the foot
-   (--plate-foot), centred in it and as large as it allows, up to a share of the screen's width: on
-   wide screens the foot's words sit either side of it, so it comes down beside them; on phones and
-   tablets they sit under it, so it stops above them. Every later stack is built round --vy, the
-   middle of the screen, out to --rs1. */
+/* The plate's stack is a square round its centre, half way across and --v down, out to --rs. It sits
+   in the room between the title (--plate-top) and the words at the foot (--plate-foot), centred in it
+   and as large as it allows, up to a share of the screen's width: on wide screens the foot's words
+   sit either side of it, so it comes down beside them; on phones and tablets they sit under it, so it
+   stops above them. Every room's stack is drawn there. */
 .inside-stage {
   --intro-pad: clamp(0.5rem, 2cqh, 1.5rem);
   /* Under the words at the foot: clear of the preview pill in the corner (preview builds only) and
@@ -61,10 +49,8 @@
   --plate-top: calc(var(--header-h) + var(--intro-pad) + 3.25rem + var(--fs-h2) * 2.24 + clamp(1.25rem, 3.5cqh, 2.75rem));
   --plate-foot: max(var(--foot-pad), 15cqh);
   --plate-room: calc(100cqh - var(--plate-top) - var(--plate-foot));
-  --rs0: min(calc(var(--plate-room) / 2), 40cqw);
-  --v0: calc(var(--plate-top) + var(--plate-room) / 2);
-  --rs1: 34cqmin;
-  --vy: 50cqh;
+  --rs: min(calc(var(--plate-room) / 2), 40cqw);
+  --v: calc(var(--plate-top) + var(--plate-room) / 2);
   --k0: 0.6;
   --kd: 0.1;
   position: relative;
@@ -77,66 +63,23 @@
   container-type: size;
 }
 
-.inside-rooms,
-.inside-room,
-.inside-step,
-.inside-tone,
-.inside-veil,
-.inside-dim {
-  position: absolute;
-  inset: 0;
-}
-
 /* The rooms are a picture only: nothing in them takes a pointer, so a wheel or a tap over the stage
    never has to search the stacked discs for a target. */
 .inside-rooms {
+  position: absolute;
+  inset: 0;
   pointer-events: none;
 }
 
+/* Each room is the plate's stack: the square the outer ring fills. Only the five rooms work out where
+   that is; their discs are placed in it by share alone. */
 .inside-room {
-  --v: var(--vy);
-  --rs: var(--rs1);
-}
-
-.inside-room:first-child {
-  --v: var(--v0);
-  --rs: var(--rs0);
-}
-
-/* One disc, at rest: a square as wide as the stack, cut round and scaled to its own share of it,
-   --inside-s. Its photograph is printed on it at that size. Its lip and its shadow are drawn at
-   1/--inside-s so they show at the same width on every disc. Its dark ground shows only while the
-   photograph loads. Its step is the whole stage, scaled (when it is) round the stack's centre. */
-.inside-step {
-  --inside-s: calc(var(--k0) + var(--kd) * var(--j));
-  transform-origin: 50% var(--v);
-}
-
-.inside-tier {
   position: absolute;
   left: calc(50% - var(--rs));
   top: calc(var(--v) - var(--rs));
   width: calc(var(--rs) * 2);
-  aspect-ratio: 1;
-  border-radius: 50%;
-  overflow: hidden;
-  scale: var(--inside-s);
-  background: var(--color-ink-raised);
-  box-shadow: 0 calc(5px / var(--inside-s)) calc(12px / var(--inside-s)) rgb(0 0 0 / 0.5);
-}
-
-.inside-tier::after {
-  content: "";
-  position: absolute;
-  inset: 0;
-  border: calc(1px / var(--inside-s)) solid rgb(243 243 243 / 0.5);
-  border-radius: inherit;
-}
-
-/* Each ring a step darker than the one it carries, down to the ground. */
-.inside-tone {
-  background: var(--color-ink);
-  opacity: calc(var(--j) * 0.13);
+  height: calc(var(--rs) * 2);
+  contain: layout style;
 }
 
 /* On the plate only the first room shows. */
@@ -144,22 +87,32 @@
   display: none;
 }
 
-.inside-dim {
+/* One disc: a circle centred in its stack, --inside-s of its width: the photograph's disc is --k0 of
+   it and each ring --kd wider than the one inside it (--j counts the discs out from the photograph),
+   so the outer ring fills it. Its photograph is printed on it at that size, cut round itself, so
+   nothing here clips; the disc is its lip and its dark ground, which shows through the photograph to
+   shade each ring a step darker than the one it carries.
+   Reached (--inside-on 1) it rests on the stack; not yet (0), it is lifted just clear of it (a touch
+   larger) and out of sight, so not drawn. Between the two it moves in time: settling in, the outer
+   ring first and the photograph last; lifting off, coming back, the other way round. */
+.inside-ring {
+  --inside-s: calc(var(--k0) + var(--kd) * var(--j));
+  position: absolute;
+  inset: calc((1 - var(--inside-s)) * 50%);
+  border: 1px solid rgb(243 243 243 / 0.5);
+  border-radius: 50%;
   background: var(--color-ink);
-  opacity: 0;
+  box-shadow: 0 5px 12px rgb(0 0 0 / 0.5);
+  opacity: var(--inside-on);
+  scale: calc(1.04 - 0.04 * var(--inside-on));
+  transition-property: opacity, scale;
+  transition-timing-function: var(--ease-brand);
+  transition-duration: var(--dur-base), calc(var(--dur-base) + var(--inside-on) * 0.15s);
+  transition-delay: calc(var(--inside-on) * var(--k) * 80ms + (1 - var(--inside-on)) * var(--j) * 60ms);
 }
 
-/* Under the words at the foot, once a room fills the screen. On the room's own photograph, so it
-   never shades the next room's stack as it is built over it. */
-.inside-veil {
-  display: none;
-  background: linear-gradient(
-    to top,
-    rgb(20 20 20 / 0.88) 0%,
-    rgb(20 20 20 / 0.76) 20%,
-    rgb(20 20 20 / 0.34) 38%,
-    rgb(20 20 20 / 0) 54%
-  );
+.inside-ring > img {
+  opacity: calc(1 - var(--j) * 0.13);
 }
 
 .inside-intro {
@@ -196,31 +149,27 @@
   bottom: 0;
 }
 
+/* The lead and the captions, at the foot, one at a time, by --inside-on as the discs are. Leaving, it
+   fades where it is; coming in, a moment later, it rises a little as it fades up. */
+.inside-lead,
+.inside-cap-in {
+  opacity: var(--inside-on);
+  translate: 0 calc((1 - var(--inside-on)) * 0.75rem);
+  transition-property: opacity, translate;
+  transition-timing-function: var(--ease-brand);
+  transition-duration: calc(var(--dur-quick) + var(--inside-on) * 0.3s), calc(var(--inside-on) * var(--dur-reveal));
+  transition-delay: calc(var(--inside-on) * 0.2s), calc(var(--dur-quick) - var(--inside-on) * 0.05s);
+}
+
 /* "Scroll to step inside" is said only where scrolling does that. */
 .inside-hint {
   display: none;
 }
 
 .inside-project {
-  position: relative;
-  z-index: 0;
   flex-direction: column;
   align-items: flex-end;
   text-align: right;
-}
-
-/* The project and the way to its case study stay on screen all through the walk, over every disc as
-   it sweeps past and every ring that holds the screen, so they carry their own shade: dark behind the
-   words, out to the corner of the screen, fading over 7rem above them and 8rem to their left. On
-   the plate it is ink on ink. */
-.inside-project::before {
-  content: "";
-  position: absolute;
-  z-index: -1;
-  inset: -7rem calc(-1 * var(--page-gutter)) calc(-1 * var(--foot-pad)) -8rem;
-  background: linear-gradient(to top, rgb(20 20 20 / 0.82) calc(100% - 7rem), rgb(20 20 20 / 0));
-  mask-image: linear-gradient(to right, transparent, #000 8rem);
-  pointer-events: none;
 }
 
 /* Laptops and desktops: the lead sits beside the plate's stack, low on the left, so the stack also
@@ -229,42 +178,28 @@
 @supports (width: hypot(3px, 4px)) {
   @media (min-width: 64rem) {
     .inside-stage {
-      --rs0: min(
+      --rs: min(
         calc(var(--plate-room) / 2),
         40cqw,
-        hypot(50cqw - var(--page-gutter) - 26rem, max(0px, 100cqh - var(--foot-pad) - 5.5rem - var(--v0))) - 1.5rem
+        hypot(50cqw - var(--page-gutter) - 26rem, max(0px, 100cqh - var(--foot-pad) - 5.5rem - var(--v))) - 1.5rem
       );
     }
   }
 }
 
 /* Phones and tablets: the lead sits under the plate's stack and keeps its room, and the foot stays
-   clear of the floating contact bar. Later stacks are built a little above the middle, which is the
-   middle of what shows while the browser's bar is out. */
+   clear of the floating contact bar. */
 @media (max-width: 63.99rem) {
   .inside-stage {
     --foot-base: 5.75rem;
     --plate-foot: calc(var(--foot-pad) + 8rem);
-    --rs0: min(calc(var(--plate-room) / 2), 44cqw);
-    --rs1: 40cqmin;
-    --vy: 46cqh;
-  }
-
-  /* The caption sits higher here, so the shade reaches further up behind it. */
-  .inside-veil {
-    background: linear-gradient(
-      to top,
-      rgb(20 20 20 / 0.9) 0%,
-      rgb(20 20 20 / 0.8) 30%,
-      rgb(20 20 20 / 0.36) 48%,
-      rgb(20 20 20 / 0) 62%
-    );
+    --rs: min(calc(var(--plate-room) / 2), 44cqw);
   }
 }
 
 /* Short landscape screens (a phone on its side, a small laptop window): the lead gives its room to
    the stack, so the section still opens on its label, as every other section does, and the stack
-   comes down to the foot. */
+   comes down to the foot. The captions then sit beside it, so they keep 1.5rem clear of it. */
 @media (orientation: landscape) and (max-height: 37.5rem) {
   .inside-lead {
     display: none;
@@ -274,9 +209,11 @@
     --foot-base: 1.25rem;
     --plate-top: calc(var(--header-h) + var(--intro-pad) + 3.25rem + var(--fs-h2) * 2.24 + 1rem);
     --plate-foot: 0.75rem;
-    --rs0: min(calc(var(--plate-room) / 2), 40cqw);
-    --rs1: 36cqmin;
-    --vy: 50cqh;
+    --rs: min(calc(var(--plate-room) / 2), 40cqw);
+  }
+
+  .inside-words {
+    width: min(100%, 26rem, 50cqw - var(--rs) - var(--page-gutter) - 1.5rem);
   }
 }
 
@@ -298,15 +235,12 @@
 }
 
 .inside-disc-stack {
-  --v: 50cqh;
-  --rs: 50cqmin;
   --k0: 0.68;
   --kd: 0.08;
   position: relative;
   width: min(84vw, 26rem);
   aspect-ratio: 1;
   margin-inline: auto;
-  container-type: size;
 }
 
 @media (min-width: 40rem) {
@@ -332,247 +266,118 @@
   }
 }
 
-/* tan(atan2()) and hypot() are in the test because the walk's geometry is worked out with them. */
-@supports (animation-timeline: view()) and (scale: tan(atan2(1px, 2px))) and (width: hypot(3px, 4px)) {
+/* ——— The walk ———
+   The scene is the run of scroll the plate is pinned for. Its one scroll-driven animation counts the
+   stages (--inside-at, a whole number, so it changes only as a stage is reached); style queries on it
+   set --inside-on for the rooms, the lead and the captions, and their transitions, in time, do the
+   rest. So only the room arriving or leaving moves, five discs and a caption at most, and only while
+   it moves; nothing else in the section is worked out again.
+   The section asks a style query of itself first (--inside-walk), so a browser with scroll-driven
+   animation but no style queries leaves the section as it is at rest. */
+@supports (animation-timeline: view()) {
   @media (prefers-reduced-motion: no-preference) {
-    /* The timeline ignores the header's scroll padding, so contain 0% is the moment the stage pins. */
-    .inside-scene {
-      height: calc(var(--run) + 100lvh);
-      view-timeline: --inside block;
-      view-timeline-inset: 0px;
+    .inside {
+      container-name: inside;
+      --inside-walk: on;
     }
 
-    /* The stage is the large viewport high: on phones the browser's bar can cover its foot. */
-    .inside-stage {
-      --foot-pad: calc(100lvh - 100svh + var(--foot-base));
-      position: sticky;
-      top: 0;
-      height: 100lvh;
-      min-height: 0;
+    @container inside style(--inside-walk: on) {
+      /* The timeline ignores the header's scroll padding, so contain 0% is the moment the stage pins,
+         and contain 100% the moment it lets go. Each stage has an even share of that run. */
+      .inside-scene {
+        height: calc(var(--run) + 100lvh);
+        container-name: inside-walk;
+        view-timeline: --inside block;
+        view-timeline-inset: 0px;
+        animation: inside-at both;
+        animation-timing-function: steps(var(--inside-stages), jump-none);
+        animation-timeline: --inside;
+        animation-range: contain 0% contain 100%;
+      }
+
+      /* The stage is the large viewport high: on phones the browser's bar can cover its foot. */
+      .inside-stage {
+        --foot-pad: calc(100lvh - 100svh + var(--foot-base));
+        position: sticky;
+        top: 0;
+        height: 100lvh;
+        min-height: 0;
+      }
+
+      /* Every room after the first, the lead and the captions wait until their stage. */
+      .inside-room + .inside-room {
+        display: block;
+        --inside-on: 0;
+      }
+
+      .inside-lead,
+      .inside-cap {
+        --inside-on: 0;
+      }
+
+      .inside-cap {
+        display: block;
+      }
+
+      .inside-hint {
+        display: inline;
+      }
+
+      .inside-discs {
+        display: none;
+      }
     }
 
-    /* Here every disc is drawn as wide as it will be when it covers the screen: a square whose
-       circle reaches the farthest corner of the screen from the stack's centre (--inside-cover, with
-       a little to spare for the lip). At rest it is scaled down to its place in the stack,
-       --inside-s, the ratio of the two radii (tan(atan2(a, b)) is a / b as a number); the ring
-       inside it rests at --inside-s-in. A move is a change of scale only, so the photograph printed
-       on the disc grows with it and steps nearer each time.
-       Each disc has three moves: it steps out from under the disc inside it (inside-build, on its
-       step; the photograph's own disc pops up from the middle, inside-pop), it sweeps out to cover
-       the screen (inside-sweep), and it is dropped once it is covered (inside-gone): a ring once its
-       room's photograph fills the screen, the photograph once the next room's outer ring covers it.
-       Each move has its own stretch of the scroll (b0..b1, p0..p1, x0..x1, set by InsideProject.tsx)
-       and a firm ease, so the scrub goes in steps. An element never has two moves of the same kind,
-       so every one of them can run on the compositor. Before its first move a disc of a later room
-       sits on a step at scale 0: nothing to draw. */
-    .inside-room {
-      --inside-cover: calc(hypot(50cqw, max(var(--v), 100cqh - var(--v))) + 0.25rem);
+    /* The stages. Every room up to the stage's own is on the stack, and the stage's caption is at the
+       foot: the plate and the first room's caption share the first room. Five rooms at most (WALK in
+       InsideProject.tsx). */
+    @container inside-walk style(--inside-at: 0) {
+      .inside-lead {
+        --inside-on: 1;
+      }
     }
 
-    /* Chrome runs a move on the compositor, off the main thread, only if its element is painted when
-       the move is set up, and it sets every move up as the page loads, when this section lies far
-       below what is painted; it does not try again. So the rooms and the captions (screen readers
-       are given both in the list) are left out until the section is a screen below the fold, and
-       their moves are set up then. Nothing on screen changes. */
-    .inside-rooms,
-    .inside-caps {
-      animation: inside-wake linear both;
-      animation-timeline: --inside;
-      animation-range: cover -100lvh cover -99lvh;
+    @container inside-walk style(--inside-at: 1) {
+      .inside-cap:nth-child(1) {
+        --inside-on: 1;
+      }
     }
 
-    .inside-room + .inside-room {
-      display: block;
+    @container inside-walk style(--inside-at: 2) {
+      .inside-room:nth-child(-n + 2),
+      .inside-cap:nth-child(2) {
+        --inside-on: 1;
+      }
     }
 
-    .inside-step {
-      --inside-s: tan(atan2(calc(var(--rs) * (var(--k0) + var(--kd) * var(--j))), var(--inside-cover)));
-      --inside-s-in: tan(atan2(calc(var(--rs) * (var(--k0) + var(--kd) * (var(--j) - 1))), var(--inside-cover)));
-      --a-out: inside-gone;
-      --x0: var(--o-b);
-      --x1: var(--o-c);
-      animation: inside-build var(--ease-settle) forwards;
-      animation-timeline: --inside;
-      animation-range: contain var(--b0) contain var(--b1);
+    @container inside-walk style(--inside-at: 3) {
+      .inside-room:nth-child(-n + 3),
+      .inside-cap:nth-child(3) {
+        --inside-on: 1;
+      }
     }
 
-    .inside-step:last-child {
-      --x0: var(--g-a);
-      --x1: var(--g-b);
-      animation-name: inside-pop;
+    @container inside-walk style(--inside-at: 4) {
+      .inside-room:nth-child(-n + 4),
+      .inside-cap:nth-child(4) {
+        --inside-on: 1;
+      }
     }
 
-    .inside-room + .inside-room .inside-step {
-      scale: 0;
-    }
-
-    .inside-tier {
-      left: calc(50% - var(--inside-cover));
-      top: calc(var(--v) - var(--inside-cover));
-      width: calc(var(--inside-cover) * 2);
-      animation-name: inside-sweep, var(--a-out);
-      animation-timing-function: var(--ease-settle), linear;
-      animation-fill-mode: forwards;
-      animation-timeline: --inside, --inside;
-      animation-range:
-        contain var(--p0) contain var(--p1),
-        contain var(--x0) contain var(--x1);
-    }
-
-    /* The first room is stacked on the plate already; the last stays when the page moves on. */
-    .inside-room:first-child .inside-step {
-      animation: none;
-    }
-
-    .inside-room:last-child .inside-step:last-child {
-      --a-out: none;
-    }
-
-    /* The room darkens while the next stack is built in its middle, so the stack stands out on it as
-       the first did on the plate. */
-    .inside-dim {
-      animation: inside-dim var(--ease-scrub) both;
-      animation-timeline: --inside;
-      animation-range: contain var(--n-a) contain var(--n-d);
-    }
-
-    .inside-room:last-child .inside-dim {
-      animation: none;
-    }
-
-    /* The shade for the caption covers the screen's own rectangle on the photograph's disc, and comes
-       up as the disc sweeps open. */
-    .inside-veil {
-      display: block;
-      inset: auto;
-      left: calc(var(--inside-cover) - 50cqw);
-      top: calc(var(--inside-cover) - var(--v));
-      width: 100cqw;
-      height: 100cqh;
-      animation: inside-fade-in linear both;
-      animation-timeline: --inside;
-      animation-range: contain var(--vi) contain var(--ci);
-    }
-
-    /* The title and the lead step out of the way as the first ring sweeps out. */
-    .inside-intro {
-      animation: inside-rise-out var(--ease-scrub) both;
-      animation-timeline: --inside;
-      animation-range: contain 0% contain var(--intro-out);
-    }
-
-    .inside-lead {
-      animation: inside-drop-out var(--ease-scrub) both;
-      animation-timeline: --inside;
-      animation-range: contain 0% contain var(--intro-out);
-    }
-
-    .inside-cap {
-      display: block;
-      animation: inside-cap-out var(--ease-scrub) forwards;
-      animation-timeline: --inside;
-      animation-range: contain var(--n-a) contain var(--co);
-    }
-
-    .inside-cap-in {
-      animation: inside-cap-in var(--ease-scrub) both;
-      animation-timeline: --inside;
-      animation-range: contain var(--ci) contain var(--o-b);
-    }
-
-    .inside-cap:last-child {
-      animation: none;
-    }
-
-    .inside-hint {
-      display: inline;
-    }
-
-    .inside-discs {
-      display: none;
+    @container inside-walk style(--inside-at: 5) {
+      .inside-room:nth-child(-n + 5),
+      .inside-cap:nth-child(5) {
+        --inside-on: 1;
+      }
     }
   }
 }
 
-@keyframes inside-wake {
+@keyframes inside-at {
   from {
-    display: none;
+    --inside-at: 0;
   }
   to {
-    display: block;
-  }
-}
-
-/* On a disc's step: from nothing, or from just inside the disc it steps out from under, to its place. */
-@keyframes inside-pop {
-  from {
-    scale: 0;
-  }
-  to {
-    scale: 1;
-  }
-}
-
-@keyframes inside-build {
-  from {
-    scale: calc(var(--inside-s-in) / var(--inside-s) * 0.995);
-  }
-  to {
-    scale: 1;
-  }
-}
-
-@keyframes inside-sweep {
-  from {
-    scale: var(--inside-s);
-  }
-  to {
-    scale: 1;
-  }
-}
-
-@keyframes inside-gone {
-  to {
-    opacity: 0;
-  }
-}
-
-@keyframes inside-fade-in {
-  from {
-    opacity: 0;
-  }
-}
-
-@keyframes inside-dim {
-  to {
-    opacity: 0.62;
-  }
-}
-
-@keyframes inside-rise-out {
-  to {
-    opacity: 0;
-    translate: 0 -2.5rem;
-  }
-}
-
-@keyframes inside-drop-out {
-  to {
-    opacity: 0;
-    translate: 0 0.75rem;
-  }
-}
-
-@keyframes inside-cap-in {
-  from {
-    opacity: 0;
-    translate: 0 0.75rem;
-  }
-}
-
-@keyframes inside-cap-out {
-  to {
-    opacity: 0;
-    translate: 0 -0.75rem;
+    --inside-at: var(--inside-last);
   }
 }

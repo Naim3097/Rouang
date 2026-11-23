@@ -8,11 +8,12 @@ import { Breadcrumbs } from "@/components/ui/Breadcrumbs";
 import { Figure } from "@/components/ui/Figure";
 import { Pending } from "@/components/ui/Section";
 import { Label, TitlePair } from "@/components/ui/Typography";
-import { brandImagery } from "@/config/media";
+import { brandImagery, placeholderImagery } from "@/config/media";
 import { founders, team } from "@/config/people";
 import { processSteps, processSummary } from "@/config/process";
 import { studio } from "@/config/studio";
 import { getProjects, getServices, projectImage, publicImage } from "@/lib/content";
+import type { Image } from "@/lib/content/schema";
 import { pageMetadata } from "@/lib/seo";
 
 export const ensureStatic = "navigation";
@@ -36,10 +37,37 @@ const purpose = [
   },
 ];
 
+/**
+ * One small picture per capability, the same three the Services page shows, keyed by service slug.
+ * Temporary Unsplash stand-ins: publicImage() drops them from production, and the columns then read
+ * as text alone, as they did before.
+ */
+const capabilityImagery: Record<string, Image> = {
+  "design-and-build": placeholderImagery.capabilityDesignBuild,
+  "renovation-and-interior": placeholderImagery.capabilityRenovation,
+  "new-build-and-construction": placeholderImagery.capabilityNewBuild,
+};
+
 export default async function AboutPage() {
   const [projects, services] = await Promise.all([getProjects(), getServices()]);
   // A real material photograph behind the wordmark; brand-kit atmosphere only as a preview fallback.
   const horizon = projectImage(projects.find((p) => p.slug === "ampang"), "ampang-black-joinery") ?? publicImage(brandImagery.horizonWall);
+  // Approach: a drawing being made by hand, beside the words about how the work is planned.
+  const drawing = publicImage(placeholderImagery.drawingByHand);
+
+  const approach = [
+    <p key="framework">
+      Our approach brings design and construction together under a clear project framework, supported by thoughtful
+      planning, transparent communication and responsible project management. From initial concept through construction
+      and handover, every decision is guided by the project&rsquo;s purpose, our clients&rsquo; needs and a commitment to
+      quality.
+    </p>,
+    <p key="growth">
+      As ROUANG continues to grow, we are building more than a portfolio of completed spaces. We are building stronger
+      systems, developing capable teams and continuously refining the standards by which we design, manage and deliver our
+      work.
+    </p>,
+  ];
 
   return (
     <>
@@ -83,18 +111,25 @@ export default async function AboutPage() {
               <h2 id="approach-title" className="t-headline max-w-[22ch]">
                 Great spaces are shaped by purposeful design and delivered through disciplined execution.
               </h2>
-              <div className="mt-12 grid gap-x-[var(--grid-gap)] gap-y-6 text-ink-soft md:grid-cols-2">
-                <p>
-                  Our approach brings design and construction together under a clear project framework, supported by
-                  thoughtful planning, transparent communication and responsible project management. From initial concept
-                  through construction and handover, every decision is guided by the project&rsquo;s purpose, our
-                  clients&rsquo; needs and a commitment to quality.
-                </p>
-                <p>
-                  As ROUANG continues to grow, we are building more than a portfolio of completed spaces. We are building
-                  stronger systems, developing capable teams and continuously refining the standards by which we design,
-                  manage and deliver our work.
-                </p>
+              {/* With the picture: the picture and the two paragraphs side by side under the statement, the
+                  paragraphs one column so the two halves stand about the same height. Without it (production,
+                  until the studio supplies its own), the two paragraphs are the two columns. */}
+              <div className="mt-12 grid items-start gap-x-[var(--grid-gap)] gap-y-8 text-ink-soft md:grid-cols-2">
+                {drawing ? (
+                  <>
+                    <Figure
+                      image={drawing}
+                      aspect="3/2"
+                      // The frame is drawn in on the hands and the drawing (about-drawing), so the picture
+                      // is asked for at half as wide again as its frame.
+                      sizes="(min-width: 1024px) 50vw, (min-width: 768px) 70vw, 150vw"
+                      imgClassName="about-drawing"
+                    />
+                    <div className="space-y-6">{approach}</div>
+                  </>
+                ) : (
+                  approach
+                )}
               </div>
             </div>
           </div>
@@ -140,15 +175,32 @@ export default async function AboutPage() {
                   Design, renovation and construction, under one coordinated process.
                 </h2>
                 <ol className="mt-14 grid gap-x-[var(--grid-gap)] border-t border-kapur/15 md:grid-cols-3">
-                  {services.map((s, i) => (
-                    <li key={s.slug} className="border-b border-kapur/15">
-                      <Link href={`/services/${s.slug}`} className="block py-8">
-                        <span className="t-label tabular-nums text-mouse">{String(i + 1).padStart(2, "0")}</span>
-                        <h3 className="link-name t-title mt-4">{s.title}</h3>
-                        <p className="t-meta mt-3 text-kapur/75">{s.summary}</p>
-                      </Link>
-                    </li>
-                  ))}
+                  {services.map((s, i) => {
+                    const pictured = capabilityImagery[s.slug];
+                    const img = pictured ? publicImage(pictured) : null;
+                    return (
+                      <li key={s.slug} className="border-b border-kapur/15">
+                        <Link href={`/services/${s.slug}`} className={`block py-8 ${img ? "about-capability" : ""}`}>
+                          {img ? (
+                            <Figure
+                              // A stand-in picture inside a link already named by its words: decorative.
+                              image={{ ...img, alt: "" }}
+                              aspect="3/2"
+                              sizes="(min-width: 1024px) 22vw, (min-width: 768px) 30vw, (min-width: 640px) 38vw, 92vw"
+                              tone="dark"
+                              className="about-capability-figure"
+                              imgClassName="about-capability-img"
+                            />
+                          ) : null}
+                          <div>
+                            <span className="t-label tabular-nums text-mouse">{String(i + 1).padStart(2, "0")}</span>
+                            <h3 className="link-name t-title mt-4">{s.title}</h3>
+                            <p className="t-meta mt-3 text-kapur/75">{s.summary}</p>
+                          </div>
+                        </Link>
+                      </li>
+                    );
+                  })}
                 </ol>
               </div>
             </div>
@@ -156,21 +208,24 @@ export default async function AboutPage() {
         </section>
       ) : null}
 
-      {/* Process */}
+      {/* Process, set as the home page sets it (home/Process.tsx): the label, the title pair and the summary
+          on the centre line, and the steps centred under them, each one's text on the same short measure. */}
       {processSteps.length ? (
         <section data-tone="light" className="bg-kapur text-ink" aria-labelledby="process-title">
           <div className="page-x section-y">
-            <div className="page-grid gap-y-10">
-              <Label pill index="04" className="col-span-12 text-ink-muted lg:col-span-3">
+            <div className="flex flex-col items-center text-center">
+              <Label pill index="04" className="text-ink-muted">
                 Process
               </Label>
-              <div className="col-span-12 lg:col-span-9">
-                <TitlePair id="process-title" lead="How a project runs" follow="from the first discussion to handover" />
-                <p className="mt-8 max-w-[40rem] text-ink-soft">{processSummary}</p>
-              </div>
+              <TitlePair
+                id="process-title"
+                lead="How a project runs"
+                follow="from the first discussion to handover"
+                className="mt-6"
+              />
+              <p className="mt-8 max-w-[38rem] text-balance text-ink-soft">{processSummary}</p>
             </div>
-            {/* The same steps on the same line as on the home page, across the whole grid. */}
-            <ProcessSteps />
+            <ProcessSteps centred />
           </div>
         </section>
       ) : null}
@@ -260,7 +315,9 @@ export default async function AboutPage() {
               </p>
             </div>
           </div>
-          <div className="relative order-1 min-h-[60svh] lg:order-2 lg:min-h-full">
+          {/* Phones and tablets: a band of a set shape above the words (4:3, then 3:2), never most of the
+              screen. Side by side: exactly as tall as the words beside it. */}
+          <div className="relative order-1 aspect-[4/3] sm:aspect-[3/2] lg:order-2 lg:aspect-auto lg:min-h-full">
             {horizon ? <Figure image={horizon} sizes="(min-width: 1024px) 50vw, 100vw" aspect="auto" className="absolute inset-0 h-full" tone="dark" /> : null}
             <div className="absolute inset-0 flex items-center justify-center p-10">
               <Wordmark className="h-auto w-[min(80%,26rem)] text-kapur" title="ROUANG" />
@@ -272,16 +329,18 @@ export default async function AboutPage() {
       {/* The mark. Its dashed guides run past the circle, so the section clips them at the screen's edge. */}
       <section data-tone="light" className="overflow-x-clip bg-kapur text-ink" aria-labelledby="mark-title">
         <div className="page-x section-y">
-          <div className="page-grid items-center gap-y-14">
-            <div className="col-span-12 flex justify-center lg:col-span-5">
-              <div className="relative aspect-square w-[min(70vw,24rem)]">
-                <span className="absolute -inset-8 rounded-full border border-dashed border-ink/25" aria-hidden="true" />
+          {/* The mark is sized to the words beside it (about-mark), so it is never the larger of the two.
+              From tablets the two stand side by side. */}
+          <div className="page-grid items-center gap-y-12">
+            <div className="col-span-12 flex justify-center md:col-span-5">
+              <div className="about-mark relative aspect-square">
+                <span className="absolute -inset-[9%] rounded-full border border-dashed border-ink/25" aria-hidden="true" />
                 <span className="absolute inset-x-[-30%] top-0 h-px bg-[repeating-linear-gradient(90deg,currentColor_0_6px,transparent_6px_12px)] opacity-25" aria-hidden="true" />
                 <span className="absolute inset-x-[-30%] bottom-0 h-px bg-[repeating-linear-gradient(90deg,currentColor_0_6px,transparent_6px_12px)] opacity-25" aria-hidden="true" />
                 <Mark className="h-full w-full" title="The ROUANG mark" />
               </div>
             </div>
-            <div className="col-span-12 lg:col-span-6 lg:col-start-7">
+            <div className="col-span-12 md:col-span-7 lg:col-span-6 lg:col-start-7">
               <Label pill index="08" className="text-ink-muted">
                 The mark
               </Label>

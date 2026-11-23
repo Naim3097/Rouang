@@ -1,0 +1,63 @@
+/* about (round 6, 23 Nov 2026). The About page (app/about/page.tsx). Imported by globals.css.
+   The process is drawn by styles/home/process.css; nothing here changes it. */
+
+/* ——— 01 Approach: the drawing by hand. ———
+   The photograph is wider than its 3:2 frame and shows the whole desk; the frame is drawn in on the
+   hands, the scale rule and the drawing, below the shoulders, so no face and no lettering on
+   clothing is in it. Scaled from the foot of the frame, centred across it. */
+.about-drawing {
+  object-position: 50% 100%;
+  scale: 1.5;
+  transform-origin: 50% 100%;
+}
+
+/* ——— 03 Capabilities: one small picture per column. ———
+   Each column is one link: the picture (3:2, the same size in every column), then the number, title
+   and summary under it. Between 40rem and 48rem, where a single column would make the pictures
+   large, the picture stands to the left of the words instead. */
+.about-capability-figure {
+  margin-bottom: 1.75rem;
+}
+
+@media (min-width: 40rem) and (max-width: 47.99rem) {
+  .about-capability {
+    display: grid;
+    grid-template-columns: minmax(0, 2fr) minmax(0, 3fr);
+    column-gap: var(--grid-gap);
+    align-items: start;
+  }
+
+  .about-capability-figure {
+    margin-bottom: 0;
+  }
+}
+
+/* The picture settles a little closer on hover or keyboard focus, as the project plates do. */
+@media (prefers-reduced-motion: no-preference) {
+  .about-capability-img {
+    transition: scale 1.6s var(--ease-brand);
+  }
+
+  .about-capability:focus-visible .about-capability-img {
+    scale: 1.03;
+  }
+}
+
+@media (hover: hover) and (prefers-reduced-motion: no-preference) {
+  .about-capability:hover .about-capability-img {
+    scale: 1.03;
+  }
+}
+
+/* ——— 08 The mark ———
+   Sized to the words beside it: under them on phones (about half the width), then in five columns
+   beside them, never taller than the heading and paragraph it explains. */
+.about-mark {
+  width: clamp(10.5rem, 48vw, 15rem);
+}
+
+@media (min-width: 48rem) {
+  .about-mark {
+    width: clamp(11rem, 25vw, 18rem);
+  }
+}

@@ -14,7 +14,7 @@ import type { Image } from "@/lib/content/schema";
 
 type DoorImage = Image | null | undefined;
 
-/** Every door photograph is drawn in a 4:5 frame, at least (pathways.css). */
+/** Every door photograph is drawn in the same 4:5 frame at every width (pathways.css). */
 const FRAME = 4 / 5;
 
 /**

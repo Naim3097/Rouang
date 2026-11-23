@@ -38,6 +38,9 @@ const nextConfig: NextConfig = {
     deviceSizes: [640, 828, 1080, 1280, 1600, 1920, 2560],
     // Optimised images are kept for 31 days. A replaced photograph gets a new file name.
     minimumCacheTTL: 2678400,
+    // The temporary Unsplash photographs (placeholderImagery in src/config/media.ts). Delete this
+    // once the last of them is replaced.
+    remotePatterns: [{ protocol: "https", hostname: "images.unsplash.com", pathname: "/photo-*" }],
   },
   turbopack: {
     rules: {

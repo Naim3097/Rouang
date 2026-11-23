@@ -107,6 +107,23 @@ for (const dir of ["projects", "services", "insights"]) {
   }
 }
 
+// ——— Temporary Unsplash photographs (src/config/media.ts, placeholderImagery) ———
+{
+  const walk = (dir) =>
+    fs.readdirSync(dir, { withFileTypes: true }).flatMap((e) => {
+      const p = path.join(dir, e.name);
+      return e.isDirectory() ? walk(p) : /\.(tsx?|mdx?)$/.test(e.name) ? [p] : [];
+    });
+  const used = new Set();
+  for (const file of walk(path.join(root, "src"))) {
+    if (file.endsWith(path.join("config", "media.ts"))) continue;
+    const text = fs.readFileSync(file, "utf8");
+    for (const m of text.matchAll(/placeholderImagery\.(\w+)/g)) used.add(m[1]);
+    if (/\binsightImagery\b/.test(text)) used.add("insightImagery (one per article)");
+  }
+  if (used.size) block("Images", `${used.size} temporary Unsplash photograph(s) still in use: ${[...used].join(", ")}. Replace them with the studio's own`);
+}
+
 // ——— Studio facts and process (read from the config source) ———
 const studioSrc = fs.readFileSync(path.join(root, "src/config/studio.ts"), "utf8");
 for (const m of studioSrc.matchAll(/\{\s*name:\s*"([^"]+)",\s*confirmed:\s*false\s*\}/g)) block("Studio", `service area not confirmed: ${m[1]}`);

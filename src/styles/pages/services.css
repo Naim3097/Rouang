@@ -1,0 +1,514 @@
+/* services (round 6, 23 Nov 2026). The Services index and the three service pages: the before-and-after
+   comparison under the index's opening words (components/services/BeforeAfter.tsx, ba-*), the
+   Capabilities band (components/services/Capabilities.tsx, cap-*), and on a service page its project
+   photograph and the photograph beside its own text (svc-*). Imported by globals.css. */
+
+/* ——— Before and after (ba-*) ———
+   The line's place is one number, --ba-pos (0 to 100, the share of the frame showing "before"), set
+   on the figure by the component. Registered, so it can ease between places and carry the first
+   sweep: the "after" photograph's clip, the line and the handle all follow it, and nothing is resized.
+   The frame keeps to a ratio and never stands taller than 70% of the screen: 4:3 across a phone,
+   3:2 on tablets, 16:9 on wide screens at 68rem at most. */
+
+@property --ba-pos {
+  syntax: "<number>";
+  inherits: true;
+  initial-value: 50;
+}
+
+.ba {
+  width: min(100%, 70svh * 4 / 3);
+  margin-inline: auto;
+}
+
+.ba-frame {
+  position: relative;
+  aspect-ratio: 4 / 3;
+  overflow: hidden;
+  border-radius: 2px;
+  background: var(--color-kapur-deep);
+  /* The line and the handle measure themselves against the frame (cqi). */
+  container-type: inline-size;
+  /* A vertical swipe still scrolls the page; a sideways one is the comparison's. */
+  touch-action: pan-y;
+  cursor: ew-resize;
+  user-select: none;
+  -webkit-user-select: none;
+  -webkit-touch-callout: none;
+}
+
+@media (min-width: 40rem) {
+  .ba {
+    width: min(100%, 70svh * 3 / 2);
+  }
+
+  .ba-frame {
+    aspect-ratio: 3 / 2;
+  }
+}
+
+@media (min-width: 64rem) {
+  .ba {
+    width: min(100%, 68rem, 70svh * 16 / 9);
+  }
+
+  .ba-frame {
+    aspect-ratio: 16 / 9;
+  }
+}
+
+.ba-layer {
+  position: absolute;
+  inset: 0;
+}
+
+/* The finished space, to the right of the line. */
+.ba-after {
+  clip-path: inset(0 0 0 calc(var(--ba-pos) * 1%));
+}
+
+.ba-line {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  width: 2px;
+  margin-left: -1px;
+  background: var(--color-kapur);
+  /* A faint shade either side, so the line holds against a white wall. */
+  box-shadow:
+    0 0 0 0.5px rgb(20 20 20 / 0.12),
+    0 0 10px rgb(20 20 20 / 0.22);
+  translate: calc(var(--ba-pos) * 1cqi) 0;
+  pointer-events: none;
+}
+
+/* The handle: a small pill in Milky White, like the site's buttons, with a chevron each way and the
+   line passing through it. It follows the line but keeps inside the frame at either end. */
+.ba-handle {
+  position: absolute;
+  top: 50%;
+  left: 0;
+  display: grid;
+  place-items: center;
+  width: 3.75rem;
+  height: 2.5rem;
+  border-radius: 999px;
+  background: var(--color-kapur);
+  color: var(--color-ink);
+  box-shadow:
+    0 0 0 1px rgb(20 20 20 / 0.08),
+    0 0 0 6px rgb(243 243 243 / 0.3),
+    0 12px 28px -12px rgb(20 20 20 / 0.55);
+  translate: calc(clamp(1.875rem, var(--ba-pos) * 1cqi, 100cqi - 1.875rem) - 50%) -50%;
+  cursor: grab;
+  transition:
+    scale var(--dur-quick) var(--ease-brand),
+    box-shadow var(--dur-quick) var(--ease-brand);
+}
+
+.ba-handle svg {
+  width: 2.25rem;
+  height: 0.9rem;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.4;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  overflow: visible;
+}
+
+.ba-handle-rule {
+  opacity: 0.3;
+  stroke-width: 1;
+}
+
+/* Keyboard focus: an ink ring inside a Milky White one, so it reads over a dark or a pale photograph. */
+.ba-handle:focus-visible {
+  outline: 2px solid var(--color-ink);
+  outline-offset: 2px;
+  box-shadow:
+    0 0 0 1px rgb(20 20 20 / 0.08),
+    0 0 0 6px var(--color-kapur),
+    0 12px 28px -12px rgb(20 20 20 / 0.55);
+}
+
+.ba[data-dragging] .ba-frame,
+.ba[data-dragging] .ba-handle {
+  cursor: grabbing;
+}
+
+.ba[data-dragging] .ba-handle {
+  scale: 0.94;
+}
+
+/* "Before" and "After", pinned to the top corners. Each lives on its own photograph's layer, so the
+   line slides over the one it passes instead of running through it. */
+.ba-tag {
+  position: absolute;
+  top: clamp(0.75rem, 2.4cqi, 1.25rem);
+  padding: 0.3125rem 0.75rem;
+  border-radius: 999px;
+  line-height: 1.2;
+  white-space: nowrap;
+  pointer-events: none;
+}
+
+.ba-tag-before {
+  left: clamp(0.75rem, 2.4cqi, 1.25rem);
+  background: rgb(20 20 20 / 0.72);
+  color: var(--color-kapur);
+  -webkit-backdrop-filter: blur(6px);
+  backdrop-filter: blur(6px);
+}
+
+.ba-tag-after {
+  right: clamp(0.75rem, 2.4cqi, 1.25rem);
+  background: rgb(243 243 243 / 0.92);
+  color: var(--color-ink);
+}
+
+.ba-hint {
+  margin-top: 1rem;
+  text-align: center;
+  color: var(--color-ink-muted);
+  text-wrap: balance;
+}
+
+.ba-hint-touch {
+  display: none;
+}
+
+@media (pointer: coarse) {
+  .ba-hint-fine {
+    display: none;
+  }
+
+  .ba-hint-touch {
+    display: inline;
+  }
+}
+
+/* A click or a key eases the line to its new place; a drag follows the pointer exactly. The first
+   sweep: a little towards "before", across towards "after", and home, once. */
+@media (prefers-reduced-motion: no-preference) {
+  .ba {
+    transition: --ba-pos var(--dur-base) var(--ease-brand);
+  }
+
+  .ba[data-dragging] {
+    transition: none;
+  }
+
+  .ba[data-sweep] {
+    animation: ba-sweep 3.4s var(--ease-scrub) 0.3s;
+  }
+}
+
+@keyframes ba-sweep {
+  30% {
+    --ba-pos: 36;
+  }
+  72% {
+    --ba-pos: 63;
+  }
+}
+
+/* ——— Capabilities (cap-*) ———
+   Wide screens (64rem): the photograph on the left (40% of the band, 46% from 80rem), the full
+   height of the band, the label and line on it at the top; the rows on the right. Under 64rem the
+   photograph is a band across the screen (4:3 on phones, 16:9 on tablets) and the rows follow.
+   The band stays under 760px tall at 1440 (the sizing standard), so the rows are spaced a little
+   tighter than a whole section. */
+
+.cap {
+  display: grid;
+}
+
+.cap-lead {
+  position: relative;
+  isolation: isolate;
+  display: flex;
+  aspect-ratio: 4 / 3;
+  overflow: hidden;
+  background: var(--color-ink-raised);
+}
+
+/* Without the photograph (production, until the studio's own is in) the dark panel is only as tall
+   as its words when stacked. */
+.cap-lead.cap-lead-plain {
+  aspect-ratio: auto;
+}
+
+/* A shade over the photograph, held at 62% or more as far down as the words reach and easing off
+   below them. The photograph has white walls and a bright window, so the shade has to cover the
+   brightest of it: measured with the words hidden, every pixel behind the label and the intro line
+   keeps Milky White at 4.5:1 or more at all six check widths. On a phone the words fill most of the
+   band, so the shade holds further down. */
+.cap-scrim {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  background: linear-gradient(
+    180deg,
+    rgb(20 20 20 / 0.66) 0%,
+    rgb(20 20 20 / 0.62) 74%,
+    rgb(20 20 20 / 0.36) 100%
+  );
+  pointer-events: none;
+}
+
+.cap-lead-text {
+  position: relative;
+  z-index: 1;
+  align-self: flex-start;
+  padding: clamp(1.5rem, 5vw, 3rem) var(--page-gutter);
+}
+
+.cap-intro {
+  max-width: 14em;
+  margin-top: 1.25rem;
+}
+
+.cap-list {
+  --cap-thumb: 7.5rem;
+  padding: clamp(2.5rem, 8vw, 4.5rem) var(--page-gutter);
+}
+
+.cap-item + .cap-item {
+  border-top: 1px solid rgb(20 20 20 / 0.16);
+}
+
+/* A row: its number, a short upright rule, the name and summary, the picture at the end. On phones
+   the number, the name and the picture make one line, centred on the picture, and the summary runs
+   on under the name and the picture. */
+.cap-row {
+  display: grid;
+  grid-template-columns: auto 1px minmax(0, 1fr) var(--cap-thumb);
+  grid-template-areas:
+    "num rule title thumb"
+    ". . body body";
+  align-items: center;
+  column-gap: 0.875rem;
+  row-gap: 0.75rem;
+  padding-block: 1.5rem;
+}
+
+.cap-item:first-child .cap-row {
+  padding-top: 0;
+}
+
+.cap-item:last-child .cap-row {
+  padding-bottom: 0;
+}
+
+.cap-row-plain {
+  --cap-thumb: 0px;
+}
+
+.cap-num {
+  grid-area: num;
+  min-width: 1.5rem;
+  color: var(--color-ink-soft);
+}
+
+.cap-rule {
+  grid-area: rule;
+  width: 1px;
+  height: 2.5rem;
+  background: rgb(20 20 20 / 0.22);
+}
+
+.cap-title {
+  grid-area: title;
+}
+
+.cap-body {
+  grid-area: body;
+  max-width: 34rem;
+  text-wrap: pretty;
+}
+
+.cap-thumb {
+  grid-area: thumb;
+  position: relative;
+  display: block;
+  aspect-ratio: 2 / 1;
+  overflow: hidden;
+  background: rgb(20 20 20 / 0.06);
+}
+
+/* Hover and focus, quietly: the name underlines and the picture comes a fraction closer. */
+.cap-name {
+  text-decoration-line: underline;
+  text-decoration-thickness: 1px;
+  text-underline-offset: 0.2em;
+  text-decoration-color: transparent;
+  transition: text-decoration-color var(--dur-quick) var(--ease-brand);
+}
+
+.cap-row:focus-visible .cap-name {
+  text-decoration-color: currentColor;
+}
+
+@media (hover: hover) {
+  .cap-row:hover .cap-name {
+    text-decoration-color: currentColor;
+  }
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .cap-thumb img {
+    transition: scale var(--dur-reveal) var(--ease-brand);
+  }
+
+  .cap-row:focus-visible .cap-thumb img {
+    scale: 1.03;
+  }
+
+  @media (hover: hover) {
+    .cap-row:hover .cap-thumb img {
+      scale: 1.03;
+    }
+  }
+}
+
+@media (min-width: 40rem) {
+  .cap-lead {
+    aspect-ratio: 16 / 9;
+  }
+
+  .cap-scrim {
+    background: linear-gradient(
+      180deg,
+      rgb(20 20 20 / 0.66) 0%,
+      rgb(20 20 20 / 0.62) 54%,
+      rgb(20 20 20 / 0.2) 100%
+    );
+  }
+
+  .cap-list {
+    --cap-thumb: clamp(10rem, 26vw, 15rem);
+  }
+
+  /* From 40rem the picture stands at the row's end, beside both the name and the summary, and
+     the number and its rule hang from the top of the row. */
+  .cap-row {
+    grid-template-areas:
+      "num rule title thumb"
+      "num rule body thumb";
+    grid-template-rows: auto 1fr;
+    align-items: start;
+    column-gap: clamp(1rem, 1.6vw, 1.5rem);
+    row-gap: 0.5rem;
+    padding-block: clamp(1.5rem, 2.2vw, 2rem);
+  }
+
+  .cap-num {
+    padding-top: 0.3rem;
+  }
+
+  .cap-body {
+    padding-right: clamp(0rem, 1vw, 1rem);
+  }
+}
+
+@media (min-width: 64rem) {
+  .cap {
+    grid-template-columns: minmax(0, 40fr) minmax(0, 60fr);
+  }
+
+  .cap-lead {
+    aspect-ratio: auto;
+  }
+
+  .cap-lead-text,
+  .cap-list {
+    padding-block: clamp(3.5rem, 5.5vw, 5.5rem);
+  }
+
+  .cap-lead-text {
+    padding-right: clamp(2rem, 4vw, 4rem);
+  }
+
+  .cap-list {
+    --cap-thumb: 16vw;
+    padding-left: clamp(2rem, 4.5vw, 5rem);
+  }
+
+  /* The words keep to the top half of the tall panel, so the lower half comes up almost clear. */
+  .cap-scrim {
+    background: linear-gradient(
+      180deg,
+      rgb(20 20 20 / 0.66) 0%,
+      rgb(20 20 20 / 0.62) 52%,
+      rgb(20 20 20 / 0.18) 84%,
+      rgb(20 20 20 / 0.08) 100%
+    );
+  }
+}
+
+@media (min-width: 80rem) {
+  .cap {
+    grid-template-columns: minmax(0, 46fr) minmax(0, 54fr);
+  }
+
+  .cap-list {
+    --cap-thumb: 15rem;
+  }
+}
+
+/* ——— A service page's own project photograph, under the opening words (svc-feature) ———
+   A band inside the page margins: 21:9 on wide screens, 16:9 on tablets, 3:2 on phones, where a
+   21:9 band would thin to a strip. */
+
+.svc-feature {
+  position: relative;
+  aspect-ratio: 3 / 2;
+  overflow: hidden;
+}
+
+@media (min-width: 40rem) {
+  .svc-feature {
+    aspect-ratio: 16 / 9;
+  }
+}
+
+@media (min-width: 64rem) {
+  .svc-feature {
+    aspect-ratio: 21 / 9;
+  }
+}
+
+/* ——— A service page's photograph, beside its own text (svc-*) ———
+   Wide screens: in the margin column beside the text, 4:5, held in view while the text runs on.
+   It starts level with the text's first heading (prose-rouang sets 2em above an h3, at the lead
+   size). Narrower screens: above the text at its width, 3:2 on phones and 16:9 on tablets. */
+
+.svc-photo {
+  position: relative;
+  aspect-ratio: 3 / 2;
+  overflow: hidden;
+  max-width: 40rem;
+}
+
+@media (min-width: 40rem) {
+  .svc-photo {
+    aspect-ratio: 16 / 9;
+  }
+}
+
+@media (min-width: 64rem) {
+  .svc-aside {
+    position: sticky;
+    top: calc(var(--header-h) + 2rem);
+    align-self: start;
+    margin-top: calc(var(--fs-lead) * 2);
+  }
+
+  .svc-photo {
+    aspect-ratio: 4 / 5;
+    max-width: none;
+    max-height: min(72svh, 720px);
+  }
+}

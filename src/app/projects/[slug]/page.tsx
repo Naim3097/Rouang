@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import Image from "next/image";
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { ViewTransition } from "react";
+import { type CSSProperties, ViewTransition } from "react";
 import { CurveRule } from "@/components/brand/Brand";
 import { TitleBlock } from "@/components/projects/TitleBlock";
 import { DraftTag } from "@/components/projects/ProjectIndex";
@@ -63,10 +63,15 @@ export default async function ProjectPage({ params }: PageProps<"/projects/[slug
   ];
   const visibleChapters = chapters.filter((c) => c.body || showStubs);
 
-  // Photographs are threaded through the story rather than parked at the end.
-  const lead = gallery[0] ?? null;
-  const threaded = visibleChapters.map((_, i) => gallery.slice(1 + i * 2, 3 + i * 2));
-  const remainder = gallery.slice(1 + visibleChapters.length * 2);
+  // Photographs are threaded through the story rather than parked at the end, a row at a time: the
+  // first row opens the case study, each chapter with its own words gets the next, and the rest close
+  // it. A chapter still awaiting the studio's words (a preview stub) takes none, so the rows fall the
+  // same way in previews as on the live site.
+  const rows = planGallery(gallery);
+  const lead = rows[0] ?? null;
+  let cursor = 1;
+  const threaded = visibleChapters.map((c) => (c.body ? (rows[cursor++] ?? null) : null));
+  const remainder = rows.slice(cursor);
 
   const facts = [project.sector === "commercial" ? "Commercial" : "Residential", project.type, project.location, project.visualisation ? "Design proposal" : null]
     .filter(Boolean)
@@ -101,8 +106,9 @@ export default async function ProjectPage({ params }: PageProps<"/projects/[slug
           </div>
         </header>
       ) : (
-      /* ——— Opening: the photograph, full screen, with the title set on it ——— */
-      <header data-tone="dark" className="relative min-h-[100svh] overflow-hidden">
+      /* ——— Opening: the photograph with the title set on it. Four-fifths of the screen, not all of
+         it, so the first line of the case study already shows beneath it. ——— */
+      <header data-tone="dark" className="relative min-h-[80svh] overflow-hidden">
         <div className="absolute inset-0">
           {hero ? (
             <ViewTransition name={`project-${project.slug}`} share="project-image" default="none">
@@ -122,7 +128,7 @@ export default async function ProjectPage({ params }: PageProps<"/projects/[slug
           <div className="absolute inset-x-0 top-0 h-64 bg-linear-to-b from-ink/85 via-ink/60 to-transparent" aria-hidden="true" />
         </div>
 
-        <div className="page-x relative flex min-h-[100svh] flex-col justify-between pb-12 pt-[calc(var(--header-h)+1.5rem)] sm:pb-16">
+        <div className="page-x relative flex min-h-[80svh] flex-col justify-between pb-12 pt-[calc(var(--header-h)+1.5rem)] sm:pb-16">
           <Breadcrumbs tone="photo" items={[{ name: "Projects", href: "/projects" }, { name: project.title, href: `/projects/${project.slug}` }]} />
           <div>
             {/* The name comes first in the heading; the facts line is shown above it. */}
@@ -176,9 +182,7 @@ export default async function ProjectPage({ params }: PageProps<"/projects/[slug
               ) : null}
             </div>
           </div>
-          {lead ? (
-            <Figure image={lead} sizes="100vw" className="mt-20 sm:mt-28" showCaption />
-          ) : null}
+          {lead ? <GalleryRow row={lead} className="mt-20 sm:mt-28" /> : null}
         </div>
       </section>
 
@@ -211,7 +215,7 @@ export default async function ProjectPage({ params }: PageProps<"/projects/[slug
                     )}
                   </div>
                 </div>
-                {threaded[i]?.length ? <GalleryRow items={threaded[i]} flip={i % 2 === 1} /> : null}
+                {threaded[i] ? <GalleryRow row={threaded[i]} className="mt-16 sm:mt-24" /> : null}
               </div>
             ))}
           </div>
@@ -228,10 +232,15 @@ export default async function ProjectPage({ params }: PageProps<"/projects/[slug
                   <span id="motion-title">In motion</span>
                 </Label>
               </div>
-              {/* One loop is shown on its own at a readable size; more sit in a row. */}
+              {/* One loop is shown on its own at a readable size; more sit in a row. Three on a phone:
+                  the first across the width and two under it, rather than one left on its own. */}
               <ul
                 className={`col-span-12 grid gap-[var(--grid-gap)] lg:col-span-9 ${
-                  project.loops.length === 1 ? "max-w-[26rem] grid-cols-1" : project.loops.length === 2 ? "grid-cols-2" : "grid-cols-2 sm:grid-cols-3"
+                  project.loops.length === 1
+                    ? "max-w-[26rem] grid-cols-1"
+                    : project.loops.length === 2
+                      ? "grid-cols-2"
+                      : `grid-cols-2 sm:grid-cols-3 ${project.loops.length === 3 ? "[&>li:first-child]:col-span-2 sm:[&>li:first-child]:col-span-1" : ""}`
                 }`}
               >
                 {project.loops.map((l) => (
@@ -242,7 +251,7 @@ export default async function ProjectPage({ params }: PageProps<"/projects/[slug
                           src={l.poster}
                           alt={l.alt}
                           fill
-                          sizes={project.loops.length === 1 ? "(min-width: 640px) 26rem, 100vw" : "(min-width: 1024px) 24vw, (min-width: 640px) 31vw, 48vw"}
+                          sizes={project.loops.length === 1 ? "(min-width: 640px) 26rem, 100vw" : "(min-width: 1024px) 24vw, (min-width: 640px) 31vw, 92vw"}
                           quality={78}
                           className="object-cover"
                         />
@@ -339,8 +348,8 @@ export default async function ProjectPage({ params }: PageProps<"/projects/[slug
       {remainder.length ? (
         <section data-tone="light" className="bg-kapur text-ink" aria-label="More photographs">
           <div className="page-x section-y space-y-[var(--grid-gap)]">
-            {chunk(remainder, 2).map((row, i) => (
-              <GalleryRow key={i} items={row} flip={i % 2 === 0} tight />
+            {remainder.map((row, i) => (
+              <GalleryRow key={i} row={row} />
             ))}
           </div>
         </section>
@@ -414,32 +423,91 @@ function openerStill(hero: ImageData, film: Project["film"]): ImageData {
   return { ...hero, ...narrow, wide, alt };
 }
 
-function GalleryRow({ items, flip = false, tight = false }: { items: GalleryItem[]; flip?: boolean; tight?: boolean }) {
-  const spanClass: Record<GalleryItem["span"], string> = {
-    full: "col-span-12",
-    wide: "col-span-12 lg:col-span-9",
-    half: "col-span-12 sm:col-span-6",
-    narrow: "col-span-12 sm:col-span-5 lg:col-span-4",
-  };
-  // One crop per span, so phone photographs never run taller than the screen and pairs line up.
-  const aspectFor: Record<GalleryItem["span"], string> = { full: "16/9", wide: "3/2", half: "4/5", narrow: "4/5" };
+/*
+ * The gallery, in rows. A row is one wide view, or two or three photographs side by side; which one
+ * is set in the project's Markdown by each photograph's `span` and its order:
+ *   full / wide   a landscape on its own, as a 16:9 view
+ *   half          two side by side (consecutive halves pair up)
+ *   narrow        three side by side (consecutive narrows group in threes)
+ * Every frame is one of three shapes whatever the file's own proportions: portraits 4:5, landscapes
+ * 3:2, and anything wider 16:9 (`focus` sets what a crop keeps). In a row the photographs share one
+ * height, so tops and feet line up, even where a portrait sits beside a landscape. The row's height
+ * is capped by the sizing standard (styles/pages/case-study.css), so a row of portraits is drawn
+ * narrower rather than taller. A portrait is never left on its own: it joins the row beside it.
+ */
+type GalleryRowData = { wide: boolean; cells: GalleryItem[] };
+
+const PORTRAIT = 4 / 5;
+const LANDSCAPE = 3 / 2;
+const WIDE = 16 / 9;
+
+function frameRatio(item: GalleryItem) {
+  const own = "pending" in item ? ratioOf(item.aspect) : item.width / item.height;
+  return own < 1 ? PORTRAIT : own < 1.65 ? LANDSCAPE : WIDE;
+}
+
+function ratioOf(aspect: string) {
+  const [w, h] = aspect.split("/").map(Number);
+  return w / h;
+}
+
+function planGallery(items: GalleryItem[]): GalleryRowData[] {
+  const rows: GalleryRowData[] = [];
+  for (let i = 0; i < items.length; ) {
+    const first = items[i];
+    if ((first.span === "full" || first.span === "wide") && frameRatio(first) > 1) {
+      rows.push({ wide: true, cells: [first] });
+      i += 1;
+      continue;
+    }
+    const size = first.span === "narrow" ? 3 : 2;
+    let n = 1;
+    while (n < size && i + n < items.length && items[i + n].span === first.span) n += 1;
+    rows.push({ wide: false, cells: items.slice(i, i + n) });
+    i += n;
+  }
+  // A photograph left on its own: a landscape stands as a wide view; a portrait joins the row
+  // before it (or after it) where that row has room, so it is never alone at full width.
+  for (let r = 0; r < rows.length; r += 1) {
+    const row = rows[r];
+    if (row.wide || row.cells.length > 1) continue;
+    if (frameRatio(row.cells[0]) > 1) {
+      row.wide = true;
+      continue;
+    }
+    const host = [rows[r - 1], rows[r + 1]].find((h) => h && !h.wide && h.cells.length < 3);
+    if (!host) continue;
+    if (host === rows[r - 1]) host.cells.push(row.cells[0]);
+    else host.cells.unshift(row.cells[0]);
+    rows.splice(r, 1);
+    r -= 1;
+  }
+  return rows;
+}
+
+function GalleryRow({ row, className = "" }: { row: GalleryRowData; className?: string }) {
+  const ratios = row.cells.map((c) => (row.wide ? WIDE : frameRatio(c)));
+  const sum = ratios.reduce((s, r) => s + r, 0);
+  const first = row.cells[0];
+  // A wide view is never drawn wider than its file, so a small render is not blown up.
+  const max = row.wide && !("pending" in first) ? `${first.width}px` : undefined;
   return (
-    <div className={`page-grid items-start gap-y-[var(--grid-gap)] ${tight ? "" : "mt-16 sm:mt-24"}`}>
-      {items.map((img, k) => {
-        // A photograph on its own in a row is centred, not left beside an empty column.
-        const alone = items.length === 1 && img.span !== "full" && img.span !== "wide";
-        const start = alone ? "sm:col-start-4 sm:col-span-6" : items.length === 1 && img.span === "wide" ? (flip ? "lg:col-start-4" : "") : "";
-        return (
-          <Figure
-            key={k}
-            image={img}
-            aspect={aspectFor[img.span]}
-            sizes={img.span === "full" ? "100vw" : img.span === "narrow" ? "(min-width: 1024px) 33vw, 100vw" : "(min-width: 640px) 50vw, 100vw"}
-            className={`${spanClass[img.span]} ${start} ${flip && k === 0 && items.length > 1 ? "sm:order-2" : ""}`}
-            showCaption
-          />
-        );
-      })}
+    <div
+      className={`cs-row ${className}`}
+      style={{ "--cs-sum": sum.toFixed(4), "--cs-gaps": row.cells.length - 1, "--cs-max": max } as CSSProperties}
+    >
+      {row.cells.map((img, k) => (
+        <Figure
+          key={"pending" in img ? img.pending : img.src}
+          image={img}
+          aspect="var(--cs-a)"
+          // Phones: the width of the page. Larger screens: the frame's share of the row.
+          sizes={`(min-width: 640px) ${Math.ceil((ratios[k] / sum) * 92)}vw, 92vw`}
+          className={`cs-cell ${ratios[k] > 1 ? "cs-cell-land" : ""}`}
+          style={{ "--cs-r": ratios[k].toFixed(4) } as CSSProperties}
+          showCaption
+        />
+      ))}
     </div>
   );
 }
@@ -472,10 +540,4 @@ function NextProject({ project }: { project: Project }) {
       </Link>
     </section>
   );
-}
-
-function chunk<T>(arr: T[], size: number) {
-  const out: T[][] = [];
-  for (let i = 0; i < arr.length; i += size) out.push(arr.slice(i, i + size));
-  return out;
 }

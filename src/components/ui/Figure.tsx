@@ -1,12 +1,17 @@
 import Image from "next/image";
-import { ViewTransition } from "react";
+import { type CSSProperties, ViewTransition } from "react";
 import type { Image as ImageData, PendingImage } from "@/lib/content/schema";
 
 type FigureProps = {
   image: ImageData | PendingImage;
   sizes: string;
-  /** CSS aspect-ratio. Defaults to the photograph's own proportions. */
+  /**
+   * CSS aspect-ratio. Defaults to the photograph's own proportions. It may name a custom property
+   * ("var(--cs-a)"), so a stylesheet can change the frame's shape per breakpoint.
+   */
   aspect?: string;
+  /** Inline style for the <figure>, e.g. custom properties a layout reads (case-study.css). */
+  style?: CSSProperties;
   /** Above the fold: load at once and at high priority, with no reveal. */
   priority?: boolean;
   reveal?: boolean;
@@ -34,6 +39,7 @@ export function Figure({
   tone = "light",
   transitionName,
   showCaption = false,
+  style,
 }: FigureProps) {
   const isPending = "pending" in image;
   const ratio = aspect ?? (isPending ? image.aspect : `${image.width}/${image.height}`);
@@ -72,7 +78,7 @@ export function Figure({
   ) : null;
 
   return (
-    <figure className={className}>
+    <figure className={className} style={style}>
       {transitionName ? (
         <ViewTransition name={transitionName} share="project-image" default="none">
           {box}

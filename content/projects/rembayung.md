@@ -50,23 +50,9 @@ gallery:
     alt: "The timber-lined A-frame ceiling of the dining hall, rising to a glazed gable above a mezzanine"
     width: 1800
     height: 2400
-    span: wide
+    span: half
     role: space
     caption: "The main hall under its timber-lined roof."
-  - src: /images/projects/rembayung/rembayung-table-in-sun.jpg
-    alt: "A timber table and rattan-backed chair by the window in afternoon sun, with planting outside"
-    width: 1800
-    height: 2400
-    span: narrow
-    role: material
-    caption: "Timber and rattan by the window."
-  - src: /images/projects/rembayung/rembayung-batik-frame.jpg
-    alt: "Blue and white batik stretched across a timber frame beneath the roof, with a rattan lamp below"
-    width: 1800
-    height: 2400
-    span: half
-    role: material
-    caption: "Batik carried on timber frames overhead."
   - src: /images/projects/rembayung/rembayung-long-hall.jpg
     alt: "A long dining hall under the A-frame roof, divided down its length by a planted banquette"
     width: 1350
@@ -74,30 +60,18 @@ gallery:
     span: half
     role: whole
     caption: "The long hall, divided by a planted banquette."
-  - src: /images/projects/rembayung/rembayung-counter-edge.jpg
-    alt: "Close-up of a timber counter top with a routed groove along its edge, against slatted timber"
+  - src: /images/projects/rembayung/rembayung-batik-frame.jpg
+    alt: "Blue and white batik stretched across a timber frame beneath the roof, with a rattan lamp below"
     width: 1800
     height: 2400
     span: narrow
     role: material
-    caption: "Edge detail on a timber counter."
-  - src: /images/projects/rembayung/rembayung-rattan-pendant.jpg
-    alt: "A large rattan pendant lamp hanging under the steel and timber roof, with tables below"
-    width: 1350
-    height: 2400
-    span: half
-    role: space
-  - src: /images/projects/rembayung/rembayung-gable-dining.jpg
-    alt: "Dining tables with rattan-backed chairs beneath the glazed gable, behind a slatted timber screen"
-    width: 1350
-    height: 2400
-    span: half
-    role: space
+    caption: "Batik carried on timber frames overhead."
   - src: /images/projects/rembayung/rembayung-stained-glass-screen.jpg
     alt: "A partition of corrugated and stained glass in green, blue and amber, hung with woven trays and the Rembayung name"
     width: 1350
     height: 2400
-    span: half
+    span: narrow
     role: material
     caption: "Stained glass, woven trays and the restaurant's name."
   - src: /images/projects/rembayung/rembayung-batik-shelves.jpg
@@ -106,36 +80,62 @@ gallery:
     height: 2400
     span: narrow
     role: material
-  - src: /images/projects/rembayung/rembayung-ground-floor.jpg
-    alt: "The ground-floor dining room with bentwood chairs, timber blinds and a terracotta and concrete floor"
-    width: 1350
-    height: 2400
-    span: half
-    role: whole
   - src: /images/projects/rembayung/rembayung-upper-dining.jpg
     alt: "Upstairs dining under the pitched timber roof, with rows of tables and planters along the edge"
     width: 1350
     height: 2400
-    span: half
+    span: narrow
     role: whole
   - src: /images/projects/rembayung/rembayung-brick-wall.jpg
     alt: "The dining hall beneath a red brick wall with green and blue stained-glass windows and a mezzanine above"
     width: 1350
     height: 2400
-    span: half
+    span: narrow
     role: space
+  - src: /images/projects/rembayung/rembayung-ground-floor.jpg
+    alt: "The ground-floor dining room with bentwood chairs, timber blinds and a terracotta and concrete floor"
+    width: 1350
+    height: 2400
+    span: narrow
+    role: whole
+  - src: /images/projects/rembayung/rembayung-table-in-sun.jpg
+    alt: "A timber table and rattan-backed chair by the window in afternoon sun, with planting outside"
+    width: 1800
+    height: 2400
+    span: narrow
+    role: material
+    caption: "Timber and rattan by the window."
+  - src: /images/projects/rembayung/rembayung-rattan-pendant.jpg
+    alt: "A large rattan pendant lamp hanging under the steel and timber roof, with tables below"
+    width: 1350
+    height: 2400
+    span: narrow
+    role: space
+  - src: /images/projects/rembayung/rembayung-gable-dining.jpg
+    alt: "Dining tables with rattan-backed chairs beneath the glazed gable, behind a slatted timber screen"
+    width: 1350
+    height: 2400
+    span: narrow
+    role: space
+  - src: /images/projects/rembayung/rembayung-screen-and-lantern.jpg
+    alt: "A slatted timber screen and rattan lantern against the tall glass facade"
+    width: 1350
+    height: 2400
+    span: narrow
+    role: space
+  - src: /images/projects/rembayung/rembayung-counter-edge.jpg
+    alt: "Close-up of a timber counter top with a routed groove along its edge, against slatted timber"
+    width: 1800
+    height: 2400
+    span: narrow
+    role: material
+    caption: "Edge detail on a timber counter."
   - src: /images/projects/rembayung/rembayung-service-counter.jpg
     alt: "A timber service counter with a slatted front and patterned glass inserts"
     width: 1800
     height: 2400
     span: narrow
     role: material
-  - src: /images/projects/rembayung/rembayung-screen-and-lantern.jpg
-    alt: "A slatted timber screen and rattan lantern against the tall glass facade"
-    width: 1350
-    height: 2400
-    span: half
-    role: space
 brief: null
 concept: >-
   The interior sits under the building's tall pitched roof, which is lined in timber, carried on a

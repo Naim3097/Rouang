@@ -78,17 +78,17 @@
 }
 
 /* ——— The house beside "built" (StudioHouse.tsx) ———
-   A generic exploded drawing in Milky White line, decorative only. Every layer is a box the size of
-   the drawing's viewBox (1810 × 2866 units), masked by its line work, so a move in percent of a
-   layer's own height is a move in the drawing. The upper floor comes down 587 units (20.48%),
-   carrying the roof with it; the roof then comes down 507 more at the left guide (17.69%), with a
-   3.56° vertical shear (593 at its far corner), because the drawing turns the roof slightly
-   against the floors: so both eaves sit on the walls and vertical lines stay vertical. The ground
-   floor stays where it is. A layer takes the move of the upper floor as its translate and the move
-   of the roof as its transform, so the scroll can drive both on the compositor (the keyframes at
-   the foot of this file). At rest two numbers give the pose, --studio-up and --studio-roof: 1
-   where the house stands whole (without scroll-driven animation, and once it has come together),
-   0 where the layers hang apart as drawn (reduced motion).
+   A generic exploded drawing in Milky White line, decorative only. Here it is a still picture:
+   every layer a box the size of the drawing's viewBox (1810 × 2866 units), masked by its line work,
+   so a move in percent of a layer's own height is a move in the drawing. Two numbers give the pose,
+   --studio-ground and --studio-roof: 0 where the layers hang apart as drawn, 1 where the house stands
+   whole (without scroll-driven animation). Whole, the ground floor has risen 587 units (20.48%)
+   onto the upper floor and the roof has come down 507 units at the left guide (17.69%) onto it,
+   with a 3.56° vertical shear (593 at its far corner), because the drawing turns the roof slightly
+   against the floors: so both eaves sit on the walls and vertical lines stay vertical.
+   Where the house comes together as the page scrolls, a canvas draws it instead and this picture
+   steps aside (data-canvas). It stays without JavaScript, with reduced motion, and until the canvas
+   has drawn.
    Mind the comments inside the rules here: a lone apostrophe in one makes the compiler drop the
    custom property that follows it. */
 
@@ -100,10 +100,20 @@
   row-gap: clamp(2.5rem, 8vw, 4rem);
 }
 
+/* Centred under the sentence, so its rings, half as wide again as the drawing, run off both sides of
+   a phone alike and stay whole on a tablet. */
 .studio-house {
-  justify-self: end;
+  justify-self: center;
   width: min(100%, var(--studio-house-h) * 1810 / 2866);
   pointer-events: none;
+}
+
+/* Where the drawing starts on the screen, worked out against the room it sits in (the containers
+   below) and read by the rings, which measure against the drawing itself, as a length. */
+@property --art-x {
+  syntax: "<length>";
+  inherits: true;
+  initial-value: 0px;
 }
 
 /* Beside it: the sentence's column is a little wider than its longest line (16.7em of the headline
@@ -115,10 +125,21 @@
     grid-template-columns: calc(17.5 * var(--fs-h2)) minmax(0, 1fr);
     column-gap: clamp(2rem, 5vw, 5rem);
     align-items: center;
+    /* Measured by the rings, below. */
+    container-type: inline-size;
   }
 
-  .studio-house {
-    justify-self: center;
+  /* The left edge of the drawing on the screen, for the rings (below): the house centred in the
+     second column. */
+  .studio-house-art {
+    --art-x: calc(
+      var(--page-gutter) +
+        (
+          100cqw + 17.5 * var(--fs-h2) + clamp(2rem, 5vw, 5rem) -
+            min(100cqw - 17.5 * var(--fs-h2) - clamp(2rem, 5vw, 5rem), var(--studio-house-h) * 1810 / 2866)
+        ) /
+        2
+    );
   }
 }
 
@@ -127,38 +148,182 @@
   aspect-ratio: 1810 / 2866;
 }
 
-/* The drawing's full box: every layer below is a box this size. The still copy of the house
-   (StudioHouse.tsx) shows only where the other one moves. */
+/* The full box of the drawing: every layer below is a box this size, and so is the box of the rings. */
 .studio-house-stack {
-  --studio-up: 1;
-  --studio-roof: 1;
+  --studio-ground: 0;
+  --studio-roof: 0;
+}
+
+.studio-house-stack,
+.studio-house-rings {
   position: absolute;
   inset: 0;
 }
 
-.studio-house-still {
-  display: none;
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .studio-house-stack {
-    --studio-up: 0;
-    --studio-roof: 0;
-  }
-}
-
-/* Standing whole and still: the box keeps only the house, not the air the layers came down through. */
+/* Standing whole and still: the box keeps only the house, not the air the layers closed. The
+   finished house spans units 513 to 2271 of the drawing. */
 @supports not (animation-timeline: view()) {
   @media (prefers-reduced-motion: no-preference) {
+    /* With room above and below for the rings, which reach beyond the finished house: 462 and 530
+       units, and their dots. */
     .studio-house-art {
       aspect-ratio: 1810 / 1758;
+      margin-block: calc(462.4 / 1810 * 100% + 0.5rem) calc(529.6 / 1810 * 100% + 0.5rem);
     }
 
     .studio-house-stack {
-      inset: auto 0 0;
+      --studio-ground: 1;
+      --studio-roof: 1;
+    }
+
+    .studio-house-stack,
+    .studio-house-rings {
+      inset: calc(-513 / 1758 * 100%) 0 auto;
       height: calc(100% * 2866 / 1758);
     }
   }
+}
+
+/* ——— The rings behind the house (the client mockup, 23 Nov) ———
+   Three dotted circles in Milky White, centred on the finished house (905, 1425.6 in units of the
+   drawing: the middle of its width, and halfway from the ridge to the lowest corner of the garden),
+   so the house comes together in their middle. Hanging apart it fills them, as in the mockup: the
+   roof and the corner of the garden reach the outer ring. In the mockup the outer ring is 81% of
+   the height of the screen across, about the height of the house, and the others 0.865 and 0.70 of
+   it. Here the outer ring is 2750 units across (0.96 of the height of the drawing), the others in
+   the same proportion, so they scale with the house at every size.
+   Fainter towards the middle: the outer ring the clearest, the inner one barely there, so the
+   middle stays clean behind the house. And behind it: where a floor or the roof stands, the rings
+   are hidden, as the house hides them in the mockup.
+   This is the still picture, drawn once. Where the house comes together, the canvas draws the rings
+   too, from the geometry here (StudioHouse.tsx), beneath the house and cut away by it as it moves. */
+
+/* The box of the drawing, as a container: the rings measure the house by it. */
+.studio-house-rings {
+  container-type: size;
+}
+
+.studio-rings {
+  /* The outer ring across, then the side of the box: room around the outer ring for its dots,
+     which the mask would otherwise cut in half. */
+  --ring-d: calc(100cqw * 2750 / 1810);
+  --ring-s: calc(var(--ring-d) + 1rem);
+  /* Where the drawing lies in this box: centred across, the finished house at its middle. */
+  --ring-art: calc((var(--ring-s) - 100cqw) / 2) calc(var(--ring-s) / 2 - 100cqh * 1425.6 / 2866);
+  position: absolute;
+  left: 50%;
+  top: calc(1425.6 / 2866 * 100%);
+  width: var(--ring-s);
+  max-width: none;
+  height: auto;
+  aspect-ratio: 1;
+  translate: -50% -50%;
+  overflow: visible;
+  /* Cut away where the roof, the upper floor and the ground floor stand, hanging apart as drawn. */
+  mask-image:
+    linear-gradient(#000 0 0), url("/images/studio/house-roof-solid.svg"), url("/images/studio/house-upper-solid.svg"),
+    url("/images/studio/house-ground-solid.svg");
+  mask-size:
+    100% 100%,
+    100cqw 100cqh,
+    100cqw 100cqh,
+    100cqw 100cqh;
+  mask-position: 0 0, var(--ring-art), var(--ring-art), var(--ring-art);
+  mask-repeat: no-repeat;
+  mask-composite: subtract, add, add, add;
+}
+
+/* Each ring a row of round dots (a dash of no length, with round caps). A radius in percent is of
+   the side of the box, which is square: the outer ring on its edge, less the room for the dots, the
+   others 0.865 and 0.70 of it, as in the mockup. */
+.studio-ring {
+  --ring-r: calc(50% - 0.5rem);
+  fill: none;
+  stroke: var(--color-kapur);
+  stroke-width: 1.5px;
+  stroke-linecap: round;
+  stroke-dasharray: 0 1;
+}
+
+.studio-ring-1 {
+  r: var(--ring-r);
+  stroke-opacity: 0.46;
+}
+
+.studio-ring-2 {
+  r: calc(var(--ring-r) * 0.865);
+  stroke-opacity: 0.22;
+}
+
+.studio-ring-3 {
+  r: calc(var(--ring-r) * 0.7);
+  stroke-opacity: 0.09;
+}
+
+/* Beside the sentence: where the screen is too narrow for the rings to clear it (below about 1400px
+   wide), they fade out on the left before its longest line, 16.7em of the headline size from the
+   gutter, as the house keeps clear of it. Elsewhere this changes nothing. */
+@media (min-width: 64rem), (orientation: landscape) and (max-height: 32rem) {
+  .studio-rings {
+    --ring-fade: calc(var(--page-gutter) + 16.7 * var(--fs-h2) + 0.75rem - var(--art-x) - 50cqw + var(--ring-s) / 2);
+    mask-image:
+      linear-gradient(to right, transparent var(--ring-fade), #000 calc(var(--ring-fade) + 2.75rem)), linear-gradient(#000 0 0),
+      url("/images/studio/house-roof-solid.svg"), url("/images/studio/house-upper-solid.svg"),
+      url("/images/studio/house-ground-solid.svg");
+    mask-size:
+      100% 100%,
+      100% 100%,
+      100cqw 100cqh,
+      100cqw 100cqh,
+      100cqw 100cqh;
+    mask-position: 0 0, 0 0, var(--ring-art), var(--ring-art), var(--ring-art);
+    mask-composite: intersect, subtract, add, add, add;
+  }
+}
+
+/* Standing whole and still (no scroll-driven animation): the house is too compact there to stand
+   in front of any ring but the inner one, at the corners of its garden, so nothing is cut away;
+   beside the sentence, the fade alone. */
+@supports not (animation-timeline: view()) {
+  @media (prefers-reduced-motion: no-preference) {
+    .studio-rings {
+      mask-image: none;
+    }
+  }
+
+  @media (prefers-reduced-motion: no-preference) and (min-width: 64rem), (prefers-reduced-motion: no-preference) and (orientation: landscape) and (max-height: 32rem) {
+    .studio-rings {
+      mask-image: linear-gradient(to right, transparent var(--ring-fade), #000 calc(var(--ring-fade) + 2.75rem));
+      mask-size: 100% 100%;
+      mask-position: 0 0;
+      mask-composite: add;
+    }
+  }
+}
+
+/* The canvas (StudioHouse.tsx) covers the drawing pixel for pixel, and the rings around it: as
+   wide as the outer ring, and a little taller than the drawing. Hidden, not removed, until it has
+   drawn, so it keeps its size. */
+.studio-house-canvas {
+  position: absolute;
+  top: -0.5rem;
+  left: calc(50% - max(50%, 2750 / 1810 * 50% + 0.5rem));
+  width: max(100%, 2750 / 1810 * 100% + 1rem);
+  height: calc(100% + 1rem);
+  max-width: none;
+  visibility: hidden;
+}
+
+.studio-house[data-canvas] .studio-rings {
+  visibility: hidden;
+}
+
+.studio-house[data-canvas] .studio-house-canvas {
+  visibility: visible;
+}
+
+.studio-house[data-canvas] .studio-house-stack {
+  display: none;
 }
 
 .studio-house-frame,
@@ -167,27 +332,22 @@
   inset: 0;
 }
 
-.studio-house-up {
-  translate: 0 calc(var(--studio-up) * 20.4815%);
+/* The ground floor rises onto the upper floor. */
+.studio-house-ground {
+  translate: 0 calc(var(--studio-ground) * -20.4815%);
 }
 
-.studio-house-up-undo {
-  translate: 0 calc(var(--studio-up) * -20.4815%);
-}
-
-/* The roof rides down with the upper floor, then settles onto it, sheared about the left guide. */
+/* The roof comes down onto the upper floor, sheared about the left guide. */
 .studio-house-roof,
 .studio-house-roof-undo {
   transform-origin: 12.3204% 0;
 }
 
 .studio-house-roof {
-  translate: 0 calc(var(--studio-up) * 20.4815%);
   transform: translateY(calc(var(--studio-roof) * 17.6902%)) skewY(calc(var(--studio-roof) * 3.556deg));
 }
 
 .studio-house-roof-undo {
-  translate: 0 calc(var(--studio-up) * -20.4815%);
   transform: skewY(calc(var(--studio-roof) * -3.556deg)) translateY(calc(var(--studio-roof) * -17.6902%));
 }
 
@@ -213,11 +373,11 @@
   mask-repeat: no-repeat;
 }
 
-.studio-house-ground {
+.studio-house-ground-lines {
   mask-image: url("/images/studio/house-ground-lines.svg");
 }
 
-.studio-house-upper {
+.studio-house-upper-lines {
   mask-image: url("/images/studio/house-upper-lines.svg");
 }
 
@@ -225,10 +385,11 @@
   mask-image: url("/images/studio/house-roof-lines.svg");
 }
 
-/* A guide: a strip around one dashed run, clipped in the frame of the layer it hangs from, with
-   the dashes fixed to the layer below. As the gap closes the higher layer comes down the strip,
-   and the guide is gone as the two meet. Inside the strip the dashes are a box the size of the
-   drawing again, set back to its corner, so they move as the layers do. */
+/* A guide: a strip around one dashed run, with the dashes fixed to the upper floor. The strip moves
+   with the lower edge of its gap: the roof coming down onto the upper floor, or the ground floor
+   rising to it. So the guide shortens as the gap closes and is gone as the two meet. Inside the
+   strip the dashes are a box the size of the drawing again, set back to its corner, so they can
+   be held where the drawing has them. */
 .studio-house-guide {
   position: absolute;
   left: calc(var(--gx) / 1810 * 100%);
@@ -249,105 +410,93 @@
   mask-repeat: no-repeat;
 }
 
-/* Between the roof and the upper floor: the strip moves with the roof, the dashes with the floor. */
+/* Between the roof and the upper floor: the strip moves with the roof, the dashes stay. */
 .studio-house-guide-upper > div {
   mask-image: url("/images/studio/house-guides-upper.svg");
   transform-origin: 12.3204% 0;
   transform: skewY(calc(var(--studio-roof) * -3.556deg)) translateY(calc(var(--studio-roof) * -17.6902%));
 }
 
-/* Between the upper floor and the ground floor. */
+/* Between the upper floor and the ground floor: the strip rises with the ground floor, the dashes
+   stay. */
 .studio-house-guide-lower > div,
 .studio-house-guide-ground > div {
   mask-image: url("/images/studio/house-guides-lower.svg");
 }
 
 .studio-house-guide-lower > div {
-  translate: 0 calc(var(--studio-up) * -20.4815%);
+  translate: 0 calc(var(--studio-ground) * 20.4815%);
 }
 
-/* Within the ground floor, down to the carport: it fades as the upper floor sets off. */
+/* Within the ground floor, down to the carport: it fades as the ground floor sets off. */
 .studio-house-guide-ground {
-  opacity: calc(1 - 2 * var(--studio-up));
+  opacity: calc(1 - 2 * var(--studio-ground));
 }
 
 /* Large screens with scroll-driven animation: the stage pins. First the house comes together
-   beside the sentence: the upper floor settles onto the ground floor, then the roof onto it. Then
-   the sentence pans left out of the frame, each line at a slightly different rate so it moves like
-   type on a sheet rather than a block, and the house with it, while the studio arrives from the
-   right. The field travels the same way at about half the pace, so the light leaves with the
-   sentence and the studio settles on the deep green. Elsewhere the house comes together as it
-   crosses the screen, whole by the time it reaches the middle, and the last word drifts a little as
-   it passes. Transforms and opacity only, all of them run by the compositor. */
+   beside the sentence, in the middle: the roof comes down as the ground floor rises onto the upper
+   floor (drawn on a canvas, StudioHouse.tsx, timed to contain 4% to 34% of the pinned run). Then the
+   sentence pans left out of the frame, each line at a slightly different rate so it moves like type
+   on a sheet rather than a block, and the house with it, while the studio arrives from the right.
+   The field travels the same way at about half the pace, so the light leaves with the sentence and
+   the studio settles on the deep green. Elsewhere the house comes together as it crosses the
+   screen, whole by the time it reaches the middle, and the last word drifts a little as it passes.
+   Transforms and opacity only, all of them run by the compositor.
+
+   Chrome runs a move on the compositor, off the main thread, only if its element is painted when
+   the move is set up. It sets every move up as the page loads, when this section lies far from
+   what is painted, and does not try again, so they would all run on the main thread. So the moves
+   are set up late, in the spirit of Inside a project: --studio-near is 1 only while the section
+   is within a screen of the window, above or below. Then every move changes to a copy of itself
+   under a second name; the first is dropped and the copy set up, and nothing on screen changes,
+   since every move is still at its start (or its end). The text stays in the page throughout, for
+   keyboards and screen readers alike, and the drawing is loaded with the page as before, so the
+   change costs one restyle of the section and nothing more. A browser without style queries keeps
+   the first moves. */
+
+/* 1 while the section is within a screen of the window (set by the scroll, below). Not inherited:
+   the moves read it on the section itself, the container named studio, so turning it on restyles
+   only what depends on it. */
+@property --studio-near {
+  syntax: "<integer>";
+  inherits: false;
+  initial-value: 0;
+}
 
 @supports (animation-timeline: view()) {
   @media (prefers-reduced-motion: no-preference) {
+    /* The switch is two short moves, on as the section comes within a screen and off once it is a
+       screen past, each over 1lvh of scroll and held between: a move held at its end costs nothing
+       per frame, where one running the whole way would restyle the section on every frame. */
+    .studio-scene {
+      container-name: studio;
+      view-timeline: --studio block;
+      animation-name: studio-near-on, studio-near-off;
+      animation-timing-function: linear;
+      animation-fill-mode: both, forwards;
+      animation-timeline: --studio;
+      animation-range:
+        cover -100lvh cover -99lvh,
+        cover calc(100% + 99lvh) cover calc(100% + 100lvh);
+    }
+
     .studio-line-3 {
       animation: studio-drift var(--ease-scrub) both;
       animation-timeline: view();
       animation-range: cover 0% cover 100%;
     }
 
-    /* The house comes together over one stretch of the scroll, named here for everything in it:
-       as the drawing crosses the screen, or (below) early in the pinned run. At the very end of
-       the stretch the still copy, standing whole, takes the place of the moving one. */
-    .studio-house-art {
-      --studio-build: --studio-house;
-      --studio-build-range: cover 12% cover 50%;
-      view-timeline: --studio-house block;
-    }
-
-    .studio-house-moving {
-      animation: studio-house-moving step-end both;
-    }
-
-    .studio-house-still {
-      display: block;
-      animation: studio-house-still step-end both;
-    }
-
-    .studio-house-moving .studio-house-up {
-      animation: studio-house-up linear both;
-    }
-
-    .studio-house-moving .studio-house-up-undo,
-    .studio-house-guide-lower > div {
-      animation: studio-house-up-undo linear both;
-    }
-
-    .studio-house-moving .studio-house-roof {
-      animation:
-        studio-house-up linear both,
-        studio-house-roof linear both;
-    }
-
-    .studio-house-moving .studio-house-roof-undo {
-      animation:
-        studio-house-up-undo linear both,
-        studio-house-roof-undo linear both;
-    }
-
-    .studio-house-guide-upper > div {
-      animation: studio-house-roof-undo linear both;
-    }
-
-    .studio-house-guide-ground {
-      animation: studio-house-guide-fade linear both;
-    }
-
-    .studio-house-stack,
-    .studio-house-moving .studio-house-frame,
-    .studio-house-guide > div,
-    .studio-house-guide-ground {
-      animation-timeline: var(--studio-build);
-      animation-range: var(--studio-build-range);
+    /* Near the window, the same moves under their second names (see above). */
+    @container studio style(--studio-near: 1) {
+      .studio-line-3 {
+        animation-name: studio-drift-near;
+      }
     }
   }
 
   @media (min-width: 64rem) and (prefers-reduced-motion: no-preference) {
     .studio-scene {
       height: 390svh;
-      view-timeline: --studio block;
     }
 
     /* Clipped, not a scroll box: focus on a link still on its way in must not scroll the stage
@@ -414,23 +563,28 @@
     }
 
     /* The house: in the room to the right of the sentence, as large as that room allows. */
+    /* Not a container here: the house is placed against the stage (it is the house that the
+       rings measure by). */
     .studio-pair {
       display: block;
+      container-type: normal;
     }
 
     .studio-house {
       --pan: -100vw;
-      --pad: clamp(1rem, 3svh, 2rem);
+      /* The nearest it may come to the sentence: its longest line is 16.7em of the headline size. */
+      --house-left: max(var(--page-gutter) + 17 * var(--fs-h2) + clamp(2rem, 4vw, 4.5rem), 42vw + var(--page-gutter));
       position: absolute;
       justify-self: stretch;
-      /* Centred on 71% of the screen's width, as in the client's mockup, from just under the header
-         to just above the foot (on a 16:9 or 16:10 screen about 86% of its height); nearer the
-         sentence only where the screen is too narrow for that. */
-      inset: calc(var(--header-h) + var(--pad)) var(--page-gutter) var(--pad)
-        max(var(--page-gutter) + 17 * var(--fs-h2) + clamp(2rem, 4vw, 4.5rem), 42vw + var(--page-gutter));
+      /* As in the client's mockup: the line work runs from 11.4% of the screen's height, just under
+         the header, to 2.6% above its foot, so 86% of its height (the drawing's box reaches a
+         little beyond its lines), centred on 70.9% of its width; nearer the sentence, or smaller,
+         only where the screen is too narrow for that. */
+      inset: max(var(--header-h) + 0.75rem, 11.1svh) var(--page-gutter) max(0.75rem, 2.3svh) var(--house-left);
       width: auto;
       display: grid;
-      place-items: center;
+      align-items: center;
+      justify-items: start;
       container-type: size;
       /* The sentence's longest line is 16.7em wide; the house keeps a gap beyond it. It leaves with
          the sentence, setting off a little after it and travelling further, so it never closes on
@@ -442,9 +596,23 @@
     }
 
     .studio-house-art {
-      --studio-build: --studio;
-      --studio-build-range: contain 4% contain 34%;
-      height: min(100cqh, 100cqw * 2866 / 1810);
+      --art-h: min(100cqh, 100cqw * 2866 / 1810);
+      --art-ml: clamp(0px, 70.9vw - var(--house-left) - var(--art-h) * 905 / 2866, 100cqw - var(--art-h) * 1810 / 2866);
+      --art-x: calc(var(--house-left) + var(--art-ml));
+      height: var(--art-h);
+      margin-inline-start: var(--art-ml);
+    }
+
+    /* Room above for the drawing as it rises (at most 300 units, StudioHouse.tsx), the rings with it. */
+    .studio-house-canvas {
+      top: calc(-300 / 2866 * 100% - 0.5rem);
+      height: calc(100% + 300 / 2866 * 100% + 1rem);
+    }
+
+    /* The outer ring no wider than leaves it clear of the header once the house has risen to the
+       middle of the stage: 81% of the height where the screen is 900px high, as in the mockup. */
+    .studio-rings {
+      --ring-d: min(100cqw * 2750 / 1810, 100svh - 2 * (var(--header-h) + 0.5rem));
     }
 
     .studio-idea {
@@ -457,88 +625,73 @@
       animation-timeline: --studio;
       animation-range: contain 55.9% contain 90.1%;
     }
+
+    /* Near the window, the same moves under their second names (see above). */
+    @container studio style(--studio-near: 1) {
+      .studio-field {
+        animation-name: studio-field-near;
+      }
+
+      .studio-word > .t-label,
+      .studio-line,
+      .studio-house {
+        animation-name: studio-pan-near;
+      }
+
+      .studio-idea {
+        animation-name: studio-arrive-near;
+      }
+    }
   }
 }
 
-/* The house comes together: the upper floor settles first, eased in and out over the first two
-   thirds of the stretch; the roof sets off as the floor nears its place and lands last. Each
-   layer of the drawing takes the moves it shares (and the frame under it takes them back). */
-@keyframes studio-house-up {
-  0% {
-    translate: 0 0;
-    animation-timing-function: cubic-bezier(0.42, 0, 0.22, 1);
-  }
-  64%,
-  100% {
-    translate: 0 20.4815%;
-  }
-}
-
-@keyframes studio-house-up-undo {
-  0% {
-    translate: 0 0;
-    animation-timing-function: cubic-bezier(0.42, 0, 0.22, 1);
-  }
-  64%,
-  100% {
-    translate: 0 -20.4815%;
-  }
-}
-
-@keyframes studio-house-roof {
-  0%,
-  36% {
-    transform: translateY(0) skewY(0deg);
-    animation-timing-function: cubic-bezier(0.42, 0, 0.22, 1);
-  }
-  100% {
-    transform: translateY(17.6902%) skewY(3.556deg);
-  }
-}
-
-@keyframes studio-house-roof-undo {
-  0%,
-  36% {
-    transform: skewY(0deg) translateY(0);
-    animation-timing-function: cubic-bezier(0.42, 0, 0.22, 1);
-  }
-  100% {
-    transform: skewY(-3.556deg) translateY(-17.6902%);
-  }
-}
-
-/* The short guide within the ground floor is gone by the time the upper floor is halfway down. */
-@keyframes studio-house-guide-fade {
-  0% {
-    opacity: 1;
-    animation-timing-function: ease-in;
-  }
-  23.4%,
-  100% {
-    opacity: 0;
-  }
-}
-
-/* From the very end of the stretch on, the still copy stands in for the moving one. */
-@keyframes studio-house-moving {
-  to {
-    opacity: 0;
-  }
-}
-
-@keyframes studio-house-still {
+/* --studio-near: 1 from a screen before the section to a screen after it, 0 beyond. */
+@keyframes studio-near-on {
   from {
-    opacity: 0;
+    --studio-near: 0;
+  }
+  to {
+    --studio-near: 1;
   }
 }
 
+@keyframes studio-near-off {
+  from {
+    --studio-near: 1;
+  }
+  to {
+    --studio-near: 0;
+  }
+}
+
+/* The moves of the text and the field, twice in the same way. */
 @keyframes studio-pan {
   to {
     translate: var(--pan) 0;
   }
 }
 
+@keyframes studio-pan-near {
+  to {
+    translate: var(--pan) 0;
+  }
+}
+
 @keyframes studio-arrive {
+  0% {
+    translate: 46vw 0;
+    opacity: 0;
+  }
+  45% {
+    opacity: 1;
+  }
+  100% {
+    translate: 0 0;
+    opacity: 1;
+  }
+}
+
+@keyframes studio-arrive-near {
   0% {
     translate: 46vw 0;
     opacity: 0;
@@ -561,7 +714,22 @@
   }
 }
 
+@keyframes studio-drift-near {
+  from {
+    translate: 7vw 0;
+  }
+  to {
+    translate: 0 0;
+  }
+}
+
 @keyframes studio-field {
+  to {
+    translate: -100vw 0;
+  }
+}
+
+@keyframes studio-field-near {
   to {
     translate: -100vw 0;
   }

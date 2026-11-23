@@ -1,0 +1,52 @@
+/* case-study (round 6, 23 Nov 2026). The gallery rows of a case study (app/projects/[slug]/page.tsx,
+   GalleryRow). Imported by globals.css.
+
+   A row is one wide view, or two or three photographs side by side. Every frame is one of three
+   shapes (--cs-r on each: portrait 4:5, landscape 3:2, wide 16:9), and the photographs in a row share
+   one height: each takes a share of the row's width in proportion to its shape (grow by --cs-r from a
+   basis of 0), so the tops and the feet line up even where a portrait sits beside a landscape.
+   No row is taller than min(72svh, 720px): the sizing standard's cap for portraits, used here for
+   wide views too (the standard allows them up to min(80svh, 760px)), so the large rows of a case
+   study share one height and none fills the screen under the header. A row that would be taller is
+   drawn narrower and centred (--cs-sum is the sum of its shapes, --cs-gaps the number of gaps), so
+   its frames keep their shapes instead of being cropped flatter. A wide view is also never wider than
+   its own file (--cs-max).
+   Phones: one photograph after another, the full width of the page, portraits at 4:5 and every
+   landscape at 3:2. */
+
+/* Items start at the top rather than stretch: a stretched figure would hand its caption's height on
+   to the frame inside it (Figure's frame is h-full) and break the frame's shape. */
+.cs-row {
+  --cs-cap: min(72svh, 720px);
+  display: grid;
+  align-items: start;
+  row-gap: var(--grid-gap);
+}
+
+.cs-cell {
+  --cs-a: var(--cs-r);
+  min-width: 0;
+}
+
+@media (max-width: 39.999rem) {
+  .cs-cell-land {
+    --cs-a: 3 / 2;
+  }
+}
+
+@media (min-width: 40rem) {
+  .cs-row {
+    display: flex;
+    align-items: flex-start;
+    column-gap: var(--grid-gap);
+    max-width: min(100%, calc(var(--cs-cap) * var(--cs-sum) + var(--cs-gaps) * var(--grid-gap)), var(--cs-max, 100%));
+    margin-inline: auto;
+  }
+
+  /* Scaled by 100 so the growth of a row always adds up to more than 1 and fills it. */
+  .cs-cell {
+    flex-grow: calc(var(--cs-r) * 100);
+    flex-shrink: 1;
+    flex-basis: 0%;
+  }
+}

@@ -73,14 +73,9 @@ gallery:
     alt: "Design visualisation: rattan chairs on the covered terrace, open to the street"
     width: 1080
     height: 607
-    span: half
+    span: wide
   - src: /images/projects/warung-soho/warung-soho-buffet.jpg
     alt: "Design visualisation: the buffet counter in front of a leaf-pattern mural"
-    width: 1080
-    height: 607
-    span: half
-  - src: /images/projects/warung-soho/warung-soho-glasshouse.jpg
-    alt: "Design visualisation: tables along a glazed wall with hanging planting and rattan pendants"
     width: 1080
     height: 607
     span: half
@@ -89,6 +84,11 @@ gallery:
     width: 1080
     height: 607
     span: half
+  - src: /images/projects/warung-soho/warung-soho-glasshouse.jpg
+    alt: "Design visualisation: tables along a glazed wall with hanging planting and rattan pendants"
+    width: 1080
+    height: 607
+    span: wide
 services:
   - renovation-and-interior
 seo:

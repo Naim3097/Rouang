@@ -74,11 +74,21 @@ gallery:
     width: 1600
     height: 2400
     span: narrow
+  - src: /images/projects/ampang/ampang-powder-room.jpg
+    alt: "A powder room with floral wallpaper, an arched mirror between wall lanterns, green tiles and a black vanity"
+    width: 1600
+    height: 2400
+    span: narrow
+  - src: /images/projects/ampang/ampang-velvet-seat.jpg
+    alt: "A tufted red velvet seat set into an arched recess in white joinery"
+    width: 1600
+    height: 2400
+    span: narrow
   - src: /images/projects/ampang/ampang-porch.jpg
     alt: "The porch: an arched, black-framed front door beside full-height black-framed windows on a white wall"
     width: 2400
     height: 1601
-    span: wide
+    span: half
   - src: /images/projects/ampang/ampang-corridor.jpg
     alt: "A narrow panelled corridor ending in an arched glass door, over a black and white geometric floor"
     width: 1600
@@ -89,26 +99,6 @@ gallery:
     width: 1600
     height: 2400
     span: narrow
-  - src: /images/projects/ampang/ampang-powder-room.jpg
-    alt: "A powder room with floral wallpaper, an arched mirror between wall lanterns, green tiles and a black vanity"
-    width: 1600
-    height: 2400
-    span: half
-  - src: /images/projects/ampang/ampang-black-joinery.jpg
-    alt: "Black joinery with ribbed vents and turned brass handles"
-    width: 1600
-    height: 2400
-    span: narrow
-  - src: /images/projects/ampang/ampang-velvet-seat.jpg
-    alt: "A tufted red velvet seat set into an arched recess in white joinery"
-    width: 1600
-    height: 2400
-    span: half
-  - src: /images/projects/ampang/ampang-dressing-arch.jpg
-    alt: "A timber-lined arch opening into a dressing area with a lit mirror and brass lantern"
-    width: 1600
-    height: 2400
-    span: half
   - src: /images/projects/ampang/ampang-dressing-room.jpg
     alt: "A dark timber wardrobe with lit open shelves beside a dressing table"
     width: 1600
@@ -116,6 +106,16 @@ gallery:
     span: narrow
   - src: /images/projects/ampang/ampang-wall-lights.jpg
     alt: "Black-shaded brass wall lights against black panelling"
+    width: 1600
+    height: 2400
+    span: narrow
+  - src: /images/projects/ampang/ampang-dressing-arch.jpg
+    alt: "A timber-lined arch opening into a dressing area with a lit mirror and brass lantern"
+    width: 1600
+    height: 2400
+    span: narrow
+  - src: /images/projects/ampang/ampang-black-joinery.jpg
+    alt: "Black joinery with ribbed vents and turned brass handles"
     width: 1600
     height: 2400
     span: narrow

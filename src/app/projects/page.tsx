@@ -28,7 +28,9 @@ export async function generateMetadata(): Promise<Metadata> {
  * phones. Every plate is the same size and the same shape, 4:3, with its caption beneath it at the
  * same distance, so the columns, the pictures and the captions all line up. Two across rather than
  * three: the photographs stay large enough to read a room, and the smaller source files (some
- * visualisations are only about 1,100 px wide) still hold at that size.
+ * visualisations are only about 1,100 px wide) still hold at that size. The one exception is a group
+ * of exactly three or six on large screens (Plates), which sits three across rather than leave a
+ * plate alone beside an empty half.
  */
 const PLATE_ASPECT = "4/3";
 
@@ -99,10 +101,15 @@ export default async function ProjectsPage() {
   );
 }
 
-/** One group of plates. Built work is numbered first and the proposals carry on from it. */
+/**
+ * One group of plates. Built work is numbered first and the proposals carry on from it.
+ * A group of three (or six) sits three across on large screens, so its last row is never one plate
+ * beside an empty half; it also sets the proposals a step smaller than the finished work above them.
+ */
 function Plates({ projects, startAt, heading: Heading }: { projects: Project[]; startAt: number; heading: "h2" | "h3" }) {
+  const threes = projects.length % 3 === 0;
   return (
-    <ul className="grid gap-x-[var(--grid-gap)] gap-y-[clamp(3rem,6vw,5rem)] sm:grid-cols-2">
+    <ul className={`grid gap-x-[var(--grid-gap)] gap-y-[clamp(3rem,6vw,5rem)] sm:grid-cols-2 ${threes ? "lg:grid-cols-3" : ""}`}>
       {projects.map((p, i) => {
         const img = publicImage(p.card ?? p.hero);
         const n = startAt + i;
@@ -113,7 +120,7 @@ function Plates({ projects, startAt, heading: Heading }: { projects: Project[]; 
                 <Figure
                   image={plateImage(img)}
                   aspect={PLATE_ASPECT}
-                  sizes="(min-width: 640px) 50vw, 100vw"
+                  sizes={threes ? "(min-width: 1024px) 31vw, (min-width: 640px) 46vw, 92vw" : "(min-width: 640px) 46vw, 92vw"}
                   // The first plate is the largest paint on this page.
                   priority={n === 1}
                   transitionName={`project-${p.slug}`}

@@ -1,15 +1,17 @@
 import type { Metadata } from "next";
+import Image from "next/image";
 import { notFound } from "next/navigation";
 import { Icon, Mark } from "@/components/brand/Brand";
 import { ProjectIndex } from "@/components/projects/ProjectIndex";
 import { ButtonLink } from "@/components/ui/Button";
 import { Breadcrumbs } from "@/components/ui/Breadcrumbs";
-import { Figure } from "@/components/ui/Figure";
 import { JsonLd } from "@/components/ui/JsonLd";
 import { Pending } from "@/components/ui/Section";
 import { Label, TitlePair } from "@/components/ui/Typography";
+import { placeholderImagery } from "@/config/media";
 import { processSteps } from "@/config/process";
-import { getProject, getProjects, getService, getServices, projectImage, staticSlugs } from "@/lib/content";
+import { getProject, getProjects, getService, getServices, projectImage, publicImage, staticSlugs } from "@/lib/content";
+import type { Image as ImageData } from "@/lib/content/schema";
 import { SHOW_DRAFTS } from "@/lib/env";
 import { serviceSchema } from "@/lib/schema";
 import { pageMetadata } from "@/lib/seo";
@@ -18,6 +20,29 @@ export const ensureStatic = "navigation";
 // Every slug is prerendered and quick to fetch, so a navigation that waits for the static
 // payload is acceptable. Content stays in the HTML instead of a hidden Suspense segment.
 export const instant = false;
+
+/*
+ * One temporary photograph per service (src/config/media.ts), set beside the page's own text, the
+ * longest run of words on it. publicImage() drops it from production, where the text simply keeps
+ * its column. None shows a ROUANG project, so none is captioned. A page that shows one of the
+ * studio's own photographs (its feature, under the opening words) keeps that one as well.
+ */
+const servicePhotos: Record<string, ImageData | null> = {
+  "design-and-build": publicImage(placeholderImagery.serviceDesignBuild),
+  "renovation-and-interior": publicImage(placeholderImagery.serviceRenovation),
+  "new-build-and-construction": publicImage(placeholderImagery.serviceNewBuild),
+};
+
+/** `sizes` for the photograph beside the text, widened where it has to cover its frame (services.css, svc-*). */
+function asideSizes(image: ImageData) {
+  const ratio = image.width / image.height;
+  const at = (frame: number, w: string) => {
+    const cover = Math.max(1, ratio / frame);
+    return cover === 1 ? w : `calc(${w} * ${cover.toFixed(2)})`;
+  };
+  // Three of the twelve columns on wide screens; under that, the text's width (at most 40rem).
+  return [`(min-width: 64rem) ${at(4 / 5, "22vw")}`, `(min-width: 40rem) ${at(16 / 9, "min(92vw, 40rem)")}`, at(3 / 2, "92vw")].join(", ");
+}
 
 export async function generateStaticParams() {
   return staticSlugs(await getServices());
@@ -40,6 +65,7 @@ export default async function ServicePage({ params }: PageProps<"/services/[slug
   const faqs = service.faqs.filter((f) => f.confirmed || SHOW_DRAFTS);
   const featureProject = service.feature ? await getProject(service.feature.project) : null;
   const feature = service.feature ? projectImage(featureProject, service.feature.image) : null;
+  const photo = servicePhotos[service.slug] ?? null;
   // A service for one kind of client preselects it on the enquiry form.
   const enquiryHref = service.sectors.length === 1 ? `/contact?project=${service.sectors[0]}` : "/contact";
   // Sections are numbered in the order they appear, since Work and Questions are not on every page.
@@ -82,7 +108,19 @@ export default async function ServicePage({ params }: PageProps<"/services/[slug
       {feature && featureProject ? (
         <section data-tone="light" className="bg-kapur text-ink" aria-label={`Photograph: ${featureProject.title}`}>
           <div className="page-x pb-[var(--section-space)]">
-            <Figure image={feature} aspect="21/9" sizes="100vw" />
+            {/* A band at 21:9 on wide screens; 16:9 on tablets and 3:2 on phones, so it never thins to a strip (services.css). */}
+            <div className="svc-feature" data-reveal="image">
+              <Image
+                src={feature.src}
+                alt={feature.alt}
+                fill
+                // The page's width inside its margins: a photograph narrower than the band covers it by its width.
+                sizes="92vw"
+                quality={78}
+                className="object-cover"
+                style={feature.focus ? { objectPosition: feature.focus } : undefined}
+              />
+            </div>
             <p className="t-caption mt-4 text-ink-muted">
               <span className="font-medium text-ink">{featureProject.title}</span>
               {/* The place, unless the project is named after it (Ampang). */}
@@ -155,9 +193,26 @@ export default async function ServicePage({ params }: PageProps<"/services/[slug
       {service.html ? (
         <section data-tone="light" className="bg-kapur text-ink">
           <div className="page-x pb-[var(--section-space)]">
-            <div className="page-grid">
+            {/* The text's first heading keeps its own space above it (prose-rouang), so the photograph needs little more. */}
+            <div className="page-grid gap-y-2">
+              {/* Beside the text, in the margin column the section labels use; above it on smaller screens. */}
+              {photo ? (
+                <div className="svc-aside col-span-12 lg:col-span-3 lg:row-start-1">
+                  <div className="svc-photo" data-reveal="image">
+                    <Image
+                      src={photo.src}
+                      alt={photo.alt}
+                      fill
+                      sizes={asideSizes(photo)}
+                      quality={78}
+                      className="object-cover"
+                      style={photo.focus ? { objectPosition: photo.focus } : undefined}
+                    />
+                  </div>
+                </div>
+              ) : null}
               <div
-                className="prose-rouang col-span-12 lg:col-span-7 lg:col-start-5"
+                className="prose-rouang col-span-12 lg:col-span-7 lg:col-start-5 lg:row-start-1"
                 dangerouslySetInnerHTML={{ __html: underSection(service.html) }}
               />
             </div>

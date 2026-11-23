@@ -197,7 +197,27 @@ in it slides vertically:
   leads it, and its vision and mission, all from the company profile. The profile states no values
   of its own, so the section gives none; "transparency, integrity and accountability" stays in the
   Mission, where p.3 puts it. The field drifts at half the pace of the type, so the light leaves
-  with the sentence. Tablets and phones: the two panels follow each other, still.
+  with the sentence. Round 5: the empty room to the right of *built* holds the client's exploded
+  drawing of a house, in Milky White line on the green: a generic drawing, decorative and
+  uncaptioned, never presented as a ROUANG project. It is placed and sized as in the client's
+  mockup: its lines run from 11.4% of the screen's height, just under the header, to 2.6% above the
+  foot (86% of the height), centred 70.9% across, with the drawing's own proportions. The mockup's
+  house is a redrawn copy about a quarter wider for its height; ours keeps the PDF's proportions, so
+  it matches the mockup's height and centre and is narrower. As the stage pins, the house comes
+  together in the middle (the client's direction of 19 Nov): the ground floor and its garden rise
+  onto the upper floor first, then the roof comes down as the floors rise a little to meet it, and
+  the guides shorten with the gaps until they are gone. The finished house stands on the middle of
+  the stage. It is complete before the sentence leaves, and leaves with it. A higher layer hides
+  what lies behind it by cutting it away, so the field and its grain show through and no flat patch
+  appears. The coming together is drawn on a canvas, from the line work, as the page scrolls: the
+  floors move in whole pixels and the roof is drawn from its outline at each step, so the lines stay
+  as sharp as the still drawing throughout. Round 5's first version moved masked layers in CSS
+  instead, which left the lines soft while the roof came down and then sharpened them with a jolt.
+  The rest of the scene's moves are set up only once the section is within a screen of the window,
+  so Chrome runs them on the compositor. Tablets and phones: the panels follow each other, and the
+  house follows *built* (beside it on a phone on its side, below it otherwise), whole by the time it
+  reaches the middle of the screen. Reduced motion and no JavaScript: the exploded drawing, still.
+  Without scroll-driven animation: the finished house, still.
 - **03 What we do.** Two doors, for homes and for businesses, either side of the three capabilities,
   which sit on one centre line in Rikyū Grey that runs the height of the composition. The door
   photographs are seen the same way, straight down a long room to its end (the Ampang corridor and

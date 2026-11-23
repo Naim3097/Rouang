@@ -1,0 +1,167 @@
+/* insights (round 6, 23 Nov 2026).
+   The articles' pictures, on the home page (InsightsList), the index (/insights) and each article.
+   One visual language: a picture in a frame of set proportions, the category line, then the title. */
+
+/* ——— The frame (InsightPicture) ———
+   The frame holds the proportions and the photograph covers it, around its focus point. Each use sets
+   its own ratio below, from the site's few: 3/2 and 4/3 on phones, 16/9 and 21/9 wide, 2/1 for
+   thumbnails. Without a photograph it is a quiet plate a step darker than the ground it sits on
+   (Milky White or the step-down grey of "Read next"). */
+.ins-frame {
+  position: relative;
+  width: 100%;
+  overflow: hidden;
+  aspect-ratio: 3 / 2;
+  background: color-mix(in oklab, var(--color-ink) 6%, transparent);
+}
+
+.ins-img {
+  transition: transform 0.6s var(--ease-brand);
+}
+
+.ins-plate {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  color: var(--color-ink);
+}
+
+.ins-plate-mark {
+  width: clamp(1.75rem, 14%, 3.25rem);
+  height: auto;
+  opacity: 0.14;
+}
+
+/* ——— A card: one link (.ins-link) around the words and the picture ———
+   The picture comes after the words in the markup, so the link is announced by its title, and is
+   moved before them on screen. Hovering brings the picture a little closer inside its frame while
+   the title eases as every link does (.link-name). Keyboard focus is the ring around the whole card,
+   with nothing moving. Reduced motion keeps the picture still. (.ins-card is the home page's
+   column; the index's rows lay out on the page grid instead.) */
+.ins-card {
+  display: flex;
+  flex-direction: column;
+}
+
+.ins-card > .ins-frame {
+  order: -1;
+}
+
+@media (hover: hover) and (prefers-reduced-motion: no-preference) {
+  .ins-link:hover .ins-img {
+    transform: scale(1.03);
+  }
+}
+
+/* ——— Home ———
+   The client's mockup: the latest article on the left, a little over half the width, with a wide
+   picture over its words; the next two as rows on the right, a thumbnail beside the title, parted by
+   hairlines, then the button. Tablets and phones stack them: the lead article full width, then the
+   two rows with the thumbnail at 40%. */
+.ins-home {
+  display: grid;
+  row-gap: 2.5rem;
+  padding-top: clamp(1.25rem, 1.8vw, 1.75rem);
+}
+
+.ins-frame-feature {
+  aspect-ratio: 3 / 2;
+  margin-bottom: 1.5rem;
+}
+
+.ins-home-row {
+  padding-block: 1.25rem;
+}
+
+.ins-home-row:first-child {
+  padding-top: 0;
+}
+
+.ins-card-row {
+  flex-direction: row;
+  align-items: flex-start;
+  gap: clamp(1rem, 1.8vw, 1.5rem);
+}
+
+.ins-card-words {
+  flex: 1 1 0;
+  min-width: 0;
+}
+
+.ins-frame-thumb {
+  flex: 0 0 40%;
+  aspect-ratio: 4 / 3;
+}
+
+.ins-home-more {
+  padding-top: 1.5rem;
+}
+
+/* Stacked, the rows open on a hairline of their own under the lead article. */
+@media (max-width: 63.999rem) {
+  .ins-home-side {
+    border-top: 1px solid color-mix(in oklab, var(--color-ink) 15%, transparent);
+    padding-top: 1.25rem;
+  }
+}
+
+@media (min-width: 40rem) {
+  .ins-frame-feature {
+    aspect-ratio: 16 / 9;
+  }
+
+  .ins-frame-thumb {
+    aspect-ratio: 2 / 1;
+  }
+}
+
+/* Side by side. Up to 1280px the rows' titles run to four or five lines, so the lead picture keeps
+   16/9 to stand as tall as they do; wider, it takes the mockup's long 21/9. */
+@media (min-width: 64rem) {
+  .ins-home {
+    grid-template-columns: minmax(0, 1.2fr) minmax(0, 1fr);
+    column-gap: clamp(2rem, 3.5vw, 3.5rem);
+  }
+
+  .ins-frame-thumb {
+    flex-basis: 46%;
+  }
+}
+
+@media (min-width: 80rem) {
+  .ins-frame-feature {
+    aspect-ratio: 21 / 9;
+  }
+}
+
+/* ——— Index (/insights) ———
+   One row per article, as before, now with its picture: 3/2 in the margin column under the page's
+   label, the words in the column under its title. Phones stack the picture over the words. */
+.ins-index-card {
+  align-items: start;
+  row-gap: 1.25rem;
+}
+
+.ins-index-card > .ins-frame {
+  order: -1;
+}
+
+/* ——— Article ———
+   The lead picture hangs under the title block from the title's own edge to the page margin: 4/3 on
+   phones, 16/9 wider, and never more than 60% of the screen's height on a desktop. */
+.ins-frame-lead {
+  aspect-ratio: 4 / 3;
+}
+
+@media (min-width: 40rem) {
+  .ins-frame-lead {
+    aspect-ratio: 16 / 9;
+  }
+}
+
+@media (min-width: 64rem) {
+  .ins-frame-lead {
+    max-height: min(60svh, 760px);
+  }
+}

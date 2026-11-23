@@ -614,6 +614,12 @@
 @import "../styles/home/inside.css";
 @import "../styles/home/process.css";
 
+/* ——— Inner pages: one stylesheet each (src/styles/pages), after the home page sections. ——— */
+@import "../styles/pages/services.css";
+@import "../styles/pages/about.css";
+@import "../styles/pages/insights.css";
+@import "../styles/pages/case-study.css";
+
 /* ——— Projects page: built work, then design proposals, each a plain grid of equal plates. ———
    The sector filter sets data-filter on their wrapper. A group left with nothing to show goes,
    heading and all; the gap between groups belongs to the wrapper, so it goes with it. */

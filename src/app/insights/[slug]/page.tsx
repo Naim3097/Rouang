@@ -2,6 +2,8 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { CurveRule } from "@/components/brand/Brand";
+import { insightImage, insightMeta } from "@/components/insights/imagery";
+import { InsightPicture } from "@/components/insights/InsightPicture";
 import { ButtonLink } from "@/components/ui/Button";
 import { Breadcrumbs } from "@/components/ui/Breadcrumbs";
 import { JsonLd } from "@/components/ui/JsonLd";
@@ -45,6 +47,9 @@ export default async function InsightPage({ params }: PageProps<"/insights/[slug
   const relatedServices = services.filter((s) => article.relatedServices.includes(s.slug));
   const relatedProjects = projects.filter((p) => article.relatedProjects.includes(p.slug));
   const more = all.filter((a) => a.slug !== article.slug).slice(0, 2);
+  const picture = insightImage(article.slug);
+  const moreImages = new Map(more.map((a) => [a.slug, insightImage(a.slug)]));
+  const morePictures = more.some((a) => moreImages.get(a.slug));
 
   return (
     <article>
@@ -71,6 +76,17 @@ export default async function InsightPage({ params }: PageProps<"/insights/[slug
                 · {article.readingMinutes} min read
               </p>
             </div>
+            {/* The article's picture, under the title block, from the title's edge to the page margin
+                (insights.css, "Article"). It illustrates the subject only, so it has no caption: it is
+                not the studio's work. */}
+            {picture ? (
+              <InsightPicture
+                image={picture}
+                lead
+                className="ins-frame-lead col-span-12 mt-4 sm:mt-8 lg:col-span-9 lg:col-start-4"
+                sizes="(min-width: 1024px) 68vw, 100vw"
+              />
+            ) : null}
           </div>
         </div>
       </header>
@@ -146,14 +162,24 @@ export default async function InsightPage({ params }: PageProps<"/insights/[slug
         <section data-tone="light" className="bg-kapur-deep text-ink" aria-label="More insights">
           <div className="page-x section-y">
             <Label className="mb-8 text-ink-muted">Read next</Label>
-            <ul className="grid gap-x-[var(--grid-gap)] border-t border-ink/15 sm:grid-cols-2">
+            {/* The home page's rows: a thumbnail beside the category line and the title. */}
+            <ul className="grid gap-x-[var(--grid-gap)] border-t border-ink/15 lg:grid-cols-2">
               {more.map((a) => (
                 <li key={a.slug} className="border-b border-ink/15">
-                  <Link href={`/insights/${a.slug}`} className="block py-8">
-                    <p className="t-label text-ink-muted">{a.category}</p>
-                    <p className="t-title mt-3">
-                      <span className="link-name">{a.title}</span>
-                    </p>
+                  <Link href={`/insights/${a.slug}`} className="ins-link ins-card ins-card-row py-8">
+                    <div className="ins-card-words">
+                      <p className="t-label text-ink-muted">{insightMeta(a, { readingTime: false })}</p>
+                      <p className="t-title mt-3">
+                        <span className="link-name">{a.title}</span>
+                      </p>
+                    </div>
+                    {morePictures ? (
+                      <InsightPicture
+                        image={moreImages.get(a.slug) ?? null}
+                        className="ins-frame-thumb"
+                        sizes="(min-width: 640px) 20vw, 40vw"
+                      />
+                    ) : null}
                   </Link>
                 </li>
               ))}
